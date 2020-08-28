@@ -14,28 +14,12 @@
  * limitations under the License.
  */
 
-package v1.models.domain
+package v1.models.request
 
-/**
-  * Represents a tax year for DES
-  *
-  * @param value the tax year string (where 2018 represents 2017-18)
-  */
-case class DesTaxYear(value: String) extends AnyVal {
-  override def toString: String = value
-}
+import play.api.mvc.AnyContentAsJson
+import uk.gov.hmrc.auth.core.Nino
+import v1.models.domain.SubmitEndOfPeriodBody
 
-object DesTaxYear {
+case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData
 
-  val taxYearStart: Int = 2
-  val taxYearEnd: Int = 5
-
-  /**
-    * @param taxYear tax year in MTD format (e.g. 2017-18)
-    */
-  def fromMtd(taxYear: String): DesTaxYear =
-    DesTaxYear(taxYear.take(taxYearStart) + taxYear.drop(taxYearEnd))
-
-  def fromDes(taxYear: String): DesTaxYear =
-    DesTaxYear((taxYear.toInt - 1) + "-" + taxYear.drop(2))
-}
+case class SubmitEndOfPeriodStatement(nino: Nino, submitEndOfPeriodBody: SubmitEndOfPeriodBody)

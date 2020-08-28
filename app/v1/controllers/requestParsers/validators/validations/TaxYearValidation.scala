@@ -25,8 +25,14 @@ object TaxYearValidation {
   def validate(taxYear: String): List[MtdError] = {
     if (taxYear.matches(taxYearFormat)) {
 
-      val start = taxYear.substring(2, 4).toInt
-      val end   = taxYear.substring(5, 7).toInt
+      val startTaxYearStart: Int = 2
+      val startTaxYearEnd: Int = 4
+
+      val endTaxYearStart: Int = 5
+      val endTaxYearEnd: Int = 7
+
+      val start = taxYear.substring(startTaxYearStart, startTaxYearEnd).toInt
+      val end   = taxYear.substring(endTaxYearStart, endTaxYearEnd).toInt
 
       if (end - start == 1) {
         NoValidationErrors

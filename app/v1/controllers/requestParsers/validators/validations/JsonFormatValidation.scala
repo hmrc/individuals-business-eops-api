@@ -22,6 +22,8 @@ import v1.models.errors.{MtdError, RuleIncorrectOrEmptyBodyError}
 
 object JsonFormatValidation {
 
+  val droppedErrors = 5
+
   def validate[A: OFormat](data: JsValue): List[MtdError] = {
     if (data == JsObject.empty) List(RuleIncorrectOrEmptyBodyError) else {
       data.validate[A] match {
@@ -40,7 +42,7 @@ object JsonFormatValidation {
 
     val logString = failures.groupBy(_.getClass)
       .values.map(failure => s"${failure.head.failureReason}: " + s"${failure.map(_.fromJsPath)}")
-      .toString().dropRight(1).drop(5)
+      .toString().dropRight(1).drop(droppedErrors)
 
     val logger: Logger = Logger(this.getClass)
     logger.warn(s"[JsonFormatValidation][validate] - Request body failed validation with errors - $logString")
