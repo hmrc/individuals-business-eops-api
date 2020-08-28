@@ -14,9 +14,23 @@
  * limitations under the License.
  */
 
-package v1.models.request.amendSample
+package utils
 
-import play.api.libs.json.JsValue
-import v1.models.request.RawData
+import java.time.LocalDate
 
-case class AmendSampleRawData(nino: String, taxYear: String, body: JsValue) extends RawData
+import v1.models.requestData.DesTaxYear
+
+object DateUtils {
+
+  def getDesTaxYear(dateProvided: Any): DesTaxYear = dateProvided match {
+    case taxYear: String => DesTaxYear.toYearYYYY(taxYear)
+    case current: LocalDate =>
+      val fiscalYearStartDate = LocalDate.parse(s"${current.getYear.toString}-04-05")
+
+      if(current.isAfter(fiscalYearStartDate)){
+        DesTaxYear((current.getYear + 1).toString)
+      } else {
+        DesTaxYear(current.getYear.toString)
+      }
+  }
+}

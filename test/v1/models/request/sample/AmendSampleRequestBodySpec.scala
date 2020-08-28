@@ -18,7 +18,7 @@ package v1.models.request.sample
 
 import play.api.libs.json._
 import support.UnitSpec
-import v1.models.request.amendSample.AmendSampleRequestBody
+import v1.models.requestData.amendSample.AmendSampleRequestBody
 import v1.models.utils.JsonErrorValidators
 
 class AmendSampleRequestBodySpec extends UnitSpec with JsonErrorValidators {

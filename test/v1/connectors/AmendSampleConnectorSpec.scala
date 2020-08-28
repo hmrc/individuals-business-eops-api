@@ -21,7 +21,8 @@ import uk.gov.hmrc.domain.Nino
 import v1.mocks.MockHttpClient
 import v1.models.domain.DesTaxYear
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.amendSample.{AmendSampleRequest, AmendSampleRequestBody}
+import v1.models.request.amendSample.AmendSampleRequest
+import v1.models.requestData.amendSample.{AmendSampleRequest, AmendSampleRequestBody}
 
 import scala.concurrent.Future
 

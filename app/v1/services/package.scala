@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
-package v1.models.request
+package v1
 
-trait RawData
+import v1.models.errors.ErrorWrapper
+import v1.models.outcomes.DesResponse
+
+package object services {
+//
+//  type DeletePensionChargesOutcome = Either[ErrorWrapper, DesResponse[Unit]]
+//
+//  type RetrievePensionChargesOutcome = Either[ErrorWrapper, DesResponse[RetrievePensionChargesResponse]]
+//
+//  type AmendPensionChargesOutcome = Either[ErrorWrapper, DesResponse[Unit]]
+
+}

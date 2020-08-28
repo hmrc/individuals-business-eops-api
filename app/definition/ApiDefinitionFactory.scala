@@ -26,7 +26,6 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
 
   private val readScope = "read:self-assessment"
   private val writeScope = "write:self-assessment"
-  private val logger: Logger = Logger(this.getClass)
 
   lazy val definition: Definition =
     Definition(
@@ -43,8 +42,8 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
         )
       ),
       api = APIDefinition(
-        name = "#mtd-api# (MTD)",
-        description = "#desc#",
+        name = "Individuals Charges (MTD)",
+        description = "This is a draft spec for the Individuals Charges API",
         context = appConfig.apiGatewayContext,
         categories = Seq("INCOME_TAX_MTD"),
         versions = Seq(
@@ -52,8 +51,7 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
             version = VERSION_1,
             access = buildWhiteListingAccess(),
             status = buildAPIStatus(VERSION_1),
-            endpointsEnabled = appConfig.endpointsEnabled(VERSION_1)
-          )
+            endpointsEnabled = appConfig.endpointsEnabled(VERSION_1))
         ),
         requiresTrust = None
       )
@@ -62,7 +60,7 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
   private[definition] def buildAPIStatus(version: String): APIStatus = {
     APIStatus.parser.lift(appConfig.apiStatus(version))
       .getOrElse {
-        logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
+        Logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
         APIStatus.ALPHA
       }
   }

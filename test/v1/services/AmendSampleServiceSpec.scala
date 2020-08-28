@@ -17,12 +17,12 @@
 package v1.services
 
 import uk.gov.hmrc.domain.Nino
-import v1.controllers.EndpointLogContext
 import v1.mocks.connectors.MockAmendSampleConnector
 import v1.models.domain.DesTaxYear
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.amendSample.{AmendSampleRequest, AmendSampleRequestBody}
+import v1.models.request.amendSample.AmendSampleRequest
+import v1.models.requestData.amendSample.{AmendSampleRequest, AmendSampleRequestBody}
 
 import scala.concurrent.Future
 

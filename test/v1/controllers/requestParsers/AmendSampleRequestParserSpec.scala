@@ -22,7 +22,8 @@ import uk.gov.hmrc.domain.Nino
 import v1.mocks.validators.MockAmendSampleValidator
 import v1.models.domain.DesTaxYear
 import v1.models.errors._
-import v1.models.request.amendSample.{AmendSampleRawData, AmendSampleRequest, AmendSampleRequestBody}
+import v1.models.request.amendSample.{AmendSampleRawData, AmendSampleRequest}
+import v1.models.requestData.amendSample.{AmendSampleRawData, AmendSampleRequest, AmendSampleRequestBody}
 
 class AmendSampleRequestParserSpec extends UnitSpec {
   val nino = "AA123456B"

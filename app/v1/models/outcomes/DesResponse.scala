@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-package v1.models.audit
+package v1.models.outcomes
 
-import play.api.libs.json.{Json, OWrites}
-
-case class SampleAuditResponse(httpStatus: Int, errors: Option[Seq[AuditError]])
-
-object SampleAuditResponse {
-  implicit val writes: OWrites[SampleAuditResponse] = Json.writes[SampleAuditResponse]
-}
+case class DesResponse[+T](correlationId: String, responseData: T)

@@ -27,7 +27,8 @@ import v1.models.audit.{AuditError, AuditEvent, SampleAuditDetail, SampleAuditRe
 import v1.models.domain.DesTaxYear
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.amendSample.{AmendSampleRawData, AmendSampleRequest, AmendSampleRequestBody}
+import v1.models.request.amendSample.{AmendSampleRawData, AmendSampleRequest}
+import v1.models.requestData.amendSample.{AmendSampleRawData, AmendSampleRequest, AmendSampleRequestBody}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-package v1.models.request.amendSample
+package utils
 
-import uk.gov.hmrc.domain.Nino
-import v1.models.domain.DesTaxYear
+import play.api.Logger
 
-case class AmendSampleRequest(nino: Nino, desTaxYear: DesTaxYear, body: AmendSampleRequestBody)
+object PagerDutyHelper {
+  val logger: Logger = Logger("PagerDutyLogger")
+
+  object PagerDutyKeys extends Enumeration {
+    val DES_INTERNAL_SERVER_ERROR: PagerDutyKeys.Value = Value
+    val DES_SERVICE_UNAVAILABLE: PagerDutyKeys.Value = Value
+    val DES_UNEXPECTED_RESPONSE: PagerDutyKeys.Value = Value
+  }
+
+  def pagerDutyLog(pagerDutyKey: PagerDutyKeys.Value, otherDetail: Option[String] = None): Unit = {
+    logger.error(s"$pagerDutyKey ${otherDetail.getOrElse("")}")
+  }
+}

@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
-package v1.models.request
+package v1.connectors
 
-case class DeleteRetrieveRawData(nino: String, taxYear: String) extends RawData
+import config.AppConfig
+import play.api.Logger
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.logging.Authorization
+
+trait DesConnector {
+
+  val logger = Logger(this.getClass)
+
+  def desHeaderCarrier(appConfig: AppConfig)(implicit hc: HeaderCarrier): HeaderCarrier =
+    hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
+      .withExtraHeaders("Environment" -> appConfig.desEnv)
+
+}

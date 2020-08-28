@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package v1.models.response.retrieveSample
+package v1.models.errors
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, OWrites, Reads}
-import utils.JsonUtils
+import play.api.libs.json._
 
-case class SampleObject (dateSubmitted: String, submissionItem: Option[SampleArrayItem])
+case class MtdError(code: String, message: String, paths: Option[Seq[String]] = None)
 
-object SampleObject extends JsonUtils {
-
-  implicit val reads: Reads[SampleObject] = (
-    (JsPath \ "dateSubmitted").read[String] and
-      (JsPath \ "submittedItems" \ "income").readNestedNullable[Seq[SampleArrayItem]](
-        filteredArrayReads("typeOfItem", "Type1")
-      ).mapHeadOption
-    ) (SampleObject.apply _)
-
-  implicit val writes: OWrites[SampleObject] = Json.writes[SampleObject]
+object MtdError {
+  implicit val writes: Writes[MtdError] = Json.writes[MtdError]
+  implicit val reads: Reads[MtdError] = (
+    (__ \ "code").read[String] and
+      (__ \ "reason").read[String] and
+      (__ \ "paths").readNullable[Seq[String]]
+    ) (MtdError.apply _)
 }

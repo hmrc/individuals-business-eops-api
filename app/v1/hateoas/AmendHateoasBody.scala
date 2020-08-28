@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers
+package v1.hateoas
 
-import javax.inject.Inject
-import uk.gov.hmrc.domain.Nino
-import v1.controllers.requestParsers.validators.DeleteRetrieveValidator
-import v1.models.domain.DesTaxYear
-import v1.models.request.{DeleteRetrieveRawData, DeleteRetrieveRequest}
+import config.AppConfig
+import play.api.libs.json.{JsValue, Json}
 
-class DeleteRetrieveRequestParser @Inject()(val validator: DeleteRetrieveValidator)
-  extends RequestParser[DeleteRetrieveRawData, DeleteRetrieveRequest] {
+trait AmendHateoasBody extends HateoasLinks {
 
-  override protected def requestFor(data: DeleteRetrieveRawData): DeleteRetrieveRequest =
-    DeleteRetrieveRequest(Nino(data.nino), DesTaxYear.fromMtd(data.taxYear))
+  def amendPensionsHateoasBody(appConfig: AppConfig, nino: String, taxYear: String): JsValue = {
+
+    val links = Seq(
+      getRetrievePensions(appConfig, nino, taxYear),
+      getAmendPensions(appConfig, nino, taxYear),
+      getDeletePensions(appConfig, nino, taxYear)
+    )
+
+    Json.obj("links" -> links)
+  }
 }

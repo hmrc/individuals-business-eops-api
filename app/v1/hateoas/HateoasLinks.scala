@@ -18,43 +18,29 @@ package v1.hateoas
 
 import config.AppConfig
 import v1.models.hateoas.Link
-import v1.models.hateoas.Method.{PUT, _}
-import v1.models.hateoas.RelType.{AMEND_SAMPLE_REL, DELETE_SAMPLE_REL, _}
+import v1.models.hateoas.Method._
+import v1.models.hateoas.RelType._
 
 trait HateoasLinks {
+  //Individuals Charges API Domain URIs
 
-  //Domain URIs
-  private def sampleUri(appConfig: AppConfig, nino: String, taxYear: String) =
-    s"/${appConfig.apiGatewayContext}/sample/$nino/$taxYear"
+  private def retrieveBaseUrl(appConfig: AppConfig, nino: String, taxYear: String): String =
+    s"/${appConfig.apiGatewayContext}/pensions/$nino/$taxYear"
 
-  //Sample links
-  def amendSample(appConfig: AppConfig, nino: String, taxYear: String): Link =
-    Link(
-      href = sampleUri(appConfig, nino, taxYear),
-      method = PUT,
-      rel = AMEND_SAMPLE_REL
-    )
+  private def deleteBaseUrl(appConfig: AppConfig, nino: String, taxYear: String) : String =
+    s"/${appConfig.apiGatewayContext}/pensions/$nino/$taxYear"
 
-  def retrieveSample(appConfig: AppConfig, nino: String, taxYear: String, isSelf: Boolean): Link =
-    if (isSelf) {
-      Link(
-        href = sampleUri(appConfig, nino, taxYear),
-        method = GET,
-        rel = SELF
-      )
-    }
-  else {
-      Link(
-        href = sampleUri(appConfig, nino, taxYear),
-        method = GET,
-        rel = RETRIEVE_SAMPLE_REL
-      )
-    }
+  private def amendBaseUrl(appConfig: AppConfig, nino: String, taxYear: String): String =
+    s"/${appConfig.apiGatewayContext}/pensions/$nino/$taxYear"
 
-  def deleteSample(appConfig: AppConfig, nino: String, taxYear: String): Link =
-    Link(
-      href = sampleUri(appConfig, nino, taxYear),
-      method = DELETE,
-      rel = DELETE_SAMPLE_REL
-    )
+  //Individual Charges API resource links
+
+  def getRetrievePensions(appConfig: AppConfig, nino: String, taxYear: String): Link =
+    Link(href = retrieveBaseUrl(appConfig, nino, taxYear), method = GET, rel = SELF)
+
+  def getDeletePensions(appConfig: AppConfig, nino: String, taxYear: String): Link =
+    Link(href = deleteBaseUrl(appConfig,nino, taxYear), method = DELETE, rel = DELETE_PENSION_CHARGES)
+
+  def getAmendPensions(appConfig: AppConfig, nino: String, taxYear: String): Link =
+    Link(href = amendBaseUrl(appConfig, nino, taxYear), method = PUT, rel = AMEND_PENSION_CHARGES)
 }

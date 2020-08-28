@@ -19,7 +19,6 @@ package v1.support
 import play.api.libs.json.{Format, Json}
 import support.UnitSpec
 import utils.Logging
-import v1.controllers.EndpointLogContext
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 

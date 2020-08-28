@@ -16,26 +16,31 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import v1.models.errors.{MtdError, RuleTaxYearRangeInvalidError, TaxYearFormatError}
+import v1.models.errors.{MtdError, RuleTaxYearRangeInvalid, TaxYearFormatError}
 
 object TaxYearValidation {
 
   val taxYearFormat = "20[1-9][0-9]\\-[1-9][0-9]"
 
   def validate(taxYear: String): List[MtdError] = {
-    if (taxYear.matches(taxYearFormat)) {
+    try {
+      if (taxYear.matches(taxYearFormat)) {
 
-      val start = taxYear.substring(2, 4).toInt
-      val end   = taxYear.substring(5, 7).toInt
+        //scalastyle:off
+        val start = taxYear.substring(2, 4).toInt
+        val end   = taxYear.substring(5, 7).toInt
+        //scalastyle:on
 
-      if (end - start == 1) {
-        NoValidationErrors
+        if (end - start == 1) {
+          NoValidationErrors
+        } else {
+          List(RuleTaxYearRangeInvalid)
+        }
       } else {
-        List(RuleTaxYearRangeInvalidError)
+        List(TaxYearFormatError)
       }
-    } else {
-      List(TaxYearFormatError)
+    }catch{
+      case e : NumberFormatException => List(TaxYearFormatError)
     }
   }
-
 }

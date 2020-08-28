@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package v1.models.request.amendSample
+package v1.models.audit
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, OWrites}
 
-case class AmendSampleRequestBody(data: String)
+case class GenericAuditDetail(
+                             userType: String,
+                             agentReferenceNumber: Option[String],
+                             nino: String,
+                             `X-CorrelationId`: String,
+                             response: AuditResponse
+                           )
 
-object AmendSampleRequestBody {
-  implicit val format: OFormat[AmendSampleRequestBody] = Json.format[AmendSampleRequestBody]
+object GenericAuditDetail {
+  implicit val writes: OWrites[GenericAuditDetail] = Json.writes[GenericAuditDetail]
 }
+

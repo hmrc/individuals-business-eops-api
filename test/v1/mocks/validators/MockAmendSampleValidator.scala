@@ -18,9 +18,8 @@ package v1.mocks.validators
 
 import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
-import v1.controllers.requestParsers.validators.AmendSampleValidator
 import v1.models.errors.MtdError
-import v1.models.request.amendSample.AmendSampleRawData
+import v1.models.requestData.amendSample.AmendSampleRawData
 
 trait MockAmendSampleValidator extends MockFactory {
 

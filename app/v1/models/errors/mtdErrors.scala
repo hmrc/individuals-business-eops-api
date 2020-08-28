@@ -18,25 +18,13 @@ package v1.models.errors
 
 import play.api.libs.json.{Json, Writes}
 
-case class MtdError(code: String, message: String, paths: Option[Seq[String]] = None)
-
-object MtdError {
-  implicit val writes: Writes[MtdError] = Json.writes[MtdError]
-}
-
 object NinoFormatError extends MtdError("FORMAT_NINO", "The provided NINO is invalid")
 object TaxYearFormatError extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid")
+object RuleTaxYearRangeInvalid extends MtdError("RULE_TAX_YEAR_RANGE_INVALID", "Tax year range invalid. A tax year range of one year is required")
 
 // Rule Errors
-object RuleTaxYearNotSupportedError extends MtdError(
-  code = "RULE_TAX_YEAR_NOT_SUPPORTED",
-  message = "Tax year not supported, because it precedes the earliest allowable tax year"
-)
-
-object RuleTaxYearRangeInvalidError extends MtdError(
-  code = "RULE_TAX_YEAR_RANGE_INVALID",
-  message = "Tax year range invalid. A tax year range of one year is required"
-)
+object RuleTaxYearNotSupportedError extends MtdError( "RULE_TAX_YEAR_NOT_SUPPORTED",
+  "Tax year not supported, because it precedes the earliest allowable tax year")
 
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
 

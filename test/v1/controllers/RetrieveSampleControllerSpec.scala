@@ -21,7 +21,6 @@ import play.api.mvc.Result
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.fixtures.RetrieveSampleControllerFixture
-import v1.hateoas.HateoasLinks
 import v1.mocks.hateoas.MockHateoasFactory
 import v1.mocks.requestParsers.MockDeleteRetrieveRequestParser
 import v1.mocks.services.{MockDeleteRetrieveService, MockEnrolmentsAuthService, MockMtdIdLookupService}
@@ -31,7 +30,8 @@ import v1.models.hateoas.Method.{DELETE, GET, PUT}
 import v1.models.hateoas.RelType.{AMEND_SAMPLE_REL, DELETE_SAMPLE_REL, SELF}
 import v1.models.hateoas.{HateoasWrapper, Link}
 import v1.models.outcomes.ResponseWrapper
-import v1.models.request.{DeleteRetrieveRawData, DeleteRetrieveRequest}
+import v1.models.request.DeleteRetrieveRequest
+import v1.models.requestData.{DeleteRetrieveRawData, DeleteRetrieveRequest}
 import v1.models.response.retrieveSample._
 
 import scala.concurrent.ExecutionContext.Implicits.global
