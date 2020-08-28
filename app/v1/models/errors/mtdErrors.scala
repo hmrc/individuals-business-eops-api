@@ -31,7 +31,7 @@ object BusinessIdFormatError extends MtdError("FORMAT_BUSINESS_ID","The provided
 object StartDateFormatError extends MtdError("FORMAT_START_DATE","The provided Start date is invalid")
 object EndDateFormatError extends MtdError("FORMAT_END_DATE","The provided From date is invalid")
 object FinalisedFormatError extends MtdError("FORMAT_FINALISED","The provided Finalised value is invalid")
-object RangeEndDateBeforeStartDateError extends MtdError("RANGE_END_DATE_BEFORE_START_DATE","The End date must be after the Start date\n")
+object RangeEndDateBeforeStartDateError extends MtdError("RANGE_END_DATE_BEFORE_START_DATE","The End date must be after the Start date")
 
 
 // Rule Errors
@@ -63,7 +63,7 @@ object RuleClass4PensionAge extends MtdError("RULE_CLASS4_PENSION_AGE",
   "Class 4 exemption is not allowed because the individual’s age is less than their State Pension age on the 6th April of the current tax year")
 object RuleFHLPrivateUseAdjustment extends MtdError("RULE_FHL_PRIVATE_USE_ADJUSTMENT",
   "For UK Furnished Holiday Lettings, the private use adjustment must not exceed the total allowable expenses")
-object RuleNonFHLPrivateUseAdjustment extends MtdError("RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT\t",
+object RuleNonFHLPrivateUseAdjustment extends MtdError("RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT",
   "For UK non-Furnished Holiday Lettings, the private use adjustment must not exceed the total allowable expenses")
 //Standard Errors
 object NotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found")
