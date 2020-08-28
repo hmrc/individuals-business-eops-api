@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package v1.mocks.validators
+package v1.models.errors
 
-import org.scalamock.handlers.CallHandler1
-import org.scalamock.scalatest.MockFactory
-import v1.models.errors.MtdError
-import v1.models.requestData.amendSample.AmendSampleRawData
+import play.api.libs.json.Json
+import support.UnitSpec
 
-trait MockAmendSampleValidator extends MockFactory {
+class ErrorSpec extends UnitSpec{
 
-  val mockAmendSampleValidator: AmendSampleValidator = mock[AmendSampleValidator]
+  "reads" should {
+    val error = MtdError("FORMAT_NINO", "The provided NINO is invalid")
 
-  object MockAmendSampleValidator {
+    val json = Json.parse(
+      """
+        |{
+        |   "code": "FORMAT_NINO",
+        |   "reason": "The provided NINO is invalid"
+        |}
+      """.stripMargin
+    )
 
-    def validate(data: AmendSampleRawData): CallHandler1[AmendSampleRawData, List[MtdError]] = {
-      (mockAmendSampleValidator
-        .validate(_: AmendSampleRawData))
-        .expects(data)
+    "generate the correct JSON" in {
+      json.as[MtdError] shouldBe error
     }
   }
 }

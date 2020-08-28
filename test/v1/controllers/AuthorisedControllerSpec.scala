@@ -23,11 +23,13 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService}
 import v1.models.errors._
+import v1.services.{EnrolmentsAuthService, MtdIdLookupService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthorisedControllerSpec extends ControllerBaseSpec {
+class
+AuthorisedControllerSpec extends ControllerBaseSpec {
 
   trait Test extends MockEnrolmentsAuthService with MockMtdIdLookupService {
     val hc = HeaderCarrier()

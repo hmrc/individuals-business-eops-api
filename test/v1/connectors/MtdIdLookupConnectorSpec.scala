@@ -32,6 +32,8 @@ class MtdIdLookupConnectorSpec extends ConnectorSpec {
     MockedAppConfig.mtdIdBaseUrl returns baseUrl
   }
 
+  lazy val baseUrl = "test-mtdIdBaseUrl"
+
   val nino = "test-nino"
   val mtdId = "test-mtdId"
 
