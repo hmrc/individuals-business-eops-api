@@ -26,6 +26,13 @@ object MtdError {
 
 object NinoFormatError extends MtdError("FORMAT_NINO", "The provided NINO is invalid")
 object TaxYearFormatError extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid")
+object TypeOfBusinessFormatError extends MtdError("FORMAT_TYPE_OF_BUSINESS","The provided type of business is invalid")
+object BusinessIdFormatError extends MtdError("FORMAT_BUSINESS_ID","The provided Business ID is invalid")
+object StartDateFormatError extends MtdError("FORMAT_START_DATE","The provided Start date is invalid")
+object EndDateFormatError extends MtdError("FORMAT_END_DATE","The provided From date is invalid")
+object FinalisedFormatError extends MtdError("FORMAT_FINALISED","The provided Finalised value is invalid")
+object RangeEndDateBeforeStartDateError extends MtdError("RANGE_END_DATE_BEFORE_START_DATE","The End date must be after the Start date")
+
 
 // Rule Errors
 object RuleTaxYearNotSupportedError extends MtdError(
@@ -39,7 +46,25 @@ object RuleTaxYearRangeInvalidError extends MtdError(
 )
 
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
-
+object RuleNotFinalisedError extends MtdError("RULE_NOT_FINALISED","Finalised must be set to true")
+object RuleAlreadySubmittedError extends MtdError("RULE_ALREADY_SUBMITTED","An End of Period Statement already exists for this business' accounting period.")
+object RuleEarlySubmissionError extends MtdError("RULE_EARLY_SUBMISSION",
+  "An End Of Period Statement cannot be submitted before the end of the accounting period.")
+object RuleLateSubmissionError extends MtdError("RULE_LATE_SUBMISSION", "The period to finalise has passed")
+object RuleNonMatchingPeriodError extends MtdError("RULE_NON_MATCHING_PERIOD",
+  "An End of Period Statement without a matching accounting period cannot be submitted")
+object RuleConsolidatedExpensesError extends MtdError("RULE_CONSOLIDATED_EXPENSES","Consolidated expenses not allowed, threshold exceeded")
+object RuleMismatchedStartDateError extends MtdError("RULE_MISMATCHED_START_DATE",
+  "The period submission start date must match the accounting period start date")
+object RuleMismatchedEndDateError extends MtdError("RULE_MISMATCHED_END_DATE","The period submission end date must match the accounting period end date")
+object RuleClass4Over16Error extends MtdError("RULE_CLASS4_OVER_16",
+  "Class 4 exemption is not allowed because the individual’s age is greater than or equal to 16 years old on the 6th April of the current tax year")
+object RuleClass4PensionAge extends MtdError("RULE_CLASS4_PENSION_AGE",
+  "Class 4 exemption is not allowed because the individual’s age is less than their State Pension age on the 6th April of the current tax year")
+object RuleFHLPrivateUseAdjustment extends MtdError("RULE_FHL_PRIVATE_USE_ADJUSTMENT",
+  "For UK Furnished Holiday Lettings, the private use adjustment must not exceed the total allowable expenses")
+object RuleNonFHLPrivateUseAdjustment extends MtdError("RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT",
+  "For UK non-Furnished Holiday Lettings, the private use adjustment must not exceed the total allowable expenses")
 //Standard Errors
 object NotFoundError extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found")
 
