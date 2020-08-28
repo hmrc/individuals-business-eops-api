@@ -18,6 +18,6 @@ package v1.models.domain
 
 import v1.models.des.TypeOfBusiness
 
-case class SubmitEndOfPeriodBody(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod)
+case class SubmitEndOfPeriodBody(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
 
-case class AccountingPeriod(startDate: String, endDate: String, finalised: Boolean)
+case class AccountingPeriod(startDate: String, endDate: String)
