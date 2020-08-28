@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.models.des
+
 
 import play.api.libs.json._
-import v1.models.errors.MtdError
+import utils.enums.Enums
 
-object JsonFormatValidation {
+//scalastyle:off
 
-  def validate[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _               => List(error)
-    }
-  }
+sealed trait TypeOfBusiness
 
+object TypeOfBusiness {
+
+  case object `self-employment` extends TypeOfBusiness
+
+  case object `uk-property` extends TypeOfBusiness
+
+  case object `foreign-property` extends TypeOfBusiness
+
+  implicit val format: Format[TypeOfBusiness] = Enums.format[TypeOfBusiness]
 }

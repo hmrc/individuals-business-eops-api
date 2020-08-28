@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.models.requestData
 
-import play.api.libs.json._
-import v1.models.errors.MtdError
+import v1.models.des.TypeOfBusiness
 
-object JsonFormatValidation {
+case class SubmitEndOfPeriodBody(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
 
-  def validate[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _               => List(error)
-    }
-  }
-
-}
+case class AccountingPeriod(startDate: String, endDate: String)

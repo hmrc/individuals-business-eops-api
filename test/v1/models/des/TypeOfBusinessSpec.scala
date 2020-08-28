@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.models.des
 
-import play.api.libs.json._
-import v1.models.errors.MtdError
+import support.UnitSpec
+import utils.enums.EnumJsonSpecSupport
+import v1.models.des.TypeOfBusiness.{`foreign-property`, `self-employment`, `uk-property`}
 
-object JsonFormatValidation {
+class TypeOfBusinessSpec extends UnitSpec with EnumJsonSpecSupport{
 
-  def validate[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _               => List(error)
-    }
-  }
+  testRoundTrip[TypeOfBusiness](("self-employment",`self-employment` ), ("uk-property", `uk-property`),("foreign-property",`foreign-property`))
 
 }

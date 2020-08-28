@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers.validators.validations
+package v1.models.requestData
 
-import play.api.libs.json._
-import v1.models.errors.MtdError
+import play.api.mvc.AnyContentAsJson
+import uk.gov.hmrc.auth.core.Nino
+import v1.models.requestData.SubmitEndOfPeriodBody
 
-object JsonFormatValidation {
+case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData
 
-  def validate[A](data: JsValue, error: MtdError)(implicit reads: Reads[A]): List[MtdError] = {
-    data.validate[A] match {
-      case JsSuccess(_, _) => NoValidationErrors
-      case _               => List(error)
-    }
-  }
-
-}
+case class SubmitEndOfPeriodStatement(nino: Nino, submitEndOfPeriodBody: SubmitEndOfPeriodBody)
