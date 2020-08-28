@@ -20,7 +20,8 @@ import v1.models.errors.ErrorWrapper
 import v1.models.outcomes.DesResponse
 
 package object services {
-//
+//TODO UPDATE FOR THIS API
+
 //  type DeletePensionChargesOutcome = Either[ErrorWrapper, DesResponse[Unit]]
 //
 //  type RetrievePensionChargesOutcome = Either[ErrorWrapper, DesResponse[RetrievePensionChargesResponse]]

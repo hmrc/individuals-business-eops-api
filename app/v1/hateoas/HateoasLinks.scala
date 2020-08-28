@@ -22,6 +22,9 @@ import v1.models.hateoas.Method._
 import v1.models.hateoas.RelType._
 
 trait HateoasLinks {
+
+  //TODO UPDATE FOR THIS API
+
   //Individuals Charges API Domain URIs
 
   private def retrieveBaseUrl(appConfig: AppConfig, nino: String, taxYear: String): String =

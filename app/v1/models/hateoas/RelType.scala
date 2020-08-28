@@ -17,6 +17,7 @@
 package v1.models.hateoas
 
 object RelType {
+  //TODO UPDATE FOR THIS API
   val DELETE_PENSION_CHARGES = "delete-charges-pensions"
   val AMEND_PENSION_CHARGES = "amend-charges-pensions"
   val SELF = "self"
