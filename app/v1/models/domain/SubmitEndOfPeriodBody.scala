@@ -16,26 +16,8 @@
 
 package v1.models.domain
 
-/**
-  * Represents a tax year for DES
-  *
-  * @param value the tax year string (where 2018 represents 2017-18)
-  */
-case class DesTaxYear(value: String) extends AnyVal {
-  override def toString: String = value
-}
+import v1.models.des.TypeOfBusiness
 
-object DesTaxYear {
+case class SubmitEndOfPeriodBody(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
 
-  val taxYearStart: Int = 2
-  val taxYearEnd: Int = 5
-
-  /**
-    * @param taxYear tax year in MTD format (e.g. 2017-18)
-    */
-  def fromMtd(taxYear: String): DesTaxYear =
-    DesTaxYear(taxYear.take(taxYearStart) + taxYear.drop(taxYearEnd))
-
-  def fromDes(taxYear: String): DesTaxYear =
-    DesTaxYear((taxYear.toInt - 1) + "-" + taxYear.drop(2))
-}
+case class AccountingPeriod(startDate: String, endDate: String)
