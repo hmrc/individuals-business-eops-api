@@ -40,7 +40,7 @@ class DocumentationControllerISpec extends IntegrationBaseSpec {
     |   "api":{
     |      "name":"#mtd-api# (MTD)",
     |      "description":"#desc#",
-    |      "context":"mtd/template",
+    |      "context":"individuals/business/end-of-period-statement",
     |      "categories":[
     |         "INCOME_TAX_MTD"
     |      ],
