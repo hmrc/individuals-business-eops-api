@@ -27,11 +27,14 @@ case class DesTaxYear(value: String) extends AnyVal {
 
 object DesTaxYear {
 
+  val taxYearStart: Int = 2
+  val taxYearEnd: Int = 5
+
   /**
     * @param taxYear tax year in MTD format (e.g. 2017-18)
     */
   def fromMtd(taxYear: String): DesTaxYear =
-    DesTaxYear(taxYear.take(2) + taxYear.drop(5))
+    DesTaxYear(taxYear.take(taxYearStart) + taxYear.drop(taxYearEnd))
 
   def fromDes(taxYear: String): DesTaxYear =
     DesTaxYear((taxYear.toInt - 1) + "-" + taxYear.drop(2))

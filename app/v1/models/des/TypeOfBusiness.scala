@@ -20,6 +20,8 @@ package v1.models.des
 import play.api.libs.json._
 import utils.enums.Enums
 
+//scalastyle:off
+
 sealed trait TypeOfBusiness
 
 object TypeOfBusiness {
