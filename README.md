@@ -1,7 +1,7 @@
 
 # individuals-business-eops-api
 
-This is a placeholder README.md for a new repository
+sbt "run 7785"
 
 ### License
 
