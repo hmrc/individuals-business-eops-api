@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-package v1.models.domain
+package data
 
-import v1.models.des.TypeOfBusiness
+import v1.models.des.TypeOfBusiness.`foreign-property`
+import v1.models.domain.{AccountingPeriod, SubmitEndOfPeriod}
 
-case class SubmitEndOfPeriod(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
+object SubmitEndOfPeriodStatementData {
 
-case class AccountingPeriod(startDate: String, endDate: String)
+
+  val validRequest: SubmitEndOfPeriod = (
+    SubmitEndOfPeriod(`foreign-property`, "XAIS12345678910", accountingPeriod = AccountingPeriod(
+      "2021-04-06","2022-04-05"
+    ),finalised = true)
+  )
+
+
+
+
+
+}

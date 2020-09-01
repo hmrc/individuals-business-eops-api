@@ -17,9 +17,9 @@
 package v1.models.request
 
 import play.api.mvc.AnyContentAsJson
-import uk.gov.hmrc.auth.core.Nino
-import v1.models.domain.SubmitEndOfPeriodBody
+import uk.gov.hmrc.domain.Nino
+import v1.models.domain.SubmitEndOfPeriod
 
 case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData
 
-case class SubmitEndOfPeriodStatement(nino: Nino, submitEndOfPeriodBody: SubmitEndOfPeriodBody)
+case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod)
