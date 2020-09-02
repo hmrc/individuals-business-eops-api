@@ -17,9 +17,8 @@
 package v1.models.hateoas
 
 object RelType {
-  val AMEND_SAMPLE_REL = "amend-sample-rel"
-  val RETRIEVE_SAMPLE_REL = "retrieve-sample-rel"
-  val DELETE_SAMPLE_REL = "delete-sample-rel"
-
+  //TODO UPDATE FOR THIS API
+  val DELETE_PENSION_CHARGES = "delete-charges-pensions"
+  val AMEND_PENSION_CHARGES = "amend-charges-pensions"
   val SELF = "self"
 }

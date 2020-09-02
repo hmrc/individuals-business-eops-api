@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.models.requestData
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+import play.api.libs.json.{Json, OFormat}
+import v1.models.des.TypeOfBusiness
+
+case class SubmitEndOfPeriod(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
+
+object SubmitEndOfPeriod {
+  implicit val format: OFormat[SubmitEndOfPeriod] = Json.format[SubmitEndOfPeriod]
+}
+
+case class AccountingPeriod(startDate: String, endDate: String)
+
+object AccountingPeriod {
+  implicit val format: OFormat[AccountingPeriod] = Json.format[AccountingPeriod]
+}

@@ -14,9 +14,27 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.models.errors
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+import play.api.libs.json.Json
+import support.UnitSpec
+
+class ErrorSpec extends UnitSpec{
+
+  "reads" should {
+    val error = MtdError("FORMAT_NINO", "The provided NINO is invalid")
+
+    val json = Json.parse(
+      """
+        |{
+        |   "code": "FORMAT_NINO",
+        |   "reason": "The provided NINO is invalid"
+        |}
+      """.stripMargin
+    )
+
+    "generate the correct JSON" in {
+      json.as[MtdError] shouldBe error
+    }
+  }
+}

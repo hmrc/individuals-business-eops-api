@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.models.requestData
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+import play.api.libs.json.{Json, OFormat}
+import play.api.mvc.AnyContentAsJson
+import uk.gov.hmrc.domain.Nino
+
+case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData
+
+case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod)
+
+object SubmitEndOfPeriodStatementRequest {
+  implicit val format: OFormat[SubmitEndOfPeriodStatementRequest] = Json.format[SubmitEndOfPeriodStatementRequest]
+}
+

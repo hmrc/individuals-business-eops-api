@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.hateoas
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+import config.AppConfig
+import play.api.libs.json.{JsValue, Json}
+
+trait AmendHateoasBody extends HateoasLinks {
+
+  //TODO UPDATE FOR THIS API
+  def amendPensionsHateoasBody(appConfig: AppConfig, nino: String, taxYear: String): JsValue = {
+
+    val links = Seq(
+      getRetrievePensions(appConfig, nino, taxYear),
+      getAmendPensions(appConfig, nino, taxYear),
+      getDeletePensions(appConfig, nino, taxYear)
+    )
+
+    Json.obj("links" -> links)
+  }
+}

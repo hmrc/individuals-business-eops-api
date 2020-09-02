@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.models.audit
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+import play.api.libs.json.{Json, OWrites}
+
+case class GenericAuditDetail(
+                             userType: String,
+                             agentReferenceNumber: Option[String],
+                             nino: String,
+                             `X-CorrelationId`: String,
+                             response: AuditResponse
+                           )
+
+object GenericAuditDetail {
+  implicit val writes: OWrites[GenericAuditDetail] = Json.writes[GenericAuditDetail]
+}
+

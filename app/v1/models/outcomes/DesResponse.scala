@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.models.outcomes
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+case class DesResponse[+T](correlationId: String, responseData: T)

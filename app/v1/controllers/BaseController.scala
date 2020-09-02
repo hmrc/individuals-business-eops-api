@@ -18,40 +18,37 @@ package v1.controllers
 
 import java.util.UUID
 
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Result
-import utils.Logging
 import v1.models.errors.ErrorWrapper
 
 trait BaseController {
-  self: Logging =>
+
+  protected val logger = Logger(this.getClass)
 
   implicit class Response(result: Result) {
 
     def withApiHeaders(correlationId: String, responseHeaders: (String, String)*): Result = {
 
       val newHeaders: Seq[(String, String)] = responseHeaders ++ Seq(
-        "X-CorrelationId" -> correlationId,
-        "X-Content-Type-Options" -> "nosniff",
-        "Content-Type" -> "application/json"
+        "X-CorrelationId"        -> correlationId,
+        "X-Content-Type-Options" -> "nosniff"
       )
 
       result.copy(header = result.header.copy(headers = result.header.headers ++ newHeaders))
     }
   }
 
-  protected def getCorrelationId(errorWrapper: ErrorWrapper)(implicit endpointLogContext: EndpointLogContext): String = {
+  protected def getCorrelationId(errorWrapper: ErrorWrapper): String = {
     errorWrapper.correlationId match {
-      case Some(correlationId) =>
-        logger.info(
-          s"[${endpointLogContext.controllerName}][getCorrelationId] - " +
-            s"Error received from DES ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
+      case Some(correlationId) => logger.info(s"[${logger.underlyingLogger}] - " +
+        s"Error received from DES ${Json.toJson(errorWrapper)} with correlationId: $correlationId")
         correlationId
       case None =>
         val correlationId = UUID.randomUUID().toString
-        logger.info(
-          s"[${endpointLogContext.controllerName}][getCorrelationId] - " +
-            s"Validation error: ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
+        logger.info(s"[${getClass.getSimpleName}] -" +
+          s"Validation error: ${Json.toJson(errorWrapper)} with correlationId: $correlationId")
         correlationId
     }
   }

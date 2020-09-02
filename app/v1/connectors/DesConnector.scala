@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.connectors
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+import config.AppConfig
+import play.api.Logger
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.logging.Authorization
+
+trait DesConnector {
+
+  val logger = Logger(this.getClass)
+
+  def desHeaderCarrier(appConfig: AppConfig)(implicit hc: HeaderCarrier): HeaderCarrier =
+    hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
+      .withExtraHeaders("Environment" -> appConfig.desEnv)
+
+}

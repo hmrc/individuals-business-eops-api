@@ -22,9 +22,10 @@ import v1.models.errors.{MtdError, RuleIncorrectOrEmptyBodyError}
 
 object JsonFormatValidation {
 
+  //TODO Look into what this is for
   val droppedErrors = 5
 
-  def validate[A: OFormat](data: JsValue): List[MtdError] = {
+  def validate[A: OFormat](data: JsValue, jsonValidation: Option[JsValue => List[MtdError]] = None): List[MtdError] = {
     if (data == JsObject.empty) List(RuleIncorrectOrEmptyBodyError) else {
       data.validate[A] match {
         case JsSuccess(body, _) => if (Json.toJson(body) == JsObject.empty) List(RuleIncorrectOrEmptyBodyError) else NoValidationErrors
@@ -46,16 +47,14 @@ object JsonFormatValidation {
 
     val logger: Logger = Logger(this.getClass)
     logger.warn(s"[JsonFormatValidation][validate] - Request body failed validation with errors - $logString")
+
     List(RuleIncorrectOrEmptyBodyError.copy(paths = Some(failures.map(_.fromJsPath))))
   }
 
   private class JsonFormatValidationFailure(path: JsPath, failure: String) {
     val failureReason: String = this.failure
 
-    def fromJsPath: String = this.path
-      .toString()
-      .replace("(", "/")
-      .replace(")", "")
+    def fromJsPath: String = this.path.toString().replace("(", "/").replace(")", "")
   }
 
   private case class MissingMandatoryField(path: JsPath) extends JsonFormatValidationFailure(path, "Missing mandatory field")

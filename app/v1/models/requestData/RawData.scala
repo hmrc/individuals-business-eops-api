@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package v1.controllers
+package v1.models.requestData
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+trait RawData
