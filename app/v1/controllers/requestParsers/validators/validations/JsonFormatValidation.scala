@@ -29,7 +29,11 @@ object JsonFormatValidation {
     if (data == JsObject.empty) List(RuleIncorrectOrEmptyBodyError) else {
       data.validate[A] match {
         case JsSuccess(body, _) => if (Json.toJson(body) == JsObject.empty) List(RuleIncorrectOrEmptyBodyError) else NoValidationErrors
-        case JsError(errors: Seq[(JsPath, Seq[JsonValidationError])]) => handleErrors(errors)
+        case JsError(errors: Seq[(JsPath, Seq[JsonValidationError])]) =>
+
+          val jsonFormatErrors: List[MtdError] = jsonValidation.map(jsonFormatValidation => jsonFormatValidation(data)).getOrElse(NoValidationErrors)
+
+          if(jsonFormatErrors.nonEmpty) jsonFormatErrors else handleErrors(errors)
       }
     }
   }
