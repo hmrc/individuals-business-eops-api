@@ -16,11 +16,12 @@
 
 package v1.connectors
 
-import data.SubmitEndOfPeriodStatementData.validRequest
+import data.SubmitEndOfPeriodStatementData._
 import mocks.MockAppConfig
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Nino
 import v1.mocks.MockHttpClient
+import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.SubmitEndOfPeriodStatementRequest
 
@@ -29,12 +30,6 @@ import scala.concurrent.Future
 class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
   val nino = "AA123456A"
-  val incomeSourceType = "self-employment"
-  val accountingPeriodStartDate = "2021-04-06"
-  val accountingPeriodEndDate = "2022-04-05"
-  val incomeSourceId = "XAIS12345678910"
-
-
 
   class Test extends MockHttpClient with MockAppConfig {
     val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(http = mockHttpClient, appConfig = mockAppConfig)
@@ -64,4 +59,40 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         )) shouldBe expected
       }
     }
-  }}
+
+    "a request returning a single error" should {
+      "return an unsuccessful response with the correct correlationId and a single error" in new Test {
+        val expected = Left(ResponseWrapper(correlationId, SingleError(NinoFormatError)))
+
+        MockedHttpClient
+          .post(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+          Json.toJson("{}"), desRequestHeaders: _ *)
+          .returns(Future.successful(expected))
+
+        await(connector.submitPeriodStatement(
+          SubmitEndOfPeriodStatementRequest(
+            nino = Nino(nino),
+            validRequest)
+        )) shouldBe expected
+      }
+    }
+    "a request returning multiple errors" should {
+      "return an unsuccessful response with the correct correlationId and multiple errors" in new Test {
+        val expected = Left(ResponseWrapper(correlationId, MultipleErrors(Seq(NinoFormatError, DownstreamError))))
+
+        MockedHttpClient
+          .post(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+            Json.toJson("{}"), desRequestHeaders: _ *)
+          .returns(Future.successful(expected))
+
+        await(connector.submitPeriodStatement(
+          SubmitEndOfPeriodStatementRequest(
+            nino = Nino(nino),
+            validRequest)
+        )) shouldBe expected
+      }
+    }
+  }
+  }

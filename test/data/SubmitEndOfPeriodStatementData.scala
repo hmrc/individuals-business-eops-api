@@ -16,20 +16,18 @@
 
 package data
 
+import v1.models.des.TypeOfBusiness
 import v1.models.des.TypeOfBusiness.`foreign-property`
 import v1.models.domain.{AccountingPeriod, SubmitEndOfPeriod}
 
 object SubmitEndOfPeriodStatementData {
 
+  val incomeSourceType : TypeOfBusiness = `foreign-property`
+  val accountingPeriodStartDate = "2021-04-06"
+  val accountingPeriodEndDate = "2022-04-05"
+  val incomeSourceId = "XAIS12345678910"
 
-  val validRequest: SubmitEndOfPeriod = (
-    SubmitEndOfPeriod(`foreign-property`, "XAIS12345678910", accountingPeriod = AccountingPeriod(
-      "2021-04-06","2022-04-05"
-    ),finalised = true)
-  )
-
-
-
-
-
+  val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(`foreign-property`, "XAIS12345678910", accountingPeriod = AccountingPeriod(
+    "2021-04-06","2022-04-05"
+  ),finalised = true)
 }
