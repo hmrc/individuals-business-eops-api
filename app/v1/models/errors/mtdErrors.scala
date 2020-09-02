@@ -18,14 +18,10 @@ package v1.models.errors
 
 import play.api.libs.json.{Json, Writes}
 
-case class MtdError(code: String, message: String, paths: Option[Seq[String]] = None)
-
-object MtdError {
-  implicit val writes: Writes[MtdError] = Json.writes[MtdError]
-}
-
 object NinoFormatError extends MtdError("FORMAT_NINO", "The provided NINO is invalid")
 object TaxYearFormatError extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid")
+object RuleTaxYearRangeInvalid extends MtdError("RULE_TAX_YEAR_RANGE_INVALID", "Tax year range invalid. A tax year range of one year is required")
+
 object TypeOfBusinessFormatError extends MtdError("FORMAT_TYPE_OF_BUSINESS","The provided type of business is invalid")
 object BusinessIdFormatError extends MtdError("FORMAT_BUSINESS_ID","The provided Business ID is invalid")
 object StartDateFormatError extends MtdError("FORMAT_START_DATE","The provided Start date is invalid")
@@ -33,17 +29,9 @@ object EndDateFormatError extends MtdError("FORMAT_END_DATE","The provided From 
 object FinalisedFormatError extends MtdError("FORMAT_FINALISED","The provided Finalised value is invalid")
 object RangeEndDateBeforeStartDateError extends MtdError("RANGE_END_DATE_BEFORE_START_DATE","The End date must be after the Start date")
 
-
 // Rule Errors
-object RuleTaxYearNotSupportedError extends MtdError(
-  code = "RULE_TAX_YEAR_NOT_SUPPORTED",
-  message = "Tax year not supported, because it precedes the earliest allowable tax year"
-)
-
-object RuleTaxYearRangeInvalidError extends MtdError(
-  code = "RULE_TAX_YEAR_RANGE_INVALID",
-  message = "Tax year range invalid. A tax year range of one year is required"
-)
+object RuleTaxYearNotSupportedError extends MtdError( "RULE_TAX_YEAR_NOT_SUPPORTED",
+  "Tax year not supported, because it precedes the earliest allowable tax year")
 
 object RuleIncorrectOrEmptyBodyError extends MtdError("RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED", "An empty or non-matching body was submitted")
 object RuleNotFinalisedError extends MtdError("RULE_NOT_FINALISED","Finalised must be set to true")

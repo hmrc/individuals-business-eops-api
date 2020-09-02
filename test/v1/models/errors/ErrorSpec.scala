@@ -16,8 +16,25 @@
 
 package v1.models.errors
 
-sealed trait DesError
+import play.api.libs.json.Json
+import support.UnitSpec
 
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+class ErrorSpec extends UnitSpec{
+
+  "reads" should {
+    val error = MtdError("FORMAT_NINO", "The provided NINO is invalid")
+
+    val json = Json.parse(
+      """
+        |{
+        |   "code": "FORMAT_NINO",
+        |   "reason": "The provided NINO is invalid"
+        |}
+      """.stripMargin
+    )
+
+    "generate the correct JSON" in {
+      json.as[MtdError] shouldBe error
+    }
+  }
+}

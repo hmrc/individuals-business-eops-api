@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.connectors
 
-sealed trait DesError
+import config.AppConfig
+import play.api.Logger
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.logging.Authorization
 
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+trait DesConnector {
+
+  val logger = Logger(this.getClass)
+
+  def desHeaderCarrier(appConfig: AppConfig)(implicit hc: HeaderCarrier): HeaderCarrier =
+    hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
+      .withExtraHeaders("Environment" -> appConfig.desEnv)
+
+}

@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1
 
-sealed trait DesError
+import v1.models.errors.ErrorWrapper
+import v1.models.outcomes.DesResponse
 
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+package object services {
+//TODO UPDATE FOR THIS API
+
+//  type DeletePensionChargesOutcome = Either[ErrorWrapper, DesResponse[Unit]]
+//
+//  type RetrievePensionChargesOutcome = Either[ErrorWrapper, DesResponse[RetrievePensionChargesResponse]]
+//
+//  type AmendPensionChargesOutcome = Either[ErrorWrapper, DesResponse[Unit]]
+
+}

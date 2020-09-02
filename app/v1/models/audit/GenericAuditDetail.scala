@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.models.audit
 
-sealed trait DesError
+import play.api.libs.json.{Json, OWrites}
 
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+case class GenericAuditDetail(
+                             userType: String,
+                             agentReferenceNumber: Option[String],
+                             nino: String,
+                             `X-CorrelationId`: String,
+                             response: AuditResponse
+                           )
+
+object GenericAuditDetail {
+  implicit val writes: OWrites[GenericAuditDetail] = Json.writes[GenericAuditDetail]
+}
+

@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.hateoas
 
-sealed trait DesError
+import config.AppConfig
+import play.api.libs.json.{JsValue, Json}
 
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+trait AmendHateoasBody extends HateoasLinks {
+
+  //TODO UPDATE FOR THIS API
+  def amendPensionsHateoasBody(appConfig: AppConfig, nino: String, taxYear: String): JsValue = {
+
+    val links = Seq(
+      getRetrievePensions(appConfig, nino, taxYear),
+      getAmendPensions(appConfig, nino, taxYear),
+      getDeletePensions(appConfig, nino, taxYear)
+    )
+
+    Json.obj("links" -> links)
+  }
+}

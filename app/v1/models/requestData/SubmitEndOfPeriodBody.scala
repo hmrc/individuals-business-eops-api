@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.models.requestData
 
-sealed trait DesError
+import play.api.libs.json.{Json, OFormat}
+import v1.models.des.TypeOfBusiness
 
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+case class SubmitEndOfPeriodBody(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
+
+object SubmitEndOfPeriodBody {
+  implicit val format: OFormat[SubmitEndOfPeriodBody] = Json.format[SubmitEndOfPeriodBody]
+}
+
+case class AccountingPeriod(startDate: String, endDate: String)
+
+object AccountingPeriod {
+  implicit val format: OFormat[AccountingPeriod] = Json.format[AccountingPeriod]
+}

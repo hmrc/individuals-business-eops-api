@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.models.requestData
 
-sealed trait DesError
+import play.api.libs.json.{Json, OFormat}
+import play.api.mvc.AnyContentAsJson
+import uk.gov.hmrc.auth.core.Nino
 
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData
+
+case class SubmitEndOfPeriodStatement(nino: Nino, submitEndOfPeriodBody: SubmitEndOfPeriodBody)
+
+object SubmitEndOfPeriodStatement {
+  implicit val format: OFormat[SubmitEndOfPeriodStatement] = Json.format[SubmitEndOfPeriodStatement]
+}
