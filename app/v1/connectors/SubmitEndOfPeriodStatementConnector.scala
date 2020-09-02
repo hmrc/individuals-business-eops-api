@@ -39,12 +39,9 @@ class SubmitEndOfPeriodStatementConnector@Inject()(val http: HttpClient, val app
     val accountingPeriodEndDate = request.submitEndOfPeriod.accountingPeriod.endDate
     val incomeSourceId = request.submitEndOfPeriod.businessId
 
-    post(
-      body = Json.toJson("{}"),
+    postEmpty(
       DesUri[Unit](s"income-tax/income-sources/nino/" +
         s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
     )
-
-
   }
 }

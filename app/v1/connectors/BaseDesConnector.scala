@@ -76,4 +76,16 @@ trait BaseDesConnector {
 
     doPut(desHeaderCarrier(hc))
   }
+
+  def postEmpty[Resp]( uri: DesUri[Resp])(implicit ec: ExecutionContext,
+                                                              hc: HeaderCarrier,
+                                                              httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
+
+    def doPostEmpty(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
+      http.POSTEmpty(s"${appConfig.desBaseUrl}/${uri.value}")
+    }
+
+    doPostEmpty(desHeaderCarrier(hc))
+  }
+
 }
