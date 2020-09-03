@@ -18,12 +18,13 @@ package v1.models.requestData
 
 import play.api.libs.json.{Json, OFormat}
 import play.api.mvc.AnyContentAsJson
-import uk.gov.hmrc.auth.core.Nino
+import uk.gov.hmrc.domain.Nino
 
 case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData
 
-case class SubmitEndOfPeriodStatement(nino: Nino, submitEndOfPeriodBody: SubmitEndOfPeriodBody)
+case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod)
 
-object SubmitEndOfPeriodStatement {
-  implicit val format: OFormat[SubmitEndOfPeriodStatement] = Json.format[SubmitEndOfPeriodStatement]
+object SubmitEndOfPeriodStatementRequest {
+  implicit val format: OFormat[SubmitEndOfPeriodStatementRequest] = Json.format[SubmitEndOfPeriodStatementRequest]
 }
+

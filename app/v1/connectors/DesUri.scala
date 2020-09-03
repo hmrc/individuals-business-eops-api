@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.connectors
 
-sealed trait DesError
-
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+case class DesUri[Resp](value: String)
