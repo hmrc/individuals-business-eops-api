@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import com.google.common.util.concurrent.Futures.FutureCombiner
 import data.SubmitEndOfPeriodStatementData.validRequest
 import uk.gov.hmrc.domain.Nino
 import v1.models.errors._

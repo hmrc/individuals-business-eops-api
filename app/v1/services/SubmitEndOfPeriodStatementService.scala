@@ -16,7 +16,6 @@
 
 package v1.services
 
-import akka.stream.actor.ActorPublisherMessage.Request
 import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.SubmitEndOfPeriodStatementConnector
