@@ -109,6 +109,5 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
           }
         }
     }
-
   }
 }
