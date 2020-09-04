@@ -20,7 +20,7 @@ import mocks.MockAppConfig
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsJson
 import support.UnitSpec
-import v1.models.errors.{BusinessIdFormatError, EndDateFormatError, FinalisedFormatError, MtdError, NinoFormatError, RangeEndDateBeforeStartDateError, RuleNotFinalisedError, StartDateFormatError, TypeOfBusinessFormatError}
+import v1.models.errors.{BusinessIdFormatError, EndDateFormatError, FinalisedFormatError, MtdError, NinoFormatError, RangeEndDateBeforeStartDateError, RuleIncorrectOrEmptyBodyError, RuleNotFinalisedError, StartDateFormatError, TypeOfBusinessFormatError}
 import v1.models.requestData.SubmitEndOfPeriodStatementRawData
 
 class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfig {
@@ -32,6 +32,31 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfi
     val validator = new SubmitEndOfPeriodStatementValidator(mockAppConfig)
 
     val emptyRequestBodyJson: JsValue = Json.parse("""{}""")
+
+    val partialJson: JsValue = Json.parse(
+      """{
+        | "typeOfBusiness":"invalid"
+        |}""".stripMargin)
+
+    val businessIdPartialJson: JsValue = Json.parse(
+      """{
+        | "businessId":"invalid"
+        |}""".stripMargin)
+
+    val accountingPeriodPartialJson: JsValue = Json.parse(
+      """{
+        | "accountingPeriod": {
+        |    "startDate": "XXXX",
+        |    "endDate":"XXXX"
+        | }
+        |}""".stripMargin)
+
+    val finalisedPartialJson: JsValue = Json.parse(
+      """{
+        | "finalised": "XXXX"
+        |}""".stripMargin)
+
+
     def fullValidJson(typeOfBusiness: String = "self-employment",
                       businessId: String = "XAIS12345678910",
                       startDate: String = "2021-04-06",
@@ -63,6 +88,25 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfi
       "an invalid nino is supplied" in new Test {
         validator.validate(SubmitEndOfPeriodStatementRawData(invalidNino, AnyContentAsJson(fullValidJson()))) shouldBe List(
           NinoFormatError
+        )
+      }
+      "an invalid json is supplied" in new Test {
+        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(emptyRequestBodyJson))) shouldBe List(
+          RuleIncorrectOrEmptyBodyError
+        )
+      }
+      "an invalid partialJson is supplied" in new Test {
+        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(partialJson))) shouldBe List(
+          TypeOfBusinessFormatError
+        )
+        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(businessIdPartialJson))) shouldBe List(
+          BusinessIdFormatError
+        )
+        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(accountingPeriodPartialJson))) shouldBe List(
+          StartDateFormatError,EndDateFormatError
+        )
+        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(finalisedPartialJson))) shouldBe List(
+          FinalisedFormatError
         )
       }
       "an invalid format finalised is supplied" in new Test {

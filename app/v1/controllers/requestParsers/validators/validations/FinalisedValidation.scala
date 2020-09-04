@@ -17,7 +17,7 @@
 package v1.controllers.requestParsers.validators.validations
 
 import play.api.Logger
-import play.api.libs.json.JsLookupResult
+import play.api.libs.json.{JsLookupResult, JsValue}
 import v1.models.errors.{FinalisedFormatError, MtdError, RuleNotFinalisedError}
 
 object FinalisedValidation {
@@ -26,9 +26,13 @@ object FinalisedValidation {
   lazy val logger: Logger = Logger(this.getClass)
 
   def validateFinalised(json: JsLookupResult): List[MtdError] ={
-    (json.asOpt[Boolean], json.asOpt[String]) match {
+
+    val jsLookup: Option[JsValue] = json.toOption
+
+    (json.asOpt[Boolean], jsLookup.isDefined) match {
       case (Some(bool), _) => validateFinalised(bool)
-      case (_, string) => finalisedIncorrectFormat(string)
+      case (_, true) => finalisedIncorrectFormat(jsLookup.toString)
+      case _ => NoValidationErrors
     }
   }
 
@@ -37,8 +41,8 @@ object FinalisedValidation {
     if(finalised) NoValidationErrors else List(RuleNotFinalisedError)
   }
 
-  def finalisedIncorrectFormat(finalised: Option[String]): List[MtdError] = {
-    logger.warn(s"$log finalised was not of type boolean. finalised: ${finalised.getOrElse("None")}")
+  def finalisedIncorrectFormat(finalised: String): List[MtdError] = {
+    logger.warn(s"$log finalised was not of type boolean. finalised: $finalised")
     //400 FORMAT_FINALISED The provided Finalised value is invalid
     List(FinalisedFormatError)
   }
