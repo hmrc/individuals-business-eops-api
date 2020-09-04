@@ -1,6 +1,6 @@
 #%RAML 1.0
 ---
-title: MTD Template
+title: Submit an End of Period Statement
 version: 1.0
 
 protocols: [ HTTPS ]
@@ -29,22 +29,17 @@ uses:
   errors: errors.raml
   headers: headers.raml
 
-'/mtd/template':
+'/individuals/business/end-of-period-statement':
   /{nino}:
     uriParameters:
       nino:
         description: National Insurance number, in the format AA999999A.
         type: string
         example: TC663795B
-    /{taxYear}:
+    /{businessId}:
       uriParameters:
-        taxYear:
-          description: 'The tax year the data applies to, for example, 2019-20. The start year and end year must not span two tax years. No gaps are allowed, for example, 2019-21 is not valid.'
-          example: "2017-18"
-      /sample-endpoint:
-        (annotations.group):
-          name: Sample Endpoint
-          description: This is a sample endpoint
-        post: !include endpoints/sample_post.raml
-        delete: !include endpoints/sample_delete.raml
-        get: !include endpoints/sample_retrieve.raml
+        businessId:
+          description: 'An identifier for the business, unique to the customer. Must conform to the regular expression ^X[A-Z0-9]{1}IS[0-9]{11}$ for example: XAIS12345678910'
+          type: string
+          example: XAIS12345678910
+      post: !include submitBusinessEOPS_post.raml

@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Submit an End of Period Statement for a Business Endpoint",
+  "description": "This endpoint allows the developer to submit a declaration that the submission data for a business is complete. A National Insurance number is required.",
+  "type": "object",
+  "properties": {
+    "typeOfBusiness": {
+      "description": "The type of business the the declaration is for. Limited to the following possible values: self-employment, uk-property and foreign-property",
+      "type": "string",
+      "enum": [
+        "self-employment",
+        "uk-property",
+        "foreign-property"
+      ],
+      "example": "self-employment"
+    },
+    "businessId": {
+      "description": "An identifier for the business, unique to the customer. Must conform to the regular expression ^X[A-Z0-9]{1}IS[0-9]{11}$. For example: XAIS12345678910",
+      "type": "string",
+      "example": "XAIS12345678910"
+    },
+    "accountingPeriod": {
+      "type": "object",
+      "description": "Object containing the accounting period start and end dates",
+      "properties": {
+        "startDate": {
+          "description": "The date the accounting period started. Must be in the format YYYY-MM-DD. For example: 2021-04-06",
+          "type": "string",
+          "example": "2021-04-06"
+        },
+        "endDate": {
+          "description": "The date the accounting period ended. Must be in the format YYYY-MM-DD. For example: 2022-04-05",
+          "type": "string",
+          "example": "2022-04-05"
+        }
+      },
+      "required": [
+        "startDate",
+        "endDate"
+      ]
+    },
+    "finalised": {
+      "description": "Declaration for the finalised statement. Limited to the following possible values: True or False",
+      "type": "boolean",
+      "example": "true"
+    }
+  },
+  "required": [
+    "typeOfBusiness",
+    "businessId",
+    "accountingPeriod",
+    "finalised"
+  ]
+}
