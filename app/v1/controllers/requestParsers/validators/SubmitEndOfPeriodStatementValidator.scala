@@ -25,7 +25,7 @@ import v1.controllers.requestParsers.validators.validations.TypeOfBusinessValida
 import v1.controllers.requestParsers.validators.validations.DateValidation._
 import v1.controllers.requestParsers.validators.validations._
 import v1.models.errors._
-import v1.models.requestData.{AccountingPeriod, SubmitEndOfPeriodBody, SubmitEndOfPeriodStatementRawData}
+import v1.models.requestData.{AccountingPeriod, SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData}
 
 class SubmitEndOfPeriodStatementValidator @Inject()(appConfig: AppConfig) extends Validator[SubmitEndOfPeriodStatementRawData] {
 
@@ -51,7 +51,7 @@ class SubmitEndOfPeriodStatementValidator @Inject()(appConfig: AppConfig) extend
   private def bodyFormatValidator: SubmitEndOfPeriodStatementRawData => List[List[MtdError]] = { data =>
 
     val jsonValidationErrors = jsonValidation(data.body.json)
-    lazy val jsonModelValidation: List[MtdError] = JsonFormatValidation.validate[SubmitEndOfPeriodBody](data.body.json)
+    lazy val jsonModelValidation: List[MtdError] = JsonFormatValidation.validate[SubmitEndOfPeriod](data.body.json)
 
     val errors = List(
       if(jsonValidationErrors.nonEmpty) jsonValidationErrors else jsonModelValidation
