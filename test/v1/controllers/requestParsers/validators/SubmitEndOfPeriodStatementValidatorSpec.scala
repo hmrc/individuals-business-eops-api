@@ -122,6 +122,17 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfi
           FinalisedFormatError,StartDateFormatError,EndDateFormatError,TypeOfBusinessFormatError,BusinessIdFormatError
         )
       }
+      "multiple fields are invalid that wont map the request body to the model when wrong type" in new Test {
+        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(
+          typeOfBusiness = "XXXXXX",
+          businessId = "XXXXXX",
+          startDate = "XXXXXX",
+          endDate = "XXXXXX",
+          finalised = "8"
+        )))) shouldBe List(
+          FinalisedFormatError,StartDateFormatError,EndDateFormatError,TypeOfBusinessFormatError,BusinessIdFormatError
+        )
+      }
       "multiple fields are invalid that do map to the request body to the model" in new Test {
         validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(
           typeOfBusiness = "uk-property",

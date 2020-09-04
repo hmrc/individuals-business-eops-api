@@ -28,8 +28,7 @@ object FinalisedValidation {
   def validateFinalised(json: JsLookupResult): List[MtdError] ={
     (json.asOpt[Boolean], json.asOpt[String]) match {
       case (Some(bool), _) => validateFinalised(bool)
-      case (_, Some(string)) => finalisedIncorrectFormat(string)
-      case _ => NoValidationErrors
+      case (_, string) => finalisedIncorrectFormat(string)
     }
   }
 
@@ -38,8 +37,8 @@ object FinalisedValidation {
     if(finalised) NoValidationErrors else List(RuleNotFinalisedError)
   }
 
-  def finalisedIncorrectFormat(finalised: String): List[MtdError] = {
-    logger.warn(s"$log finalised was not of type boolean. finalised: $finalised")
+  def finalisedIncorrectFormat(finalised: Option[String]): List[MtdError] = {
+    logger.warn(s"$log finalised was not of type boolean. finalised: ${finalised.getOrElse("None")}")
     //400 FORMAT_FINALISED The provided Finalised value is invalid
     List(FinalisedFormatError)
   }
