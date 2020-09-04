@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package v1.models.requestData
+package data
 
-import play.api.libs.json.{Json, OFormat}
 import v1.models.des.TypeOfBusiness
+import v1.models.des.TypeOfBusiness.`foreign-property`
+import v1.models.requestData.{AccountingPeriod, SubmitEndOfPeriod}
 
-case class SubmitEndOfPeriodBody(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
+object SubmitEndOfPeriodStatementData {
 
-object SubmitEndOfPeriodBody {
-  implicit val format: OFormat[SubmitEndOfPeriodBody] = Json.format[SubmitEndOfPeriodBody]
-}
+  val incomeSourceType : TypeOfBusiness = `foreign-property`
+  val accountingPeriodStartDate = "2021-04-06"
+  val accountingPeriodEndDate = "2022-04-05"
+  val incomeSourceId = "XAIS12345678910"
 
-case class AccountingPeriod(startDate: String, endDate: String)
-
-object AccountingPeriod {
-  implicit val format: OFormat[AccountingPeriod] = Json.format[AccountingPeriod]
+  val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(`foreign-property`, "XAIS12345678910", accountingPeriod = AccountingPeriod(
+    "2021-04-06","2022-04-05"
+  ),finalised = true)
 }
