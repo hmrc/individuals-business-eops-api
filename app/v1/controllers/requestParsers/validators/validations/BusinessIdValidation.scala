@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.controllers.requestParsers.validators.validations
 
-sealed trait DesError
+import v1.models.errors.{BusinessIdFormatError, MtdError}
 
-case class SingleError(error: MtdError) extends DesError
-case class MultipleErrors(errors: Seq[MtdError]) extends DesError
-case class OutboundError(error: MtdError) extends DesError
+object BusinessIdValidation {
+
+  def validateBusinessId(businessId: String): List[MtdError] ={
+    //400 FORMAT_BUSINESS_ID The provided Business ID is invalid
+    if(businessId.matches("^X[A-Z0-9]{1}IS[0-9]{11}$")) NoValidationErrors else List(BusinessIdFormatError)
+  }
+}
