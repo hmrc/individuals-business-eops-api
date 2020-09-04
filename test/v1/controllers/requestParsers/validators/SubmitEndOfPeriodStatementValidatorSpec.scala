@@ -131,6 +131,11 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfi
           TypeOfBusinessFormatError
         )
       }
+      "an invalid typeOfBusiness json is supplied" in new Test {
+        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(typeOfBusiness = "5")))) shouldBe List(
+          TypeOfBusinessFormatError
+        )
+      }
       "an invalid businessId is supplied" in new Test {
         validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(businessId = "wow much id")))) shouldBe List(
           BusinessIdFormatError

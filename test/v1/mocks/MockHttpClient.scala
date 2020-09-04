@@ -20,7 +20,6 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockHttpClient extends MockFactory {
@@ -60,5 +59,11 @@ trait MockHttpClient extends MockFactory {
           url == actualUrl && body == actualBody && requiredHeaders.forall(h => hc.headers.contains(h))
         })
     }
+
+    def postEmpty[T](url: String): CallHandler[Future[T]] = {
+      (mockHttpClient.POSTEmpty[T](_: String, _: Seq[(String, String)])(_: HttpReads[T], _: HeaderCarrier, _: ExecutionContext))
+        .expects(url, *, *, *, *)
+    }
+
   }
 }
