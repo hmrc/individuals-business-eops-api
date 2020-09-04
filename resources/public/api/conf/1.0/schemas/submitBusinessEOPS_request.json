@@ -40,7 +40,7 @@
       ]
     },
     "finalised": {
-      "description": "Declaration for the finalised statement. Limited to the following possible values: True or False",
+      "description": "Declaration for the finalised statement. Limited to the following possible values: true or false",
       "type": "boolean",
       "example": "true"
     }
