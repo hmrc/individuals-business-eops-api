@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package data
+package itData
 
 import play.api.libs.json.{JsValue, Json}
 import v1.models.des.TypeOfBusiness

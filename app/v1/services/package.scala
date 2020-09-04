@@ -28,4 +28,6 @@ package object services {
 //
 //  type AmendPensionChargesOutcome = Either[ErrorWrapper, DesResponse[Unit]]
 
+  type SubmitEndOfPeriodStatmentOutcome = Either[ErrorWrapper, DesResponse[Unit]]
+
 }

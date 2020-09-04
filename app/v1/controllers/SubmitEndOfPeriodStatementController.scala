@@ -18,11 +18,11 @@ package v1.controllers
 
 import config.AppConfig
 import javax.inject._
-import play.api.http.MimeTypes
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import v1.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v1.hateoas.AmendHateoasBody
 import v1.models.audit._
 import v1.models.auth.UserDetails
@@ -41,18 +41,17 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc) with AmendHateoasBody with BaseController {
 
-  implicit val endpointLogContext: EndpointLogContext =
-    EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController",
-      endpointName = "Submit end of period statement")
+  implicit val endpointLogContext: EndpointLogContext = EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController",
+    endpointName = "Submit end of period statement")
 
-  def amend(nino: String, taxYear: String): Action[JsValue] = {
+  def submitEndOfPeriodStatement(nino: String): Action[JsValue] = {
     authorisedAction(nino).async(parse.json) { implicit request =>
 
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
       val parseRequest: Either[ErrorWrapper, SubmitEndOfPeriodStatementRequest] = requestParser.parseRequest(rawData)
 
-      val serviceResponse: Future[AmendPensionChargesOutcome] = parseRequest match {
-        case Right(data) => service.submitEndOfPeriodStatement(data)
+      val serviceResponse: Future[SubmitEndOfPeriodStatmentOutcome] = parseRequest match {
+        case Right(data) => service.submitEndOfPeriodStatementService(data)
         case Left(errorWrapper) => Future.successful(Left(errorWrapper))
       }
 
@@ -78,31 +77,38 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
   }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
-
     (errorWrapper.errors.head.copy(paths = None): @unchecked) match {
       case BadRequestError |
            NinoFormatError |
-           TaxYearFormatError |
-           RuleTaxYearRangeInvalid |
-           RuleTaxYearNotSupportedError |
+           TypeOfBusinessFormatError |
+           BusinessIdFormatError |
+           StartDateFormatError |
+           EndDateFormatError |
+           FinalisedFormatError |
            RuleIncorrectOrEmptyBodyError |
-           ValueFormatError |
-           RuleCountryCodeError |
-           CountryCodeFormatError |
-           QOPSRefFormatError |
-           PensionSchemeTaxRefFormatError |
-           ProviderNameFormatError |
-           ProviderAddressFormatError |
-           RuleIsAnnualAllowanceReducedError |
-           RuleBenefitExcessesError |
-           RulePensionReferenceError
+           RangeEndDateBeforeStartDateError |
+           RuleNotFinalisedError
                 => BadRequest(Json.toJson(errorWrapper))
+
+      case RuleAlreadySubmittedError |
+           RuleEarlySubmissionError |
+           RuleLateSubmissionError |
+           RuleNonMatchingPeriodError |
+           RuleConsolidatedExpensesError |
+           RuleMismatchedStartDateError |
+           RuleMismatchedEndDateError |
+           RuleClass4Over16Error |
+           RuleClass4PensionAge |
+           RuleFHLPrivateUseAdjustment |
+           RuleNonFHLPrivateUseAdjustment
+                => Forbidden(Json.toJson(errorWrapper))
+
       case NotFoundError => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
     }
   }
 
-  private def createAuditDetails(rawData: AmendPensionChargesRawData,
+  private def createAuditDetails(rawData: SubmitEndOfPeriodStatementRawData,
                                  statusCode: Int,
                                  correlationId: String,
                                  userDetails: UserDetails,
@@ -114,7 +120,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
   }
 
   private def auditSubmission(details: GenericAuditDetail)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuditResult] = {
-    val event = AuditEvent("amendPensionChargesAuditType", "amend-pension-charges-transaction-type", details)
+    val event = AuditEvent("submitEndOfPeriodStatementAuditType", "submit-end-of-period-statement-transaction-type", details)
     auditService.auditEvent(event)
   }
 }
