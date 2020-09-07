@@ -208,16 +208,15 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
 
 
         val input : Seq[(Int, JsValue, Int, MtdError)]= Seq(
-          //TODO UNCOMMENT WHEN PARSING BVR ERRORS
-//          (Status.FORBIDDEN, bvr("C55503"), Status.FORBIDDEN, RuleConsolidatedExpensesError),
-//          (Status.FORBIDDEN, bvr("C55316"), Status.FORBIDDEN, RuleConsolidatedExpensesError),
-//          (Status.FORBIDDEN, bvr("C55008"), Status.FORBIDDEN, RuleMismatchedStartDateError),
-//          (Status.FORBIDDEN, bvr("C55013"), Status.FORBIDDEN, RuleMismatchedEndDateError),
-//          (Status.FORBIDDEN, bvr("C55014"), Status.FORBIDDEN, RuleMismatchedEndDateError),
-//          (Status.FORBIDDEN, bvr("C55317"), Status.FORBIDDEN, RuleClass4Over16Error),
-//          (Status.FORBIDDEN, bvr("C55318"), Status.FORBIDDEN, RuleClass4PensionAge),
-//          (Status.FORBIDDEN, bvr("C55501"), Status.FORBIDDEN, RuleFHLPrivateUseAdjustment),
-//          (Status.FORBIDDEN, bvr("C55502"), Status.FORBIDDEN, RuleNonFHLPrivateUseAdjustment)
+          (Status.FORBIDDEN, bvr("C55503"), Status.FORBIDDEN, RuleConsolidatedExpensesError),
+          (Status.FORBIDDEN, bvr("C55316"), Status.FORBIDDEN, RuleConsolidatedExpensesError),
+          (Status.FORBIDDEN, bvr("C55008"), Status.FORBIDDEN, RuleMismatchedStartDateError),
+          (Status.FORBIDDEN, bvr("C55013"), Status.FORBIDDEN, RuleMismatchedEndDateError),
+          (Status.FORBIDDEN, bvr("C55014"), Status.FORBIDDEN, RuleMismatchedEndDateError),
+          (Status.FORBIDDEN, bvr("C55317"), Status.FORBIDDEN, RuleClass4Over16Error),
+          (Status.FORBIDDEN, bvr("C55318"), Status.FORBIDDEN, RuleClass4PensionAge),
+          (Status.FORBIDDEN, bvr("C55501"), Status.FORBIDDEN, RuleFHLPrivateUseAdjustment),
+          (Status.FORBIDDEN, bvr("C55502"), Status.FORBIDDEN, RuleNonFHLPrivateUseAdjustment)
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))

@@ -17,9 +17,10 @@
 package v1.connectors.httpparsers
 
 import play.api.Logger
-import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
 import v1.models.errors._
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 import scala.util.{Success, Try}
 
@@ -48,16 +49,24 @@ trait HttpParser {
   def retrieveCorrelationId(response: HttpResponse): String = response.header("CorrelationId").getOrElse("")
 
   private val multipleErrorReads: Reads[Seq[MtdError]] = (__ \ "failures").read[Seq[MtdError]]
+  private val bvrErrorReads: Reads[Seq[MtdError]] = {
+    implicit val errorReads: Reads[MtdError] = (
+      (__ \ "id").read[String] and
+        (__ \ "text").read[String]
+      ).tupled.map(x => MtdError(x._1,x._2))
+    (__ \ "bvrfailureResponseElement" \ "validationRuleFailures").read[Seq[MtdError]]
+  }
+
 
   def parseErrors(response: HttpResponse): DesError = {
     val singleError = response.validateJson[MtdError].map(SingleError)
     lazy val multipleErrors = response.validateJson(multipleErrorReads).map(MultipleErrors)
+    lazy val bvrErrors = response.validateJson(bvrErrorReads).map(BVRErrors)
     lazy val unableToParseJsonError = {
       Logger.warn(s"unable to parse errors from response: ${response.body}")
       OutboundError(DownstreamError)
     }
-
-    singleError orElse multipleErrors getOrElse unableToParseJsonError
+    singleError orElse multipleErrors orElse bvrErrors getOrElse unableToParseJsonError
   }
 
 }

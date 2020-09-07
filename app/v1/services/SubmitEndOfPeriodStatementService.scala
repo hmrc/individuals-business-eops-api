@@ -20,6 +20,7 @@ import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.SubmitEndOfPeriodStatementConnector
 import v1.models.errors._
+import v1.models.outcomes.DesResponse
 import v1.models.requestData.SubmitEndOfPeriodStatementRequest
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,34 +35,36 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
   def submitEndOfPeriodStatementService(request: SubmitEndOfPeriodStatementRequest)
                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmitEndOfPeriodStatmentOutcome] = {
 
-connector.submitPeriodStatement(request).map{
-  mapToVendorDirect("submitEndOfPeriodStatement", mappingDesToMtdError)
-}
-
+    connector.submitPeriodStatement(request).map {
+      mapToVendorDirect("submitEndOfPeriodStatement",desErrorToMtdError,desBvrErrorToMtdError)
+    }
   }
 
-  private def mappingDesToMtdError : Map[String, MtdError] = Map(
-    "INVALID_IDTYPE" -> DownstreamError,
-    "INVALID_IDVALUE" -> NinoFormatError,
-    "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
-    "INVALID_ACCOUNTINGPERIODENDDATE" -> EndDateFormatError,
-    "INVALID_INCOMESOURCEID" -> BusinessIdFormatError,
-    "INVALID_INCOMESOURCETYPE" -> TypeOfBusinessFormatError,
-    "CONFLICT" -> RuleAlreadySubmittedError,
-    "EARLY_SUBMISSION" -> RuleEarlySubmissionError,
-    "LATE_SUBMISSION" -> RuleLateSubmissionError,
-    "BVR_FAILURE_EXISTS - C55503" -> RuleConsolidatedExpensesError,
-    "BVR_FAILURE_EXISTS - C55316" -> RuleConsolidatedExpensesError,
-    "BVR_FAILURE_EXISTS - C55013" -> RuleMismatchedEndDateError,
-    "BVR_FAILURE_EXISTS - C55014" -> RuleMismatchedEndDateError,
-    "BVR_FAILURE_EXISTS - C55317" -> RuleClass4Over16Error,
-    "BVR_FAILURE_EXISTS - C55318" -> RuleClass4PensionAge,
-    "BVR_FAILURE_EXISTS - C55501" -> RuleFHLPrivateUseAdjustment,
-    "BVR_FAILURE_EXISTS - C55502" -> RuleNonFHLPrivateUseAdjustment,
-    "NON_MATCHING_PERIOD" -> RuleNonMatchingPeriodError,
-    "NOT_FOUND" -> NotFoundError,
-    "SERVER_ERROR" -> DownstreamError,
-    "SERVICE_UNAVAILABLE" -> DownstreamError
-  )
+    private def desErrorToMtdError: Map[String, MtdError] = Map(
+      "INVALID_IDTYPE" -> DownstreamError,
+      "INVALID_IDVALUE" -> NinoFormatError,
+      "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
+      "INVALID_ACCOUNTINGPERIODENDDATE" -> EndDateFormatError,
+      "INVALID_INCOMESOURCEID" -> BusinessIdFormatError,
+      "INVALID_INCOMESOURCETYPE" -> TypeOfBusinessFormatError,
+      "CONFLICT" -> RuleAlreadySubmittedError,
+      "EARLY_SUBMISSION" -> RuleEarlySubmissionError,
+      "LATE_SUBMISSION" -> RuleLateSubmissionError,
+      "NON_MATCHING_PERIOD" -> RuleNonMatchingPeriodError,
+      "NOT_FOUND" -> NotFoundError,
+      "SERVER_ERROR" -> DownstreamError,
+      "SERVICE_UNAVAILABLE" -> DownstreamError
+    )
 
-}
+    private def desBvrErrorToMtdError: Map[String, MtdError] = Map(
+      "C55503" -> RuleConsolidatedExpensesError,
+      "C55316" -> RuleConsolidatedExpensesError,
+      "C55013" -> RuleMismatchedEndDateError,
+      "C55014" -> RuleMismatchedEndDateError,
+      "C55317" -> RuleClass4Over16Error,
+      "C55318" -> RuleClass4PensionAge,
+      "C55501" -> RuleFHLPrivateUseAdjustment,
+      "C55502" -> RuleNonFHLPrivateUseAdjustment,
+    )
+
+  }
