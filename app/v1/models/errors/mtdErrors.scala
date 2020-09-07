@@ -18,6 +18,8 @@ package v1.models.errors
 
 import play.api.libs.json.{Json, Writes}
 
+//scalastyle:off
+
 object NinoFormatError extends MtdError("FORMAT_NINO", "The provided NINO is invalid")
 object TaxYearFormatError extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid")
 object RuleTaxYearRangeInvalid extends MtdError("RULE_TAX_YEAR_RANGE_INVALID", "Tax year range invalid. A tax year range of one year is required")
@@ -25,7 +27,7 @@ object RuleTaxYearRangeInvalid extends MtdError("RULE_TAX_YEAR_RANGE_INVALID", "
 object TypeOfBusinessFormatError extends MtdError("FORMAT_TYPE_OF_BUSINESS","The provided type of business is invalid")
 object BusinessIdFormatError extends MtdError("FORMAT_BUSINESS_ID","The provided Business ID is invalid")
 object StartDateFormatError extends MtdError("FORMAT_START_DATE","The provided Start date is invalid")
-object EndDateFormatError extends MtdError("FORMAT_END_DATE","The provided From date is invalid")
+object EndDateFormatError extends MtdError("FORMAT_END_DATE","The provided End date is invalid")
 object FinalisedFormatError extends MtdError("FORMAT_FINALISED","The provided Finalised value is invalid")
 object RangeEndDateBeforeStartDateError extends MtdError("RANGE_END_DATE_BEFORE_START_DATE","The End date must be after the Start date")
 
@@ -69,8 +71,8 @@ object UnauthorisedError extends MtdError("CLIENT_OR_AGENT_NOT_AUTHORISED", "The
 object InvalidBearerTokenError extends MtdError("UNAUTHORIZED", "Bearer token is missing or not authorized")
 
 // Accept header Errors
-object  InvalidAcceptHeaderError extends MtdError("ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
+object InvalidAcceptHeaderError extends MtdError("ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
 
-object  UnsupportedVersionError extends MtdError("NOT_FOUND", "The requested resource could not be found")
+object UnsupportedVersionError extends MtdError("NOT_FOUND", "The requested resource could not be found")
 
 object InvalidBodyTypeError extends MtdError("INVALID_BODY_TYPE", "Expecting text/json or application/json body")
