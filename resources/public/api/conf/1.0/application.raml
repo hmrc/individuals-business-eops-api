@@ -36,10 +36,4 @@ uses:
         description: National Insurance number, in the format AA999999A.
         type: string
         example: TC663795B
-    /{businessId}:
-      uriParameters:
-        businessId:
-          description: 'An identifier for the business, unique to the customer. Must conform to the regular expression ^X[A-Z0-9]{1}IS[0-9]{11}$ for example: XAIS12345678910'
-          type: string
-          example: XAIS12345678910
-      post: !include submitBusinessEOPS_post.raml
+    post: !include submitBusinessEOPS_post.raml
