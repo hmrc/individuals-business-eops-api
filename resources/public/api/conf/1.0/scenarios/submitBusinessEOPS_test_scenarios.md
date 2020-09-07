@@ -28,11 +28,11 @@
             <td><p>Simulate scenario where the user has requested a National Insurance Class 4 exemption but the individual's age is less than their State Pension age on the 6th April of the current tax year.</p></td>
         </tr>
         <tr>
-            <td><p>RULE_CONSOLIDATED_EXPENSES_C55316</p></td>
+            <td><p>RULE_CONSOLIDATED_EXPENSES_SELF_EMPLOYMENT</p></td>
             <td><p>Simulate scenario where self employment consolidated expenses are not allowed if the cumulative turnover amount exceeds the threshold.</p></td>
         </tr>
         <tr>
-            <td><p>RULE_CONSOLIDATED_EXPENSES_C55503</p></td>
+            <td><p>RULE_CONSOLIDATED_EXPENSES_UK_PROPERTY</p></td>
             <td><p>Simulate scenario where UK property consolidated expenses are not allowed if the cumulative turnover amount exceeds the threshold.</p></td>
         </tr>
         <tr>
@@ -48,11 +48,11 @@
             <td><p>Simulate scenario where the user has tried to make their End of Period Statement declaration too late.</p></td>
         </tr>
         <tr>
-            <td><p>RULE_MISMATCHED_END_DATE_C55013</p></td>
+            <td><p>RULE_MISMATCHED_END_DATE_PERIOD_SHORT</p></td>
             <td><p>Simulate scenario where the period submission end date does not match the accounting period end date.</p></td>
         </tr>
         <tr>
-            <td><p>RULE_MISMATCHED_END_DATE_C55014</p></td>
+            <td><p>RULE_MISMATCHED_END_DATE_PERIOD_EXCEEDS</p></td>
             <td><p>Simulate scenario where the period submission end date does not match the accounting period end date.</p></td>
         </tr>
         <tr>
