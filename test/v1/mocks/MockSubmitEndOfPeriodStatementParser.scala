@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package v1.controllers.requestParsers
+package v1.mocks
 
-import javax.inject.Inject
-import uk.gov.hmrc.domain.Nino
+import org.scalamock.handlers.CallHandler1
+import org.scalamock.scalatest.MockFactory
 import v1.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
-import v1.models.requestData.{SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
+import v1.models.errors.MtdError
+import v1.models.requestData.SubmitEndOfPeriodStatementRawData
 
-class SubmitEndOfPeriodStatementParser @Inject()(val validator: SubmitEndOfPeriodStatementValidator) extends RequestParser[SubmitEndOfPeriodStatementRawData,
-  SubmitEndOfPeriodStatementRequest] {
+class MockSubmitEndOfPeriodStatementParser extends MockFactory {
 
-  override protected def requestFor(data: SubmitEndOfPeriodStatementRawData): SubmitEndOfPeriodStatementRequest =
-    SubmitEndOfPeriodStatementRequest(Nino(data.nino), data.body.json.as[SubmitEndOfPeriod])
+  val mockValidator: SubmitEndOfPeriodStatementValidator = mock[SubmitEndOfPeriodStatementValidator]
+
+  object MockValidator {
+    def validate(data: SubmitEndOfPeriodStatementRawData): CallHandler1[SubmitEndOfPeriodStatementRawData, List[MtdError]] = {
+      (mockValidator.validate(_: SubmitEndOfPeriodStatementRawData)).expects(data)
+    }
+  }
+
 }

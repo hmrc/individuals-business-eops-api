@@ -50,4 +50,18 @@ object SubmitEndOfPeriodStatementData {
        |}
        |""".stripMargin
   )
+
+  val successJson: JsValue = Json.parse(
+    """
+      |{
+      |    "typeOfBusiness": "foreign-property",
+      |    "businessId": "XAIS12345678910",
+      |    "accountingPeriod": {
+      |        "startDate": "2021-04-06",
+      |        "endDate": "2022-04-05"
+      |    },
+      |    "finalised": true
+      |}""".stripMargin
+
+  )
 }

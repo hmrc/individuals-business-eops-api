@@ -150,10 +150,6 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
           }
         }
 
-//          403
-//        BVR_FAILURE_EXISTS
-//        The remote endpoint has indicated that there are bvr failures
-
         //scalastyle:off
         val input : Seq[(Int, String, String, Int, MtdError)]= Seq(
           (Status.BAD_REQUEST, "INVALID_CORRELATIONID", "", Status.INTERNAL_SERVER_ERROR, DownstreamError),
