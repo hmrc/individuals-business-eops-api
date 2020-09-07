@@ -75,7 +75,11 @@ trait DesServiceSupport {
       case Left(DesResponse(correlationId, BVRErrors(errors))) =>
         val mtdErrors = errors.map(error => bvrErrorMap.applyOrElse(error.code, defaultErrorMapping))
 
-        Left(ErrorWrapper(Some(correlationId), Seq(BVRError) ++ mtdErrors))
+        if(mtdErrors.length == 1){
+          Left(ErrorWrapper(Some(correlationId), mtdErrors))
+        } else {
+          Left(ErrorWrapper(Some(correlationId), Seq(BVRError) ++ mtdErrors))
+        }
 
       case Left(DesResponse(correlationId, SingleError(error))) =>
         Left(ErrorWrapper(Some(correlationId), Seq(errorMap.applyOrElse(error.code, defaultErrorMapping))))
