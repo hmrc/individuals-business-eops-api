@@ -17,6 +17,7 @@
 package v1.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import itData.SubmitEndOfPeriodStatementData.fullValidJson
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
@@ -29,91 +30,100 @@ class AuthISpec extends IntegrationBaseSpec {
   private trait Test {
 
     val nino = "AA123456A"
-    val taxYear = "2021-22"
 
-    def uri: String = s"/pensions/$nino/$taxYear"
+    val incomeSourceId: String = "XAIS12345678910"
 
-    def desUri: String = s"/income-tax/charges/pensions/$nino/$taxYear"
+    def uri: String = s"/$nino"
+
+    def desUri(nino: String = nino,
+               incomeSourceType:String = "self-employment",
+               accountingPeriodStartDate: String = "2021-04-06",
+               accountingPeriodEndDate: String = "2022-04-05"
+              ): String = {
+      s"/income-tax/income-sources/nino/" +
+        s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration"
+    }
 
     def setupStubs(): StubMapping
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest(uri).withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"))
+      buildRequest(uri)
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"))
     }
 
-    def errorBody(code: String): String =
+    def errorBody(code: String, message: String): String =
       s"""
          |      {
          |        "code": "$code",
-         |        "reason": "des message"
+         |        "reason": "$message"
          |      }
     """.stripMargin
   }
 
-  //TODO uncomment when api ready
-//  "Calling the sample endpoint" when {
-//
-//    "the NINO cannot be converted to a MTD ID" should {
-//
-//      "return 500" in new Test {
-//        override val nino: String = "AA123456A"
-//
-//        override def setupStubs(): StubMapping = {
-//          AuditStub.audit()
-//          MtdIdLookupStub.internalServerError(nino)
-//        }
-//
-//        val response: WSResponse = await(request().delete())
-//        response.status shouldBe Status.INTERNAL_SERVER_ERROR
-//      }
-//    }
-//
-//    "an MTD ID is successfully retrieve from the NINO and the user is authorised" should {
-//
-//      "return 201" in new Test {
-//        override def setupStubs(): StubMapping = {
-//          AuditStub.audit()
-//          AuthStub.authorised()
-//          MtdIdLookupStub.ninoFound(nino)
-//          DesStub.onSuccess(DesStub.DELETE, desUri, Status.NO_CONTENT)
-//        }
-//
-//        val response: WSResponse = await(request().delete())
-//        response.status shouldBe Status.NO_CONTENT
-//      }
-//    }
-//
-//    "an MTD ID is successfully retrieve from the NINO and the user is NOT logged in" should {
-//
-//      "return 403" in new Test {
-//        override val nino: String = "AA123456A"
-//
-//        override def setupStubs(): StubMapping = {
-//          AuditStub.audit()
-//          MtdIdLookupStub.ninoFound(nino)
-//          AuthStub.unauthorisedNotLoggedIn()
-//        }
-//
-//        val response: WSResponse = await(request().delete())
-//        response.status shouldBe Status.FORBIDDEN
-//      }
-//    }
-//
-//    "an MTD ID is successfully retrieve from the NINO and the user is NOT authorised" should {
-//
-//      "return 403" in new Test {
-//        override val nino: String = "AA123456A"
-//
-//        override def setupStubs(): StubMapping = {
-//          AuditStub.audit()
-//          MtdIdLookupStub.ninoFound(nino)
-//          AuthStub.unauthorisedOther()
-//        }
-//
-//        val response: WSResponse = await(request().delete())
-//        response.status shouldBe Status.FORBIDDEN
-//      }
-//    }
-//  }
+  "Calling the sample endpoint" when {
+
+    "the NINO cannot be converted to a MTD ID" should {
+
+      "return 500" in new Test {
+        override val nino: String = "AA123456A"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          MtdIdLookupStub.internalServerError(nino)
+        }
+
+        val response: WSResponse = await(request().post(fullValidJson()))
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "an MTD ID is successfully retrieve from the NINO and the user is authorised" should {
+
+      "return 204" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          MtdIdLookupStub.ninoFound(nino)
+          DesStub.onSuccess(DesStub.POST, desUri(), Map("incomeSourceId" -> incomeSourceId), Status.NO_CONTENT)
+        }
+
+        val response: WSResponse = await(request().post(fullValidJson()))
+        response.status shouldBe Status.NO_CONTENT
+        response.header("X-CorrelationId").nonEmpty shouldBe true
+      }
+    }
+
+    "an MTD ID is successfully retrieve from the NINO and the user is NOT logged in" should {
+
+      "return 403" in new Test {
+        override val nino: String = "AA123456A"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          MtdIdLookupStub.ninoFound(nino)
+          AuthStub.unauthorisedNotLoggedIn()
+        }
+
+        val response: WSResponse = await(request().post(fullValidJson()))
+        response.status shouldBe Status.FORBIDDEN
+      }
+    }
+
+    "an MTD ID is successfully retrieve from the NINO and the user is NOT authorised" should {
+
+      "return 403" in new Test {
+        override val nino: String = "AA123456A"
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          MtdIdLookupStub.ninoFound(nino)
+          AuthStub.unauthorisedOther()
+        }
+
+        val response: WSResponse = await(request().post(fullValidJson()))
+        response.status shouldBe Status.FORBIDDEN
+      }
+    }
+  }
 }
