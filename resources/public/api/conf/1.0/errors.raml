@@ -102,17 +102,6 @@ traits:
                 description: The user's submission is missing one or more expected fields.
                 value:
                   code: RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED
-  formatTypeOfBuisnes:
-    responses:
-      400:
-        body:
-          application/json:
-            type: types.errorResponse
-            examples:
-              formatTypeOfBuisnes:
-                description: The format of the supplied Type of Business field is not valid.
-                value:
-                  code: FORMAT_TYPE_OF_BUSINESS
   ruleEndDateBeforeStartDate:
     responses:
       400:
