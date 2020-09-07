@@ -44,6 +44,12 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
     case "DES_CODE_DOWNSTREAM" => DownstreamError
   }
 
+  val bvrToMtdErrorMap: PartialFunction[String, MtdError] = {
+    case "BVR_CODE1"           => error1
+    case "BVR_CODE2"           => error2
+    case "BVR_CODE_DOWNSTREAM" => DownstreamError
+  }
+
   val mapToError: DesResponse[D] => Either[ErrorWrapper, DesResponse[D]] = { _: DesResponse[D] =>
     ErrorWrapper(Some(correlationId), Seq(error1)).asLeft[DesResponse[V]]
   }
@@ -60,14 +66,14 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
 
       "the specified mapping function returns success" must {
         "use that as the success result" in {
-          mapToVendor(ep, desToMtdErrorMap)(mapToUpperCase)(goodResponse) shouldBe
+          mapToVendor(ep, desToMtdErrorMap, bvrToMtdErrorMap)(mapToUpperCase)(goodResponse) shouldBe
             DesResponse(correlationId, "DESRESPONSE").asRight
         }
       }
 
       "the specified mapping function returns a failure" must {
         "use that as the failure result" in {
-          mapToVendor(ep, desToMtdErrorMap)(mapToError)(goodResponse) shouldBe
+          mapToVendor(ep, desToMtdErrorMap, bvrToMtdErrorMap)(mapToError)(goodResponse) shouldBe
             ErrorWrapper(Some(correlationId), Seq(error1)).asLeft
         }
       }
@@ -93,7 +99,7 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
     }
 
     "des returns an error" when {
-      singleErrorBehaveCorrectly(mapToVendorDirect(ep, desToMtdErrorMap))
+      singleErrorBehaveCorrectly(mapToVendorDirect(ep, desToMtdErrorMap,))
 
       multipleErrorsBehaveCorrectly(mapToVendorDirect(ep, desToMtdErrorMap))
     }
@@ -105,7 +111,7 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
         val singleErrorResponse = DesResponse(correlationId, SingleError(desError1)).asLeft
 
         handler(singleErrorResponse) shouldBe
-          ErrorWrapper(Some(correlationId), Seq(error1)).asLeft
+          ErrorWrapper(Some(correlationId), None, Seq(error1)).asLeft
       }
     }
 
@@ -114,7 +120,7 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
         val singleErrorResponse = DesResponse(correlationId, SingleError(desErrorUnmapped)).asLeft
 
         handler(singleErrorResponse) shouldBe
-          ErrorWrapper(Some(correlationId), Seq(DownstreamError)).asLeft
+          ErrorWrapper(Some(correlationId), None, Seq(DownstreamError)).asLeft
       }
     }
 
@@ -123,7 +129,7 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
         val outboundErrorResponse = DesResponse(correlationId, OutboundError(desError1)).asLeft
 
         handler(outboundErrorResponse) shouldBe
-          ErrorWrapper(Some(correlationId), Seq(desError1)).asLeft
+          ErrorWrapper(Some(correlationId), None, Seq(desError1)).asLeft
       }
     }
   }
@@ -134,7 +140,7 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
         val multipleErrorResponse = DesResponse(correlationId, MultipleErrors(Seq(desError1, desError2))).asLeft
 
         handler(multipleErrorResponse) shouldBe
-          ErrorWrapper(Some(correlationId), Seq(BadRequestError, error1, error2)).asLeft
+          ErrorWrapper(Some(correlationId), None, Seq(BadRequestError, error1, error2)).asLeft
       }
 
       "one of the mtd errors is a DownstreamError" must {
@@ -142,7 +148,7 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
           val multipleErrorResponse = DesResponse(correlationId, MultipleErrors(Seq(desError1, desError3))).asLeft
 
           handler(multipleErrorResponse) shouldBe
-            ErrorWrapper(Some(correlationId), Seq(DownstreamError)).asLeft
+            ErrorWrapper(Some(correlationId), None, Seq(DownstreamError)).asLeft
         }
       }
 
@@ -151,7 +157,7 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
           val multipleErrorResponse = DesResponse(correlationId, MultipleErrors(Seq(desError1, desErrorUnmapped))).asLeft
 
           handler(multipleErrorResponse) shouldBe
-            ErrorWrapper(Some(correlationId), Seq(DownstreamError)).asLeft
+            ErrorWrapper(Some(correlationId), None, Seq(DownstreamError)).asLeft
         }
       }
     }
