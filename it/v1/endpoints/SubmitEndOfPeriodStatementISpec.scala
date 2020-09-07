@@ -185,7 +185,22 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
 
             val response: WSResponse = await(request().post(fullValidJson()))
             response.status shouldBe expectedStatus
-            response.json shouldBe Json.toJson(expectedBody)
+
+            if(expectedBody.equals(BVRError)){
+              lazy val multipleErrors: Seq[MtdError] = Seq(
+                RuleConsolidatedExpensesError,
+                RuleMismatchedStartDateError,
+                RuleMismatchedEndDateError,
+                RuleClass4Over16Error,
+                RuleClass4PensionAge,
+                RuleFHLPrivateUseAdjustment,
+                RuleNonFHLPrivateUseAdjustment
+              )
+              lazy val multipleErrorsJson = Json.toJson(expectedBody).as[JsObject] + ("errors" -> Json.toJson(multipleErrors))
+              response.json shouldBe multipleErrorsJson
+            } else {
+              response.json shouldBe Json.toJson(expectedBody)
+            }
           }
         }
 
@@ -206,6 +221,55 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
             |}
             |""".stripMargin)
 
+        val bvrMultiple = Json.parse(
+          """
+            |{
+            |    "bvrfailureResponseElement": {
+            |        "code": "BVR_FAILURE_EXISTS",
+            |        "reason": "The remote endpoint has indicated that there are bvr failures",
+            |        "validationRuleFailures": [
+            |            {
+            |                "id": "C55503",
+            |                "type": "ERR",
+            |                "text": "C55503 text"
+            |            },{
+            |                "id": "C55316",
+            |                "type": "ERR",
+            |                "text": "C55316 text"
+            |            },{
+            |                "id": "C55008",
+            |                "type": "ERR",
+            |                "text": "C55008 text"
+            |            },{
+            |                "id": "C55013",
+            |                "type": "ERR",
+            |                "text": "C55013 text"
+            |            },{
+            |                "id": "C55014",
+            |                "type": "ERR",
+            |                "text": "C55014 text"
+            |            },{
+            |                "id": "C55317",
+            |                "type": "ERR",
+            |                "text": "C55317 text"
+            |            },{
+            |                "id": "C55318",
+            |                "type": "ERR",
+            |                "text": "C55318 text"
+            |            },{
+            |                "id": "C55501",
+            |                "type": "ERR",
+            |                "text": "C55501 text"
+            |            },{
+            |                "id": "C55502",
+            |                "type": "ERR",
+            |                "text": "C55502 text"
+            |            }
+            |        ]
+            |    }
+            |}
+            |""".stripMargin
+        )
 
         val input : Seq[(Int, JsValue, Int, MtdError)]= Seq(
           (Status.FORBIDDEN, bvr("C55503"), Status.FORBIDDEN, RuleConsolidatedExpensesError),
@@ -216,7 +280,8 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
           (Status.FORBIDDEN, bvr("C55317"), Status.FORBIDDEN, RuleClass4Over16Error),
           (Status.FORBIDDEN, bvr("C55318"), Status.FORBIDDEN, RuleClass4PensionAge),
           (Status.FORBIDDEN, bvr("C55501"), Status.FORBIDDEN, RuleFHLPrivateUseAdjustment),
-          (Status.FORBIDDEN, bvr("C55502"), Status.FORBIDDEN, RuleNonFHLPrivateUseAdjustment)
+          (Status.FORBIDDEN, bvr("C55502"), Status.FORBIDDEN, RuleNonFHLPrivateUseAdjustment),
+          (Status.FORBIDDEN, bvrMultiple, Status.FORBIDDEN, BVRError)
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))
