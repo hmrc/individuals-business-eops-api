@@ -90,7 +90,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
            RuleNotFinalisedError
                 => BadRequest(Json.toJson(errorWrapper))
 
-      case RuleAlreadySubmittedError |
+      case BVRError |
+           RuleAlreadySubmittedError |
            RuleEarlySubmissionError |
            RuleLateSubmissionError |
            RuleNonMatchingPeriodError |
