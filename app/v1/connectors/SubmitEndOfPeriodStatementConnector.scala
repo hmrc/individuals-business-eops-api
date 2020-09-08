@@ -18,14 +18,13 @@ package v1.connectors
 
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import v1.models.requestData.SubmitEndOfPeriodStatementRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitEndOfPeriodStatementConnector@Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDesConnector{
+class SubmitEndOfPeriodStatementConnector@Inject()(val http: HttpClient, val appConfig: AppConfig) extends DesConnector{
 
   def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(
     implicit hc: HeaderCarrier,

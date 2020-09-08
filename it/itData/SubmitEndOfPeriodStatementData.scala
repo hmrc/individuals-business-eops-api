@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package data
+package itData
 
 import play.api.libs.json.{JsValue, Json}
 import v1.models.des.TypeOfBusiness
@@ -49,19 +49,5 @@ object SubmitEndOfPeriodStatementData {
        | "finalised": $finalised
        |}
        |""".stripMargin
-  )
-
-  val successJson: JsValue = Json.parse(
-    """
-      |{
-      |    "typeOfBusiness": "foreign-property",
-      |    "businessId": "XAIS12345678910",
-      |    "accountingPeriod": {
-      |        "startDate": "2021-04-06",
-      |        "endDate": "2022-04-05"
-      |    },
-      |    "finalised": true
-      |}""".stripMargin
-
   )
 }

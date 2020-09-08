@@ -16,8 +16,6 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{Json, Writes}
-
 //scalastyle:off
 
 object NinoFormatError extends MtdError("FORMAT_NINO", "The provided NINO is invalid")
