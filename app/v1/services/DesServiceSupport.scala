@@ -48,7 +48,7 @@ trait DesServiceSupport {
     * @tparam V the vendor response domain object type
     * @return the function to map outcomes
     */
-  final def mapToVendor[D, V](endpointName: String, errorMap: PartialFunction[String, MtdError])
+  final def mapToVendor[D, V](endpointName: String, errorMap: PartialFunction[String, MtdError],bvrErrorMap: PartialFunction[String, MtdError]  )
                              (success: DesResponse[D] => VendorOutcome[V])
                              (desOutcome: DesOutcome[D]): VendorOutcome[V] = {
 
@@ -67,16 +67,25 @@ trait DesServiceSupport {
           logger.info(
             s"[$serviceName] [$endpointName] [CorrelationId - $correlationId]" +
               s" - downstream returned ${errors.map(_.code).mkString(",")}. Revert to ISE")
-          Left(ErrorWrapper(Some(correlationId), Seq(DownstreamError)))
+          Left(ErrorWrapper(Some(correlationId),  Seq(DownstreamError)))
         } else {
           Left(ErrorWrapper(Some(correlationId), Seq(BadRequestError) ++ mtdErrors))
+        }
+
+      case Left(DesResponse(correlationId, BVRErrors(errors))) =>
+        val mtdErrors = errors.map(error => bvrErrorMap.applyOrElse(error.code, defaultErrorMapping))
+
+        if(mtdErrors.length == 1){
+          Left(ErrorWrapper(Some(correlationId), mtdErrors))
+        } else {
+          Left(ErrorWrapper(Some(correlationId), Seq(BVRError) ++ mtdErrors))
         }
 
       case Left(DesResponse(correlationId, SingleError(error))) =>
         Left(ErrorWrapper(Some(correlationId), Seq(errorMap.applyOrElse(error.code, defaultErrorMapping))))
 
       case Left(DesResponse(correlationId, OutboundError(error))) =>
-        Left(ErrorWrapper(Some(correlationId), Seq(error)))
+        Left(ErrorWrapper(Some(correlationId),  Seq(error)))
     }
   }
 
@@ -93,9 +102,10 @@ trait DesServiceSupport {
     * @tparam D the DES response domain object type
     * @return the function to map outcomes
     */
-  final def mapToVendorDirect[D](endpointName: String, errorMap: PartialFunction[String, MtdError])(desOutcome: DesOutcome[D]): VendorOutcome[D] = {
+  final def mapToVendorDirect[D](endpointName: String, errorMap: PartialFunction[String, MtdError],
+                                 bvrErrorMap: PartialFunction[String, MtdError])(desOutcome: DesOutcome[D]): VendorOutcome[D] = {
 
-    mapToVendor[D, D](endpointName, errorMap) { desResponse =>
+    mapToVendor[D, D](endpointName, errorMap, bvrErrorMap) { desResponse =>
       Right(DesResponse(desResponse.correlationId, desResponse.responseData))
     }(desOutcome)
   }

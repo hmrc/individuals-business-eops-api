@@ -44,6 +44,12 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
     case "DES_CODE_DOWNSTREAM" => DownstreamError
   }
 
+  val bvrToMtdErrorMap: PartialFunction[String, MtdError] = {
+    case "BVR_CODE1"           => error1
+    case "BVR_CODE2"           => error2
+    case "BVR_CODE_DOWNSTREAM" => DownstreamError
+  }
+
   val mapToError: DesResponse[D] => Either[ErrorWrapper, DesResponse[D]] = { _: DesResponse[D] =>
     ErrorWrapper(Some(correlationId), Seq(error1)).asLeft[DesResponse[V]]
   }
@@ -60,23 +66,23 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
 
       "the specified mapping function returns success" must {
         "use that as the success result" in {
-          mapToVendor(ep, desToMtdErrorMap)(mapToUpperCase)(goodResponse) shouldBe
+          mapToVendor(ep, desToMtdErrorMap, bvrToMtdErrorMap)(mapToUpperCase)(goodResponse) shouldBe
             DesResponse(correlationId, "DESRESPONSE").asRight
         }
       }
 
       "the specified mapping function returns a failure" must {
         "use that as the failure result" in {
-          mapToVendor(ep, desToMtdErrorMap)(mapToError)(goodResponse) shouldBe
+          mapToVendor(ep, desToMtdErrorMap, bvrToMtdErrorMap)(mapToError)(goodResponse) shouldBe
             ErrorWrapper(Some(correlationId), Seq(error1)).asLeft
         }
       }
     }
 
     "des returns an error" when {
-      singleErrorBehaveCorrectly(mapToVendor(ep, desToMtdErrorMap)(mapToUpperCase))
+      singleErrorBehaveCorrectly(mapToVendor(ep, desToMtdErrorMap, bvrToMtdErrorMap)(mapToUpperCase))
 
-      multipleErrorsBehaveCorrectly(mapToVendor(ep, desToMtdErrorMap)(mapToUpperCase))
+      multipleErrorsBehaveCorrectly(mapToVendor(ep, desToMtdErrorMap, bvrToMtdErrorMap)(mapToUpperCase))
     }
   }
 
@@ -86,16 +92,16 @@ class DesServiceSupportSpec extends UnitSpec with DesServiceSupport {
 
       "use the des content as is" must {
         "use that as the success result" in {
-          mapToVendorDirect(ep, desToMtdErrorMap)(goodResponse) shouldBe
+          mapToVendorDirect(ep, desToMtdErrorMap, bvrToMtdErrorMap)(goodResponse) shouldBe
             DesResponse(correlationId, "desresponse").asRight
         }
       }
     }
 
     "des returns an error" when {
-      singleErrorBehaveCorrectly(mapToVendorDirect(ep, desToMtdErrorMap))
+      singleErrorBehaveCorrectly(mapToVendorDirect(ep, desToMtdErrorMap,bvrToMtdErrorMap))
 
-      multipleErrorsBehaveCorrectly(mapToVendorDirect(ep, desToMtdErrorMap))
+      multipleErrorsBehaveCorrectly(mapToVendorDirect(ep, desToMtdErrorMap,bvrToMtdErrorMap))
     }
   }
 
