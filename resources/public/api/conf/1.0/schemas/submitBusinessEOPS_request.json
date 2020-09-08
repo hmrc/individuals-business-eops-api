@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "typeOfBusiness": {
-      "description": "The type of business the the declaration is for. Limited to the following possible values: self-employment, uk-property and foreign-property",
+      "description": "The type of business the the declaration is for. Limited to the following possible values: self-employment, uk-property and foreign-property.",
       "type": "string",
       "enum": [
         "self-employment",
@@ -15,21 +15,21 @@
       "example": "self-employment"
     },
     "businessId": {
-      "description": "An identifier for the business, unique to the customer. Must conform to the regular expression ^X[A-Z0-9]{1}IS[0-9]{11}$. For example: XAIS12345678910",
+      "description": "An identifier for the business, unique to the customer. Must conform to the regular expression ^X[A-Z0-9]{1}IS[0-9]{11}$.",
       "type": "string",
       "example": "XAIS12345678910"
     },
     "accountingPeriod": {
       "type": "object",
-      "description": "Object containing the accounting period start and end dates",
+      "description": "Object containing the accounting period start and end dates.",
       "properties": {
         "startDate": {
-          "description": "The date the accounting period started. Must be in the format YYYY-MM-DD. For example: 2021-04-06",
+          "description": "The date the accounting period started. Must be in the format YYYY-MM-DD.",
           "type": "string",
           "example": "2021-04-06"
         },
         "endDate": {
-          "description": "The date the accounting period ended. Must be in the format YYYY-MM-DD. For example: 2022-04-05",
+          "description": "The date the accounting period ended. Must be in the format YYYY-MM-DD.",
           "type": "string",
           "example": "2022-04-05"
         }
@@ -40,7 +40,7 @@
       ]
     },
     "finalised": {
-      "description": "Declaration for the finalised statement. Limited to the following possible values: true or false",
+      "description": "Declaration for the finalised statement. Limited to the following possible values: true or false.",
       "type": "boolean",
       "example": "true"
     }

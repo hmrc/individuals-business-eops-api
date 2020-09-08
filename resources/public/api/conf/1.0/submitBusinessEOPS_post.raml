@@ -34,8 +34,14 @@ body:
     type: !include schemas/submitBusinessEOPS_request.json
     examples:
      example-1:
-      description: Submit End of Period Statement for a Busines
-      value: !include examples/submitBusinessEOPS_post.json
+      description: Submit End of Period Statement for a Business - Self Employment
+      value: !include examples/submitBusinessEOPS_SelfEmployment_post.json
+     example-2:
+      description: Submit End of Period Statement for a Business - UK Property
+      value: !include examples/submitBusinessEOPS_UkProperty_post.json
+     example-3:
+      description: Submit End of Period Statement for a Business - Foreign Property
+      value: !include examples/submitBusinessEOPS_ForeignProperty_post.json
 responses:
   204:
       headers:
