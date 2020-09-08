@@ -67,7 +67,7 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
       "C55317" -> RuleClass4Over16Error,
       "C55318" -> RuleClass4PensionAge,
       "C55501" -> RuleFHLPrivateUseAdjustment,
-      "C55502" -> RuleNonFHLPrivateUseAdjustment,
+      "C55502" -> RuleNonFHLPrivateUseAdjustment
     )
 
   }
