@@ -16,6 +16,7 @@
 
 package data
 
+import play.api.libs.json.{JsValue, Json}
 import v1.models.des.TypeOfBusiness
 import v1.models.des.TypeOfBusiness.`foreign-property`
 import v1.models.requestData.{AccountingPeriod, SubmitEndOfPeriod}
@@ -30,4 +31,18 @@ object SubmitEndOfPeriodStatementData {
   val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(`foreign-property`, "XAIS12345678910", accountingPeriod = AccountingPeriod(
     "2021-04-06","2022-04-05"
   ),finalised = true)
+
+  val successJson: JsValue = Json.parse(
+    """
+      |{
+      |    "typeOfBusiness": "foreign-property",
+      |    "businessId": "XAIS12345678910",
+      |    "accountingPeriod": {
+      |        "startDate": "2021-04-06",
+      |        "endDate": "2022-04-05"
+      |    },
+      |    "finalised": true
+      |}""".stripMargin
+
+  )
 }
