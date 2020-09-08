@@ -33,12 +33,10 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
   override val serviceName: String = this.getClass.getSimpleName
 
   def submitEndOfPeriodStatementService(request: SubmitEndOfPeriodStatementRequest)
-                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SumbmitEndOfPeriodStatmentOutcome] = {
+                                       (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmitEndOfPeriodStatmentOutcome] = {
 
     connector.submitPeriodStatement(request).map {
-
       mapToVendorDirect("submitEndOfPeriodStatement",desErrorToMtdError,desBvrErrorToMtdError)
-
     }
   }
 

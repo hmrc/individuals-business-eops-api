@@ -24,7 +24,7 @@ import v1.models.requestData.SubmitEndOfPeriodStatementRequest
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitEndOfPeriodStatementConnector@Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDesConnector{
+class SubmitEndOfPeriodStatementConnector@Inject()(val http: HttpClient, val appConfig: AppConfig) extends DesConnector{
 
   def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(
     implicit hc: HeaderCarrier,

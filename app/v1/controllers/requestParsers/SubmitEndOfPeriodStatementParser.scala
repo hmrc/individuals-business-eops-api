@@ -25,5 +25,5 @@ class SubmitEndOfPeriodStatementParser @Inject()(val validator: SubmitEndOfPerio
   SubmitEndOfPeriodStatementRequest] {
 
   override protected def requestFor(data: SubmitEndOfPeriodStatementRawData): SubmitEndOfPeriodStatementRequest =
-    SubmitEndOfPeriodStatementRequest(Nino(data.nino),data.body.json.as[SubmitEndOfPeriod])
+    SubmitEndOfPeriodStatementRequest(Nino(data.nino), data.body.json.as[SubmitEndOfPeriod])
 }

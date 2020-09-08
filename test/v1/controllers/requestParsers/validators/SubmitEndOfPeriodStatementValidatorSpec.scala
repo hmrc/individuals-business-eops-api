@@ -20,8 +20,10 @@ import mocks.MockAppConfig
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsJson
 import support.UnitSpec
-import v1.models.errors.{BusinessIdFormatError, EndDateFormatError, FinalisedFormatError, MtdError, NinoFormatError, RangeEndDateBeforeStartDateError, RuleIncorrectOrEmptyBodyError, RuleNotFinalisedError, StartDateFormatError, TypeOfBusinessFormatError}
+import v1.models.errors.{BusinessIdFormatError, EndDateFormatError, FinalisedFormatError, NinoFormatError,
+  RangeEndDateBeforeStartDateError, RuleIncorrectOrEmptyBodyError, RuleNotFinalisedError, StartDateFormatError, TypeOfBusinessFormatError}
 import v1.models.requestData.SubmitEndOfPeriodStatementRawData
+import data.SubmitEndOfPeriodStatementData._
 
 class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfig {
 
@@ -55,26 +57,6 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfi
       """{
         | "finalised": "XXXX"
         |}""".stripMargin)
-
-
-    def fullValidJson(typeOfBusiness: String = "self-employment",
-                      businessId: String = "XAIS12345678910",
-                      startDate: String = "2021-04-06",
-                      endDate: String = "2022-04-05",
-                      finalised: String = "true"
-
-                     ): JsValue = Json.parse(
-      s"""{
-        | "typeOfBusiness":"$typeOfBusiness",
-        | "businessId":"$businessId",
-        | "accountingPeriod": {
-        |   "startDate": "$startDate",
-        |   "endDate":"$endDate"
-        | },
-        | "finalised": $finalised
-        |}
-        |""".stripMargin
-    )
   }
 
   "Running a validation" should {

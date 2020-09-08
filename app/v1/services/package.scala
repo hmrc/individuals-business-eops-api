@@ -21,6 +21,6 @@ import v1.models.outcomes.DesResponse
 
 package object services {
 
-  type SumbmitEndOfPeriodStatmentOutcome = Either[ErrorWrapper, DesResponse[Unit]]
+  type SubmitEndOfPeriodStatmentOutcome = Either[ErrorWrapper, DesResponse[Unit]]
 
 }

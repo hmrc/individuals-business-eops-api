@@ -28,10 +28,12 @@ case class ErrorWrapper(correlationId: Option[String] , errors: Seq[MtdError] = 
 object ErrorWrapper {
   implicit val writes: Writes[ErrorWrapper] = (errorResponse: ErrorWrapper) => {
 
-    val json = Json.toJson(errorResponse.errors.head).as[JsObject]
+    val distinctErrorsList = errorResponse.errors.distinct
 
-    if(errorResponse.errors.length > 1){
-      json + ("errors" -> Json.toJson(errorResponse.errors.tail))
+    val json = Json.toJson(distinctErrorsList.head).as[JsObject]
+
+    if(distinctErrorsList.length > 1){
+      json + ("errors" -> Json.toJson(distinctErrorsList.tail))
     } else {
       json
     }
