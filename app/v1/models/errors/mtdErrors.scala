@@ -15,7 +15,6 @@
  */
 
 package v1.models.errors
-import play.api.libs.json.{Json, Writes}
 
 //scalastyle:off
 
