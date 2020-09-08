@@ -103,8 +103,8 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
     }
     Map(
       "C55503" -> RuleConsolidatedExpensesError,
-      "C55008" -> RuleMismatchedStartDateError,
       "C55316" -> RuleConsolidatedExpensesError,
+      "C55008" -> RuleMismatchedStartDateError,
       "C55013" -> RuleMismatchedEndDateError,
       "C55014" -> RuleMismatchedEndDateError,
       "C55317" -> RuleClass4Over16Error,
