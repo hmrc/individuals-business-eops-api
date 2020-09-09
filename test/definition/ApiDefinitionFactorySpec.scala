@@ -56,7 +56,7 @@ class ApiDefinitionFactorySpec extends UnitSpec {
               )
             ),
             api = APIDefinition(
-              name = "Individuals Business End of Period Statement API (MTD)",
+              name = "Individuals Business End of Period Statement (MTD)",
               description = "This is a draft spec for the Individuals Business End of Period Statement API",
               context = "mtd/template",
               categories = Seq("INCOME_TAX_MTD"),
