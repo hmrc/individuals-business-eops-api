@@ -26,22 +26,22 @@ is:
   - errors.notFound
 displayName: Submit End of Period Statement for a Business
 description: This endpoint allows the developer to submit a declaration that the submission data for a business is complete. A National Insurance number is required.
-(annotations.sandboxData): !include scenarios/submitBusinessEOPS_test_scenarios.md
+(annotations.sandboxData): !include scenarios/submitBusEOPS_scenarios.md
 (annotations.scope): "write:self-assessment"
 securedBy: [ sec.oauth_2_0: { scopes: [ "write:self-assessment" ] } ]
 body:
   application/json:
-    type: !include schemas/submitBusinessEOPS_request.json
+    type: !include schemas/submitBusEOPS_req.json
     examples:
      example-1:
       description: Submit End of Period Statement for a Business - Self Employment
-      value: !include examples/submitBusinessEOPS_SelfEmployment_post.json
+      value: !include examples/submitBusEOPS_se_req.json
      example-2:
       description: Submit End of Period Statement for a Business - UK Property
-      value: !include examples/submitBusinessEOPS_UkProperty_post.json
+      value: !include examples/submitBusinessEOPS_fp_req.json
      example-3:
       description: Submit End of Period Statement for a Business - Foreign Property
-      value: !include examples/submitBusinessEOPS_ForeignProperty_post.json
+      value: !include examples/submitBusinessEOPS_prop_req.json
 responses:
   204:
       headers:
