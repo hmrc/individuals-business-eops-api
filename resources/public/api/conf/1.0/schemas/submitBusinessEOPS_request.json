@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "typeOfBusiness": {
-      "description": "The type of business the the declaration is for. Limited to the following possible values: self-employment, uk-property and foreign-property.",
+      "description": "The type of business the the declaration is for.",
       "type": "string",
       "enum": [
         "self-employment",
