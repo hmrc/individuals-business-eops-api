@@ -36,36 +36,38 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmitEndOfPeriodStatmentOutcome] = {
 
     connector.submitPeriodStatement(request).map {
+
       mapToVendorDirect("submitEndOfPeriodStatement",desErrorToMtdError,desBvrErrorToMtdError)
+
     }
   }
 
-    private def desErrorToMtdError: Map[String, MtdError] = Map(
-      "INVALID_IDTYPE" -> DownstreamError,
-      "INVALID_IDVALUE" -> NinoFormatError,
-      "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
-      "INVALID_ACCOUNTINGPERIODENDDATE" -> EndDateFormatError,
-      "INVALID_INCOMESOURCEID" -> BusinessIdFormatError,
-      "INVALID_INCOMESOURCETYPE" -> TypeOfBusinessFormatError,
-      "CONFLICT" -> RuleAlreadySubmittedError,
-      "EARLY_SUBMISSION" -> RuleEarlySubmissionError,
-      "LATE_SUBMISSION" -> RuleLateSubmissionError,
-      "NON_MATCHING_PERIOD" -> RuleNonMatchingPeriodError,
-      "NOT_FOUND" -> NotFoundError,
-      "SERVER_ERROR" -> DownstreamError,
-      "SERVICE_UNAVAILABLE" -> DownstreamError
-    )
+  private def desErrorToMtdError: Map[String, MtdError] = Map(
+    "INVALID_IDTYPE" -> DownstreamError,
+    "INVALID_IDVALUE" -> NinoFormatError,
+    "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
+    "INVALID_ACCOUNTINGPERIODENDDATE" -> EndDateFormatError,
+    "INVALID_INCOMESOURCEID" -> BusinessIdFormatError,
+    "INVALID_INCOMESOURCETYPE" -> TypeOfBusinessFormatError,
+    "CONFLICT" -> RuleAlreadySubmittedError,
+    "EARLY_SUBMISSION" -> RuleEarlySubmissionError,
+    "LATE_SUBMISSION" -> RuleLateSubmissionError,
+    "NON_MATCHING_PERIOD" -> RuleNonMatchingPeriodError,
+    "NOT_FOUND" -> NotFoundError,
+    "SERVER_ERROR" -> DownstreamError,
+    "SERVICE_UNAVAILABLE" -> DownstreamError
+  )
 
-    private def desBvrErrorToMtdError: Map[String, MtdError] = Map(
-      "C55503" -> RuleConsolidatedExpensesError,
-      "C55008" -> RuleMismatchedStartDateError,
-      "C55316" -> RuleConsolidatedExpensesError,
-      "C55013" -> RuleMismatchedEndDateError,
-      "C55014" -> RuleMismatchedEndDateError,
-      "C55317" -> RuleClass4Over16Error,
-      "C55318" -> RuleClass4PensionAge,
-      "C55501" -> RuleFHLPrivateUseAdjustment,
-      "C55502" -> RuleNonFHLPrivateUseAdjustment,
-    )
+  private def desBvrErrorToMtdError: Map[String, MtdError] = Map(
+    "C55503" -> RuleConsolidatedExpensesError,
+    "C55316" -> RuleConsolidatedExpensesError,
+    "C55008" -> RuleMismatchedStartDateError,
+    "C55013" -> RuleMismatchedEndDateError,
+    "C55014" -> RuleMismatchedEndDateError,
+    "C55317" -> RuleClass4Over16Error,
+    "C55318" -> RuleClass4PensionAge,
+    "C55501" -> RuleFHLPrivateUseAdjustment,
+    "C55502" -> RuleNonFHLPrivateUseAdjustment
+  )
 
-  }
+}

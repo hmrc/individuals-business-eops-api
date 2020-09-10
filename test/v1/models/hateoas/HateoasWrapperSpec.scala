@@ -24,13 +24,16 @@ class HateoasWrapperSpec extends UnitSpec {
 
   case class TestMtdResponse(field1: String, field2: Int)
 
+  val field2 = 123
+
+
   object TestMtdResponse {
     implicit val writes: OWrites[TestMtdResponse] = Json.writes[TestMtdResponse]
   }
 
   "HateoasWrapper writes" must {
     "place links alongside wrapped object fields" in {
-      Json.toJson(HateoasWrapper(TestMtdResponse("value1", 123), Seq(Link("/some/resource", GET, "thing")))) shouldBe
+      Json.toJson(HateoasWrapper(TestMtdResponse("value1", field2), Seq(Link("/some/resource", GET, "thing")))) shouldBe
         Json.parse("""
       |{
       |"field1": "value1",
@@ -47,7 +50,7 @@ class HateoasWrapperSpec extends UnitSpec {
     }
 
     "not write links array if there are no links" in {
-      Json.toJson(HateoasWrapper(TestMtdResponse("value1", 123), Nil)) shouldBe
+      Json.toJson(HateoasWrapper(TestMtdResponse("value1", field2), Nil)) shouldBe
         Json.parse("""
                      |{
                      |"field1": "value1",

@@ -34,49 +34,6 @@ trait DesConnector {
     hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
       .withExtraHeaders("Environment" -> appConfig.desEnv)
 
-  def post[Body: Writes, Resp](body: Body, uri: DesUri[Resp])(implicit ec: ExecutionContext,
-                                                              hc: HeaderCarrier,
-                                                              httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
-
-    def doPost(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
-      http.POST(s"${appConfig.desBaseUrl}/${uri.value}", body)
-    }
-
-    doPost(desHeaderCarrier(hc))
-  }
-
-  def get[Resp](uri: DesUri[Resp])(implicit ec: ExecutionContext,
-                                   hc: HeaderCarrier,
-                                   httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
-
-    def doGet(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] =
-      http.GET(s"${appConfig.desBaseUrl}/${uri.value}")
-
-    doGet(desHeaderCarrier(hc))
-  }
-
-  def delete[Resp](uri: DesUri[Resp])(implicit ec: ExecutionContext,
-                                      hc: HeaderCarrier,
-                                      httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
-
-    def doDelete(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
-      http.DELETE(s"${appConfig.desBaseUrl}/${uri.value}")
-    }
-
-    doDelete(desHeaderCarrier(hc))
-  }
-
-  def put[Body: Writes, Resp](body: Body, uri: DesUri[Resp])(implicit ec: ExecutionContext,
-                                                             hc: HeaderCarrier,
-                                                             httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
-
-    def doPut(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
-      http.PUT(s"${appConfig.desBaseUrl}/${uri.value}", body)
-    }
-
-    doPut(desHeaderCarrier(hc))
-  }
-
   def postEmpty[Resp]( uri: DesUri[Resp])(implicit ec: ExecutionContext,
                                                               hc: HeaderCarrier,
                                                               httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
