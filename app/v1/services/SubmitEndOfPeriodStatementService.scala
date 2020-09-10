@@ -20,7 +20,6 @@ import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.connectors.SubmitEndOfPeriodStatementConnector
 import v1.models.errors._
-import v1.models.outcomes.DesResponse
 import v1.models.requestData.SubmitEndOfPeriodStatementRequest
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,9 +35,7 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SubmitEndOfPeriodStatmentOutcome] = {
 
     connector.submitPeriodStatement(request).map {
-
       mapToVendorDirect("submitEndOfPeriodStatement",desErrorToMtdError,desBvrErrorToMtdError)
-
     }
   }
 
@@ -69,5 +66,4 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
     "C55501" -> RuleFHLPrivateUseAdjustment,
     "C55502" -> RuleNonFHLPrivateUseAdjustment
   )
-
 }
