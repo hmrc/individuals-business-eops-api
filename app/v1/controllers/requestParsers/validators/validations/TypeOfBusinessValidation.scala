@@ -32,8 +32,10 @@ object TypeOfBusinessValidation {
     }
 
     //400 FORMAT_TYPE_OF_BUSINESS The provided Type of business is invalid
-    logger.warn(s"$log typeOfBusiness is invalid. typeOfBusiness: $typeOfBusiness")
-    if(validTypeOfBusiness) NoValidationErrors else List(TypeOfBusinessFormatError)
+    if(validTypeOfBusiness) NoValidationErrors else {
+      logger.warn(s"$log typeOfBusiness is invalid. typeOfBusiness: $typeOfBusiness")
+      List(TypeOfBusinessFormatError)
+    }
   }
 
 }
