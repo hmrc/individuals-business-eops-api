@@ -33,8 +33,7 @@ object CodeCoverageSettings {
 
   val settings: Seq[Setting[_]] = Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    //TODO REVERT BACK TO 95 WHEN ENDPOINT IS AVAILABLE
-    ScoverageKeys.coverageMinimum := 91,
+    ScoverageKeys.coverageMinimum := 100,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )

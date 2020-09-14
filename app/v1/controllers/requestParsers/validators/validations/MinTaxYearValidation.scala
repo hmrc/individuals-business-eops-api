@@ -28,7 +28,7 @@ object MinTaxYearValidation {
 
       if (desTaxYear >= minTaxYear) NoValidationErrors else List(RuleTaxYearNotSupportedError)
     } catch {
-      case e: NumberFormatException => List(TaxYearFormatError)
+      case _: NumberFormatException => List(TaxYearFormatError)
     }
   }
 }

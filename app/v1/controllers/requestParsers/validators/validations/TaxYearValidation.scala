@@ -23,28 +23,25 @@ object TaxYearValidation {
   val taxYearFormat = "20[1-9][0-9]\\-[1-9][0-9]"
 
   def validate(taxYear: String): List[MtdError] = {
-    try {
-      if (taxYear.matches(taxYearFormat)) {
 
-        val startTaxYearStart: Int = 2
-        val startTaxYearEnd: Int = 4
+    if (taxYear.matches(taxYearFormat)) {
 
-        val endTaxYearStart: Int = 5
-        val endTaxYearEnd: Int = 7
+      val startTaxYearStart: Int = 2
+      val startTaxYearEnd: Int = 4
 
-        val start = taxYear.substring(startTaxYearStart, startTaxYearEnd).toInt
-        val end   = taxYear.substring(endTaxYearStart, endTaxYearEnd).toInt
+      val endTaxYearStart: Int = 5
+      val endTaxYearEnd: Int = 7
 
-        if (end - start == 1) {
-          NoValidationErrors
-        } else {
-          List(RuleTaxYearRangeInvalid)
-        }
+      val start = taxYear.substring(startTaxYearStart, startTaxYearEnd).toInt
+      val end = taxYear.substring(endTaxYearStart, endTaxYearEnd).toInt
+
+      if (end - start == 1) {
+        NoValidationErrors
       } else {
-        List(TaxYearFormatError)
+        List(RuleTaxYearRangeInvalid)
       }
-    }catch{
-      case e : NumberFormatException => List(TaxYearFormatError)
+    } else {
+      List(TaxYearFormatError)
     }
   }
 }

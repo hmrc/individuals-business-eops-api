@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package v1.models.hateoas
+package v1.models.audit
 
-object RelType {
-  //TODO UPDATE FOR THIS API
-  val DELETE_PENSION_CHARGES = "delete-charges-pensions"
-  val AMEND_PENSION_CHARGES = "amend-charges-pensions"
-  val SELF = "self"
+import data.AuditData._
+import play.api.libs.json.Json
+import support.UnitSpec
+
+class AuditResponseSpec extends UnitSpec {
+
+  "AuditResponse" when {
+    "written to JSON with a body" should {
+      "produce the expected JsObject" in {
+        Json.toJson(auditResponseModelWithBody) shouldBe auditResponseJsonWithBody
+      }
+    }
+  }
+  "written to JSON with Audit Errors" should {
+    "produce the expected JsObject" in {
+      Json.toJson(auditResponseModelWithErrors) shouldBe auditResponseJsonWithErrors
+    }
+  }
 }
