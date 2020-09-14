@@ -38,6 +38,12 @@ class DesTaxYearSpec extends UnitSpec {
         year.value shouldBe taxYear
       }
     }
+    "generate a tax year as a string" when{
+      "given a string" in {
+        val year = DesTaxYear("2018-19")
+        year.toString shouldBe taxYear
+      }
+    }
     "generate the most recent tax year" when {
       "the date is before XXXX-04-05" in {
         DesTaxYear.mostRecentTaxYear(LocalDate.parse("2020-04-01")) shouldBe DesTaxYear("2019")

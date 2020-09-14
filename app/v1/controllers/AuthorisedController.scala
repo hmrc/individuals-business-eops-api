@@ -34,7 +34,8 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
 
   val authService: EnrolmentsAuthService
   val lookupService: MtdIdLookupService
-
+  // $COVERAGE-OFF$
+  //TODO Add coverage back on when another api with a body is added
   def authorisedAction(nino: String): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
 
     override def parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser

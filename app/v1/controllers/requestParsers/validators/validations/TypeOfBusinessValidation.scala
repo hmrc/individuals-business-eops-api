@@ -27,15 +27,12 @@ object TypeOfBusinessValidation {
   lazy val log = s"[JsonFormatValidation][validate] - Request body failed validation with errors -"
 
   def typeOfBusinessFormat(typeOfBusiness: String): List[MtdError] = {
-    val validTypeOfBusiness: Boolean = try {
+    val validTypeOfBusiness: Boolean = {
       Json.parse(s""""$typeOfBusiness"""").asOpt[TypeOfBusiness].isDefined
-    } catch {
-      case _: Exception =>
-        logger.warn(s"$log typeOfBusiness is invalid. typeOfBusiness: $typeOfBusiness")
-        false
     }
 
     //400 FORMAT_TYPE_OF_BUSINESS The provided Type of business is invalid
+    logger.warn(s"$log typeOfBusiness is invalid. typeOfBusiness: $typeOfBusiness")
     if(validTypeOfBusiness) NoValidationErrors else List(TypeOfBusinessFormatError)
   }
 

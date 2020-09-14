@@ -23,6 +23,9 @@ trait Validator[A <: RawData] {
 
   type ValidationLevel[T] = T => List[MtdError]
 
+  // $COVERAGE-OFF$
+  //TODO Add coverage back on when paths have been added to the validator
+
   def validate(data: A): List[MtdError]
 
   def run(validationSet: List[A => List[List[MtdError]]], data: A): List[MtdError] = {
