@@ -19,7 +19,7 @@ package v1.connectors
 import data.SubmitEndOfPeriodStatementData._
 import mocks.MockAppConfig
 import uk.gov.hmrc.domain.Nino
-import v1.mocks.MockHttpClient
+import v1.mocks._
 import v1.models.errors._
 import v1.models.outcomes.DesResponse
 import v1.models.requestData.SubmitEndOfPeriodStatementRequest
@@ -30,7 +30,6 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
   val nino = "AA123456A"
   lazy val baseUrl = "test-BaseUrl"
-  val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
   class Test extends MockHttpClient with MockAppConfig {
     val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(http = mockHttpClient, appConfig = mockAppConfig)

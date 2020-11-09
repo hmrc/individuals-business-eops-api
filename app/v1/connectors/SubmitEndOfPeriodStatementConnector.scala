@@ -28,7 +28,7 @@ class SubmitEndOfPeriodStatementConnector@Inject()(val http: HttpClient, val app
 
   def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(
     implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[DesOutcome[Unit]] = {
+    ec: ExecutionContext, correlationId: String): Future[DesOutcome[Unit]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
 
@@ -37,6 +37,7 @@ class SubmitEndOfPeriodStatementConnector@Inject()(val http: HttpClient, val app
     val accountingPeriodStartDate = request.submitEndOfPeriod.accountingPeriod.startDate
     val accountingPeriodEndDate = request.submitEndOfPeriod.accountingPeriod.endDate
     val incomeSourceId = request.submitEndOfPeriod.businessId
+
 
     postEmpty(
       DesUri[Unit](s"income-tax/income-sources/nino/" +

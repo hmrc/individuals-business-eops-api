@@ -24,8 +24,8 @@ import v1.models.outcomes.DesResponse
 trait DesServiceSupport {
 
   /**
-    * Service name for logging
-    */
+   * Service name for logging
+   */
   val serviceName: String
 
   protected val logger: Logger = Logger(this.getClass)
@@ -33,21 +33,21 @@ trait DesServiceSupport {
   protected type VendorOutcome[T] = Either[ErrorWrapper, DesResponse[T]]
 
   /**
-    * Gets a function to map DES response outcomes from DES to vendor outcomes.
-    *
-    * MtdError codes are mapped using the supplied error mapping; success responses are
-    * mapped to vendor outcomes using the supplied function.
-    *
-    * If the DES response body domain object should be used directly in the vendor outcome,
-    * use mapToVendorDirect
-    *
-    * @param endpointName endpoint name for logging
-    * @param errorMap     mapping from DES error codes to vendor (MTD) errors
-    * @param success      mapping for a success DES response
-    * @tparam D the DES response domain object type
-    * @tparam V the vendor response domain object type
-    * @return the function to map outcomes
-    */
+   * Gets a function to map DES response outcomes from DES to vendor outcomes.
+   *
+   * MtdError codes are mapped using the supplied error mapping; success responses are
+   * mapped to vendor outcomes using the supplied function.
+   *
+   * If the DES response body domain object should be used directly in the vendor outcome,
+   * use mapToVendorDirect
+   *
+   * @param endpointName endpoint name for logging
+   * @param errorMap     mapping from DES error codes to vendor (MTD) errors
+   * @param success      mapping for a success DES response
+   * @tparam D the DES response domain object type
+   * @tparam V the vendor response domain object type
+   * @return the function to map outcomes
+   */
   final def mapToVendor[D, V](endpointName: String, errorMap: PartialFunction[String, MtdError],bvrErrorMap: PartialFunction[String, MtdError]  )
                              (success: DesResponse[D] => VendorOutcome[V])
                              (desOutcome: DesOutcome[D]): VendorOutcome[V] = {
@@ -67,41 +67,41 @@ trait DesServiceSupport {
           logger.info(
             s"[$serviceName] [$endpointName] [CorrelationId - $correlationId]" +
               s" - downstream returned ${errors.map(_.code).mkString(",")}. Revert to ISE")
-          Left(ErrorWrapper(Some(correlationId),  Seq(DownstreamError)))
+          Left(ErrorWrapper(correlationId,  Seq(DownstreamError)))
         } else {
-          Left(ErrorWrapper(Some(correlationId), Seq(BadRequestError) ++ mtdErrors))
+          Left(ErrorWrapper(correlationId, Seq(BadRequestError) ++ mtdErrors))
         }
 
       case Left(DesResponse(correlationId, BVRErrors(errors))) =>
         val mtdErrors = errors.map(error => bvrErrorMap.applyOrElse(error.code, defaultErrorMapping))
 
         if(mtdErrors.length == 1){
-          Left(ErrorWrapper(Some(correlationId), mtdErrors))
+          Left(ErrorWrapper(correlationId, mtdErrors))
         } else {
-          Left(ErrorWrapper(Some(correlationId), Seq(BVRError) ++ mtdErrors))
+          Left(ErrorWrapper(correlationId, Seq(BVRError) ++ mtdErrors))
         }
 
       case Left(DesResponse(correlationId, SingleError(error))) =>
-        Left(ErrorWrapper(Some(correlationId), Seq(errorMap.applyOrElse(error.code, defaultErrorMapping))))
+        Left(ErrorWrapper(correlationId, Seq(errorMap.applyOrElse(error.code, defaultErrorMapping))))
 
       case Left(DesResponse(correlationId, OutboundError(error))) =>
-        Left(ErrorWrapper(Some(correlationId),  Seq(error)))
+        Left(ErrorWrapper(correlationId,  Seq(error)))
     }
   }
 
   /**
-    * Gets a function to map DES response outcomes from DES to vendor outcomes.
-    *
-    * MtdError codes are mapped using the supplied error mapping.
-    *
-    * Success responses are
-    * mapped directly to vendor outcomes unchanged.
-    *
-    * @param endpointName endpoint name for logging
-    * @param errorMap     mapping from DES error codes to vendor (MTD) errors
-    * @tparam D the DES response domain object type
-    * @return the function to map outcomes
-    */
+   * Gets a function to map DES response outcomes from DES to vendor outcomes.
+   *
+   * MtdError codes are mapped using the supplied error mapping.
+   *
+   * Success responses are
+   * mapped directly to vendor outcomes unchanged.
+   *
+   * @param endpointName endpoint name for logging
+   * @param errorMap     mapping from DES error codes to vendor (MTD) errors
+   * @tparam D the DES response domain object type
+   * @return the function to map outcomes
+   */
   final def mapToVendorDirect[D](endpointName: String, errorMap: PartialFunction[String, MtdError],
                                  bvrErrorMap: PartialFunction[String, MtdError])(desOutcome: DesOutcome[D]): VendorOutcome[D] = {
 
