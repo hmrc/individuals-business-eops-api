@@ -26,9 +26,10 @@ import v1.mocks.MockSubmitEndOfPeriodStatementParser
 
 class SubmitEndOfPeriodStatementParserSpec extends UnitSpec{
   val nino = "AA123456B"
+  implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
 
-  val inputData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(SubmitEndOfPeriodStatementData.successJson))
+  val inputData: SubmitEndOfPeriodStatementRawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(SubmitEndOfPeriodStatementData.successJson))
 
   trait Test extends MockSubmitEndOfPeriodStatementParser {
     lazy val parser = new SubmitEndOfPeriodStatementParser(mockValidator)
@@ -51,13 +52,13 @@ class SubmitEndOfPeriodStatementParserSpec extends UnitSpec{
       "a single validation error occurs" in new Test {
         MockValidator.validate(inputData).returns(List(NinoFormatError))
 
-        parser.parseRequest(inputData) shouldBe Left(ErrorWrapper(None, Seq(NinoFormatError)))
+        parser.parseRequest(inputData) shouldBe Left(ErrorWrapper(correlationId, Seq(NinoFormatError)))
       }
 
       "multiple validation errors occur" in new Test {
         MockValidator.validate(inputData).returns(List(NinoFormatError, TypeOfBusinessFormatError))
 
-        parser.parseRequest(inputData) shouldBe Left(ErrorWrapper(None, Seq(BadRequestError, NinoFormatError, TypeOfBusinessFormatError)))
+        parser.parseRequest(inputData) shouldBe Left(ErrorWrapper(correlationId, Seq(BadRequestError, NinoFormatError, TypeOfBusinessFormatError)))
       }
     }
   }

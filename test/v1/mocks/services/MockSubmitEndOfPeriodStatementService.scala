@@ -32,7 +32,7 @@ trait MockSubmitEndOfPeriodStatementService extends MockFactory {
     def submitEndOfPeriodStatementService(submitEndOfPeriodStatement: SubmitEndOfPeriodStatementRequest
                                          ): CallHandler[Future[SubmitEndOfPeriodStatmentOutcome]] = {
       (mockSubmitEndOfPeriodStatementService.submitEndOfPeriodStatementService(_: SubmitEndOfPeriodStatementRequest)
-      (_: HeaderCarrier, _: ExecutionContext)).expects(submitEndOfPeriodStatement, *, *)
+      (_: HeaderCarrier, _: ExecutionContext, _: String)).expects(submitEndOfPeriodStatement, *, *, *)
     }
   }
 }

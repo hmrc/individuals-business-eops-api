@@ -28,7 +28,7 @@ trait MockSubmitEndOfPeriodStatementParser extends MockFactory {
 
   object MockSubmitEndOfPeriodStatementParser {
     def parseRequest(data: SubmitEndOfPeriodStatementRawData): CallHandler[Either[ErrorWrapper, SubmitEndOfPeriodStatementRequest]] = {
-      (mockSubmitEndOfPeriodStatementParser.parseRequest(_: SubmitEndOfPeriodStatementRawData)).expects(data)
+      (mockSubmitEndOfPeriodStatementParser.parseRequest(_: SubmitEndOfPeriodStatementRawData)(_: String)).expects(data, *)
     }
   }
 }

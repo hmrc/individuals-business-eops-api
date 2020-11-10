@@ -26,19 +26,18 @@ import scala.concurrent.Future
 class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
 
   val nino: Nino = Nino("AA123456A")
-  val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
   trait Test extends MockSubmitEndOfPeriodStatementConnector {
     lazy val service = new SubmitEndOfPeriodStatementService(connector)
   }
 
-  lazy val request = SubmitEndOfPeriodStatementRequest(nino,validRequest)
+  lazy val request: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(nino,validRequest)
 
   "Submit End Of Period Statement" should {
     "return a Right" when {
       "the connector call is successful" in new Test {
-        val desResponse = DesResponse(correlationId, ())
-        val expected = DesResponse(correlationId, ())
+        val desResponse: DesResponse[Unit] = DesResponse(correlationId, ())
+        val expected: DesResponse[Unit] = DesResponse(correlationId, ())
         MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(request).returns(Future.successful(Right(desResponse)))
 
         await(service.submitEndOfPeriodStatementService(request)) shouldBe Right(expected)
@@ -50,27 +49,27 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
         val desResponse: DesResponse[OutboundError] = DesResponse(correlationId, OutboundError(someError))
         MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(request).returns(Future.successful(Left(desResponse)))
 
-        await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(ErrorWrapper(Some(correlationId), Seq(someError)))
+        await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(ErrorWrapper(correlationId, Seq(someError)))
       }
     }
     "return a downstream error" when {
       "the connector call returns a single unknown error default to downstream error" in new Test {
         val desResponse: DesResponse[SingleError] = DesResponse(correlationId, SingleError(MtdError("Error","error")))
-        val expected: ErrorWrapper = ErrorWrapper(Some(correlationId), Seq(DownstreamError))
+        val expected: ErrorWrapper = ErrorWrapper(correlationId, Seq(DownstreamError))
 
         MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(request).returns(Future.successful(Left(desResponse)))
         await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(expected)
       }
       "the connector call returns a single downstream error" in new Test {
-        val desResponse = DesResponse(correlationId, SingleError(DownstreamError))
-        val expected = ErrorWrapper(Some(correlationId), Seq(DownstreamError))
+        val desResponse: DesResponse[SingleError] = DesResponse(correlationId, SingleError(DownstreamError))
+        val expected: ErrorWrapper = ErrorWrapper(correlationId, Seq(DownstreamError))
         MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(request).returns(Future.successful(Left(desResponse)))
 
         await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(expected)
       }
       "the connector call returns multiple errors including a downstream error" in new Test {
-        val desResponse = DesResponse(correlationId, MultipleErrors(Seq(NinoFormatError, DownstreamError)))
-        val expected = ErrorWrapper(Some(correlationId), Seq(DownstreamError))
+        val desResponse: DesResponse[MultipleErrors] = DesResponse(correlationId, MultipleErrors(Seq(NinoFormatError, DownstreamError)))
+        val expected: ErrorWrapper = ErrorWrapper(correlationId, Seq(DownstreamError))
         MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(request).returns(Future.successful(Left(desResponse)))
 
         await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(expected)
@@ -97,7 +96,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
             MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(request).returns(Future.successful(
               Left(DesResponse(correlationId, SingleError(MtdError(k, "doesn't matter"))))))
 
-            await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(ErrorWrapper(Some(correlationId), Seq(v)))
+            await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(ErrorWrapper(correlationId, Seq(v)))
           }
         }
     }
@@ -118,7 +117,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
             MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(request).returns(Future.successful(
               Left(DesResponse(correlationId, BVRErrors(Seq(MtdError(k, "doesn't matter")))))))
 
-            await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(ErrorWrapper(Some(correlationId), Seq(v)))
+            await(service.submitEndOfPeriodStatementService(request)) shouldBe Left(ErrorWrapper(correlationId, Seq(v)))
           }
         }
     }

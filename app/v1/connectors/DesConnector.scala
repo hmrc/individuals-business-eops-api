@@ -18,7 +18,6 @@ package v1.connectors
 
 import config.AppConfig
 import play.api.Logger
-import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 
@@ -28,21 +27,22 @@ trait DesConnector {
   val http: HttpClient
   val appConfig: AppConfig
 
-  val logger = Logger(this.getClass)
+  val logger:Logger = Logger(this.getClass)
 
-  private[connectors] def desHeaderCarrier(implicit hc: HeaderCarrier): HeaderCarrier =
+  private[connectors] def desHeaderCarrier(implicit hc: HeaderCarrier, correlationId: String): HeaderCarrier =
     hc.copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
-      .withExtraHeaders("Environment" -> appConfig.desEnv)
+      .withExtraHeaders("Environment" -> appConfig.desEnv, "CorrelationId" -> correlationId)
 
   def postEmpty[Resp]( uri: DesUri[Resp])(implicit ec: ExecutionContext,
                                                               hc: HeaderCarrier,
+                                                              correlationId: String,
                                                               httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
 
     def doPostEmpty(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
       http.POSTEmpty(s"${appConfig.desBaseUrl}/${uri.value}")
     }
 
-    doPostEmpty(desHeaderCarrier(hc))
+    doPostEmpty(desHeaderCarrier(hc, correlationId))
   }
 
 }

@@ -22,6 +22,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, Result}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v1.mocks.services._
 import v1.models.errors.{DownstreamError, NotFoundError, _}
@@ -37,7 +38,8 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
   with MockSubmitEndOfPeriodStatementParser
   with MockSubmitEndOfPeriodStatementService
   with MockAppConfig
-  with MockAuditService {
+  with MockAuditService
+  with MockIdGenerator {
 
     private val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
     private val nino = "AA123456A"
@@ -55,9 +57,11 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
         service = mockSubmitEndOfPeriodStatementService,
         auditService = mockAuditService,
         appConfig = mockAppConfig,
-        cc = cc
+        cc = cc,
+        idGenerator = mockIdGenerator
       )
 
+      MockIdGenerator.getCorrelationId.returns(correlationId)
       MockedMtdIdLookupService.lookup(nino).returns(Future.successful(Right("test-mtd-id")))
       MockedEnrolmentsAuthService.authoriseUser()
       MockedAppConfig.apiGatewayContext.returns("individuals/business/end-of-period-statement").anyNumberOfTimes()
@@ -86,7 +90,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
             s"a ${error.code} error is returned from the parser" in new Test {
               MockSubmitEndOfPeriodStatementParser
                 .parseRequest(rawData)
-                .returns(Left(ErrorWrapper(Some(correlationId), Seq(error))))
+                .returns(Left(ErrorWrapper(correlationId, Seq(error))))
 
               val result: Future[Result] = controller.submitEndOfPeriodStatement(nino)(fakePutRequest(fullValidJson()))
 
@@ -120,7 +124,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
 
               MockSubmitEndOfPeriodStatementService
                 .submitEndOfPeriodStatementService(requestData)
-                .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), Seq(mtdError)))))
+                .returns(Future.successful(Left(ErrorWrapper(correlationId, Seq(mtdError)))))
 
               val result: Future[Result] = controller.submitEndOfPeriodStatement(nino)(fakePutRequest(fullValidJson()))
 

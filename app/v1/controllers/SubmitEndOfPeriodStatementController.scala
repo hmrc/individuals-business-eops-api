@@ -22,6 +22,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import utils.{IdGenerator, Logging}
 import v1.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v1.hateoas.AmendHateoasBody
 import v1.models.audit._
@@ -34,18 +35,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SubmitEndOfPeriodStatementController @Inject()(val authService: EnrolmentsAuthService,
                                                      val lookupService: MtdIdLookupService,
+                                                     val idGenerator: IdGenerator,
                                                      service: SubmitEndOfPeriodStatementService,
                                                      requestParser: SubmitEndOfPeriodStatementParser,
                                                      auditService: AuditService,
                                                      appConfig: AppConfig,
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
-    extends AuthorisedController(cc) with AmendHateoasBody with BaseController {
+    extends AuthorisedController(cc) with AmendHateoasBody with BaseController with Logging {
 
   implicit val endpointLogContext: EndpointLogContext = EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController",
     endpointName = "Submit end of period statement")
 
   def submitEndOfPeriodStatement(nino: String): Action[JsValue] = {
     authorisedAction(nino).async(parse.json) { implicit request =>
+
+      implicit val correlationId: String = idGenerator.getCorrelationId
+      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        s"with correlationId : $correlationId")
 
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
       val parseRequest: Either[ErrorWrapper, SubmitEndOfPeriodStatementRequest] = requestParser.parseRequest(rawData)
@@ -68,9 +74,13 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
           NoContent.withApiHeaders(responseWrapper.correlationId)
 
         case Left(errorWrapper) =>
-          val correlationId = getCorrelationId(errorWrapper)
-          val result = errorResult(errorWrapper).withApiHeaders(correlationId)
-          auditSubmission(createAuditDetails(rawData, result.header.status, correlationId, request.userDetails, Some(errorWrapper)))
+          val resCorrelationId = errorWrapper.correlationId
+          val result = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+          logger.info(
+            s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
+              s"Error response received with CorrelationId: $resCorrelationId")
+
+          auditSubmission(createAuditDetails(rawData, result.header.status, resCorrelationId, request.userDetails, Some(errorWrapper)))
           result
       }
     }
