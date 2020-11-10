@@ -75,7 +75,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
 
         case Left(errorWrapper) =>
           val resCorrelationId = errorWrapper.correlationId
-          val result = errorResult(errorWrapper).withApiHeaders(correlationId)
+          val result = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
           logger.info(
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
               s"Error response received with CorrelationId: $resCorrelationId")
