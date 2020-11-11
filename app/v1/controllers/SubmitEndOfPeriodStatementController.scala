@@ -46,12 +46,17 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc) with AmendHateoasBody with BaseController with Logging {
 
-  implicit val correlationId: String = idGenerator.getCorrelationId
   implicit val endpointLogContext: EndpointLogContext = EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController",
     endpointName = "Submit end of period statement")
 
   def handleRequest(nino: String): Action[JsValue] =
     authorisedAction(nino).async(parse.json) { implicit request =>
+
+      implicit val correlationId: String = idGenerator.getCorrelationId
+      logger.info(
+        s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+          s"with CorrelationId: $correlationId")
+
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
       val result =
         for {
