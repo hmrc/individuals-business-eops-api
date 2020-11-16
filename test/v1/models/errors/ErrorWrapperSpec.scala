@@ -18,13 +18,13 @@ package v1.models.errors
 
 import play.api.libs.json.Json
 import support.UnitSpec
+import v1.models.audit.AuditError
 
 class ErrorWrapperSpec extends UnitSpec {
-
   val correlationId = "X-123"
 
   "Rendering a error response with one error" should {
-    val error = ErrorWrapper(correlationId, Seq(NinoFormatError))
+    val error = ErrorWrapper(correlationId, NinoFormatError, Some(Seq.empty))
 
     val json = Json.parse(
       """
@@ -41,7 +41,7 @@ class ErrorWrapperSpec extends UnitSpec {
   }
 
   "Rendering a error response with one error and an empty sequence of errors" should {
-    val error = ErrorWrapper(correlationId, Seq(NinoFormatError))
+    val error = ErrorWrapper(correlationId, NinoFormatError, Some(Seq.empty))
 
     val json = Json.parse(
       """
@@ -58,13 +58,14 @@ class ErrorWrapperSpec extends UnitSpec {
   }
 
   "Rendering a error response with two errors" should {
-    val error = ErrorWrapper(correlationId,
+    val error = ErrorWrapper(correlationId, BadRequestError,
+      Some (
         Seq(
-          BadRequestError,
           NinoFormatError,
           TaxYearFormatError
         )
       )
+    )
 
     val json = Json.parse(
       """
@@ -87,6 +88,13 @@ class ErrorWrapperSpec extends UnitSpec {
 
     "generate the correct JSON" in {
       Json.toJson(error) shouldBe json
+    }
+  }
+  "Rendering a error response" should {
+    val error = ErrorWrapper(correlationId, NinoFormatError, None)
+
+    "convert an error to an audit error with that error code" in {
+      error.auditErrors shouldBe Seq(AuditError("FORMAT_NINO"))
     }
   }
 

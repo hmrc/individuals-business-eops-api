@@ -166,7 +166,10 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
           (Status.NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists", Status.NOT_FOUND, NotFoundError),
           (Status.NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found", Status.NOT_FOUND, NotFoundError),
           (Status.INTERNAL_SERVER_ERROR, "SERVER_ERROR", "DES is currently experiencing problems that require live service intervention.", Status.INTERNAL_SERVER_ERROR, DownstreamError),
-          (Status.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", Status.INTERNAL_SERVER_ERROR, DownstreamError)
+          (Status.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", Status.INTERNAL_SERVER_ERROR, DownstreamError),
+          (Status.FORBIDDEN, "BVR_FAILURE_EXISTS - C55503", "Consolidated expenses not allowed, threshold exceeded", Status.FORBIDDEN, RuleConsolidatedExpensesError),
+          (Status.FORBIDDEN, "BVR_FAILURE_EXISTS - C55316", "Consolidated expenses not allowed, threshold exceeded", Status.FORBIDDEN, RuleConsolidatedExpensesError),
+          (Status.FORBIDDEN, "BVR_FAILURE_EXISTS - C55008", "The period submission start date must match the accounting period start date", Status.FORBIDDEN, RuleMismatchedStartDateError),
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))

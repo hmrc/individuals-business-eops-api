@@ -61,7 +61,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
       val result =
         for {
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawData))
-          serviceResponse <- EitherT(service.submitEndOfPeriodStatementService(parsedRequest))
+          serviceResponse <- EitherT(service.submit(parsedRequest))
         } yield {
           logger.info(
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
@@ -82,7 +82,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
-    (errorWrapper.errors.head.copy(paths = None): @unchecked) match {
+    (errorWrapper.error: @unchecked) match {
       case BadRequestError |
            NinoFormatError |
            TypeOfBusinessFormatError |
