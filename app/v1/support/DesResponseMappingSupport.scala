@@ -45,7 +45,17 @@ trait DesResponseMappingSupport {
               s" - downstream returned ${errorCodes.map(_.code).mkString(",")}. Revert to ISE")
           ErrorWrapper(correlationId, DownstreamError, None)
         } else {
-          ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
+              mtdErrors.headOption map {
+                case RuleConsolidatedExpensesError => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+                case RuleMismatchedStartDateError => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+                case RuleMismatchedEndDateError => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+                case RuleClass4Over16Error => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+                case RuleClass4PensionAge => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+                case RuleFHLPrivateUseAdjustment => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+                case RuleNonFHLPrivateUseAdjustment => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+                case _ => ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
+              }
+
         }
 
       case ResponseWrapper(correlationId, OutboundError(error, errors)) =>
