@@ -59,7 +59,7 @@ trait HttpParser {
   def parseErrors(response: HttpResponse): DesError = {
     val singleError = response.validateJson[DesErrorCode].map(err => DesErrors(List(err)))
     lazy val multipleErrors = response.validateJson(multipleErrorReads).map(errs => DesErrors(errs))
-    lazy val bvrErrors = response.validateJson(bvrErrorReads).map(errs => DesErrors(errs.distinct.toList))
+    lazy val bvrErrors = response.validateJson(bvrErrorReads).map(errs => DesErrors(errs.toList))
     lazy val unableToParseJsonError = {
       Logger.warn(s"unable to parse errors from response: ${response.body}")
       OutboundError(DownstreamError)

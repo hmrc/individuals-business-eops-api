@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v1.models.errors
 
-object CodeCoverageSettings {
+import support.UnitSpec
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    ".*Routes.*",
-    "config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+class DesErrorCodeSpec extends UnitSpec {
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 98,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  "toMtd" should {
+    "convert the error to an MtdError" in {
+      DesErrorCode("test").toMtd shouldBe MtdError("test", "")
+    }
+  }
 }

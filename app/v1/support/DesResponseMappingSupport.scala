@@ -37,7 +37,7 @@ trait DesResponseMappingSupport {
         ErrorWrapper(correlationId, errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping), None)
 
       case ResponseWrapper(correlationId, DesErrors(errorCodes)) =>
-        val mtdErrors = errorCodes.map(error => errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping))
+        val mtdErrors = errorCodes.map(error => errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping)).distinct
 
         if (mtdErrors.contains(DownstreamError)) {
           logger.warn(
@@ -45,17 +45,20 @@ trait DesResponseMappingSupport {
               s" - downstream returned ${errorCodes.map(_.code).mkString(",")}. Revert to ISE")
           ErrorWrapper(correlationId, DownstreamError, None)
         } else {
-              mtdErrors.headOption map {
-                case RuleConsolidatedExpensesError => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-                case RuleMismatchedStartDateError => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-                case RuleMismatchedEndDateError => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-                case RuleClass4Over16Error => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-                case RuleClass4PensionAge => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-                case RuleFHLPrivateUseAdjustment => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-                case RuleNonFHLPrivateUseAdjustment => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-                case _ => ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
-              }
-
+          val allowedErrorList =
+            List(
+              RuleConsolidatedExpensesError,
+              RuleMismatchedStartDateError,
+              RuleMismatchedEndDateError,
+              RuleClass4Over16Error,
+              RuleClass4PensionAge,
+              RuleFHLPrivateUseAdjustment,
+              RuleNonFHLPrivateUseAdjustment
+            )
+          allowedErrorList.exists(mtdErrors.contains(_)) match {
+            case true => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+            case false => ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
+          }
         }
 
       case ResponseWrapper(correlationId, OutboundError(error, errors)) =>
