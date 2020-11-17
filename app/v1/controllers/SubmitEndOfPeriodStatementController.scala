@@ -16,8 +16,11 @@
 
 package v1.controllers
 
+import cats.data.EitherT
+import cats.implicits._
 import config.AppConfig
 import javax.inject._
+import play.api.http.MimeTypes
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -46,45 +49,37 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
   implicit val endpointLogContext: EndpointLogContext = EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController",
     endpointName = "Submit end of period statement")
 
-  def submitEndOfPeriodStatement(nino: String): Action[JsValue] = {
+  def handleRequest(nino: String): Action[JsValue] =
     authorisedAction(nino).async(parse.json) { implicit request =>
 
       implicit val correlationId: String = idGenerator.getCorrelationId
-      logger.info(message = s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-        s"with correlationId : $correlationId")
+      logger.info(
+        s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+          s"with CorrelationId: $correlationId")
 
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
-      val parseRequest: Either[ErrorWrapper, SubmitEndOfPeriodStatementRequest] = requestParser.parseRequest(rawData)
-
-      val serviceResponse: Future[SubmitEndOfPeriodStatmentOutcome] = parseRequest match {
-        case Right(data) => service.submitEndOfPeriodStatementService(data)
-        case Left(errorWrapper) => Future.successful(Left(errorWrapper))
-      }
-
-      serviceResponse.map {
-        case Right(responseWrapper) =>
-
-          logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
-            s"Success response received with CorrelationId: ${responseWrapper.correlationId}")
-
-          auditSubmission(
-            createAuditDetails(rawData, NO_CONTENT, responseWrapper.correlationId, request.userDetails, None, Some(Json.toJson(responseWrapper.correlationId)))
-          )
-
-          NoContent.withApiHeaders(responseWrapper.correlationId)
-
-        case Left(errorWrapper) =>
-          val resCorrelationId = errorWrapper.correlationId
-          val result = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+      val result =
+        for {
+          parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawData))
+          serviceResponse <- EitherT(service.submitEndOfPeriodStatementService(parsedRequest))
+        } yield {
           logger.info(
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
-              s"Error response received with CorrelationId: $resCorrelationId")
+              s"Success response recieved with CorrelationId: ${serviceResponse.correlationId}")
 
-          auditSubmission(createAuditDetails(rawData, result.header.status, resCorrelationId, request.userDetails, Some(errorWrapper)))
-          result
-      }
+          NoContent.withApiHeaders(serviceResponse.correlationId)
+            .as(MimeTypes.JSON)
+        }
+
+      result.leftMap { errorWrapper =>
+        val correlationId = errorWrapper.correlationId
+        val result = errorResult(errorWrapper).withApiHeaders(correlationId)
+
+        auditSubmission(createAuditDetails(rawData, result.header.status, correlationId, request.userDetails, Some(errorWrapper)))
+
+        result
+      }.merge
     }
-  }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.errors.head.copy(paths = None): @unchecked) match {

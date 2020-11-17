@@ -61,10 +61,10 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
         idGenerator = mockIdGenerator
       )
 
-      MockIdGenerator.getCorrelationId.returns(correlationId)
       MockedMtdIdLookupService.lookup(nino).returns(Future.successful(Right("test-mtd-id")))
       MockedEnrolmentsAuthService.authoriseUser()
       MockedAppConfig.apiGatewayContext.returns("individuals/business/end-of-period-statement").anyNumberOfTimes()
+      MockIdGenerator.getCorrelationId.returns(correlationId)
     }
 
     "submit" should {
@@ -79,7 +79,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
             .submitEndOfPeriodStatementService(requestData)
             .returns(Future.successful(Right(DesResponse(correlationId, Unit))))
 
-          val result: Future[Result] = controller.submitEndOfPeriodStatement(nino)(fakePutRequest(fullValidJson()))
+          val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
           status(result) shouldBe NO_CONTENT
           header("X-CorrelationId", result) shouldBe Some(correlationId)
         }
@@ -92,7 +92,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
                 .parseRequest(rawData)
                 .returns(Left(ErrorWrapper(correlationId, Seq(error))))
 
-              val result: Future[Result] = controller.submitEndOfPeriodStatement(nino)(fakePutRequest(fullValidJson()))
+              val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
 
               status(result) shouldBe expectedStatus
               contentAsJson(result) shouldBe Json.toJson(error)
@@ -126,7 +126,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
                 .submitEndOfPeriodStatementService(requestData)
                 .returns(Future.successful(Left(ErrorWrapper(correlationId, Seq(mtdError)))))
 
-              val result: Future[Result] = controller.submitEndOfPeriodStatement(nino)(fakePutRequest(fullValidJson()))
+              val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
 
               status(result) shouldBe expectedStatus
               contentAsJson(result) shouldBe Json.toJson(mtdError)
