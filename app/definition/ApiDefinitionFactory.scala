@@ -26,6 +26,7 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
 
   private val readScope = "read:self-assessment"
   private val writeScope = "write:self-assessment"
+  val logger = Logger(getClass)
 
   lazy val definition: Definition =
     Definition(
@@ -60,7 +61,7 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
   private[definition] def buildAPIStatus(version: String): APIStatus = {
     APIStatus.parser.lift(appConfig.apiStatus(version))
       .getOrElse {
-        Logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
+        logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
         APIStatus.ALPHA
       }
   }

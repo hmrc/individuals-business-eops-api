@@ -31,7 +31,7 @@ import v1.hateoas.AmendHateoasBody
 import v1.models.audit._
 import v1.models.auth.UserDetails
 import v1.models.errors._
-import v1.models.requestData.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
+import v1.models.requestData.{SubmitEndOfPeriodStatementRawData}
 import v1.services._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -118,7 +118,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
                                  statusCode: Int,
                                  correlationId: String,
                                  userDetails: UserDetails,
-                                 errorWrapper: Option[ErrorWrapper] = None,
+                                 errorWrapper: Option[ErrorWrapper],
                                  responseBody: Option[JsValue] = None): GenericAuditDetail = {
 
     val response = errorWrapper.map( wrapper => AuditResponse(statusCode, Some(wrapper.auditErrors), None)).getOrElse(AuditResponse(statusCode, None, None))
