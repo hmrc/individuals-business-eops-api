@@ -19,14 +19,9 @@ package v1.mocks.services
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-<<<<<<< HEAD
 import v1.controllers.EndpointLogContext
-import v1.models.requestData.SubmitEndOfPeriodStatementRequest
-import v1.services.{SubmitEndOfPeriodStatementService, SubmitEndOfPeriodStatementOutcome}
-=======
 import v1.models.request.SubmitEndOfPeriodStatementRequest
 import v1.services.{SubmitEndOfPeriodStatementOutcome, SubmitEndOfPeriodStatementService}
->>>>>>> bce267c... directory renames
 
 import scala.concurrent.{ExecutionContext, Future}
 

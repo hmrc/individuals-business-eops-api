@@ -21,20 +21,16 @@ import support.UnitSpec
 
 class ErrorSpec extends UnitSpec{
 
-  "reads" should {
-    val error = MtdError("FORMAT_NINO", "The provided NINO is invalid")
-
-    val json = Json.parse(
-      """
-        |{
-        |   "code": "FORMAT_NINO",
-        |   "reason": "The provided NINO is invalid"
-        |}
-      """.stripMargin
-    )
-
+  "writes" should {
     "generate the correct JSON" in {
-      json.as[MtdError] shouldBe error
+      Json.toJson(MtdError("CODE", "some message")) shouldBe Json.parse(
+        """
+          |{
+          |   "code": "CODE",
+          |   "message": "some message"
+          |}
+        """.stripMargin
+      )
     }
   }
 }
