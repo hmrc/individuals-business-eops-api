@@ -27,7 +27,7 @@ import v1.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v1.mocks.services._
 import v1.models.errors.{DownstreamError, NotFoundError, _}
 import v1.models.outcomes.ResponseWrapper
-import v1.models.requestData.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
+import v1.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

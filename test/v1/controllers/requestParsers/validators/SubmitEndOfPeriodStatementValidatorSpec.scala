@@ -20,10 +20,9 @@ import mocks.MockAppConfig
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsJson
 import support.UnitSpec
-import v1.models.errors.{BusinessIdFormatError, EndDateFormatError, FinalisedFormatError, NinoFormatError,
-  RangeEndDateBeforeStartDateError, RuleIncorrectOrEmptyBodyError, RuleNotFinalisedError, StartDateFormatError, TypeOfBusinessFormatError}
-import v1.models.requestData.SubmitEndOfPeriodStatementRawData
+import v1.models.errors.{BusinessIdFormatError, EndDateFormatError, FinalisedFormatError, NinoFormatError, RangeEndDateBeforeStartDateError, RuleIncorrectOrEmptyBodyError, RuleNotFinalisedError, StartDateFormatError, TypeOfBusinessFormatError}
 import data.SubmitEndOfPeriodStatementData._
+import v1.models.request.SubmitEndOfPeriodStatementRawData
 
 class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfig {
 

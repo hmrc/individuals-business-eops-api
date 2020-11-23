@@ -19,7 +19,7 @@ package data
 import play.api.libs.json.{JsValue, Json}
 import v1.models.des.TypeOfBusiness
 import v1.models.des.TypeOfBusiness.`foreign-property`
-import v1.models.requestData.{AccountingPeriod, SubmitEndOfPeriod}
+import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 object SubmitEndOfPeriodStatementData {
 

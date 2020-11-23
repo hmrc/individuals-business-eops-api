@@ -18,7 +18,7 @@ import data.SubmitEndOfPeriodStatementData.validRequest
 import uk.gov.hmrc.domain.Nino
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.requestData.SubmitEndOfPeriodStatementRequest
+import v1.models.request.SubmitEndOfPeriodStatementRequest
 import v1.services.{ServiceSpec, SubmitEndOfPeriodStatementService}
 
 import scala.concurrent.Future

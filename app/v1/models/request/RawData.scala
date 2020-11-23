@@ -14,23 +14,6 @@
  * limitations under the License.
  */
 
-package utils
+package v1.models.request
 
-import java.time.LocalDate
-
-import v1.models.request.DesTaxYear
-
-object DateUtils {
-
-  def getDesTaxYear(dateProvided: Any): DesTaxYear = dateProvided match {
-    case taxYear: String => DesTaxYear.toYearYYYY(taxYear)
-    case current: LocalDate =>
-      val fiscalYearStartDate = LocalDate.parse(s"${current.getYear.toString}-04-05")
-
-      if(current.isAfter(fiscalYearStartDate)){
-        DesTaxYear((current.getYear + 1).toString)
-      } else {
-        DesTaxYear(current.getYear.toString)
-      }
-  }
-}
+trait RawData

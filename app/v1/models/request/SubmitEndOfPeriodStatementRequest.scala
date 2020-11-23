@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package utils
+package v1.models.request
 
-import java.time.LocalDate
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.domain.Nino
 
-import v1.models.request.DesTaxYear
+case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod)
 
-object DateUtils {
-
-  def getDesTaxYear(dateProvided: Any): DesTaxYear = dateProvided match {
-    case taxYear: String => DesTaxYear.toYearYYYY(taxYear)
-    case current: LocalDate =>
-      val fiscalYearStartDate = LocalDate.parse(s"${current.getYear.toString}-04-05")
-
-      if(current.isAfter(fiscalYearStartDate)){
-        DesTaxYear((current.getYear + 1).toString)
-      } else {
-        DesTaxYear(current.getYear.toString)
-      }
-  }
+object SubmitEndOfPeriodStatementRequest {
+  implicit val format: OFormat[SubmitEndOfPeriodStatementRequest] = Json.format[SubmitEndOfPeriodStatementRequest]
 }
