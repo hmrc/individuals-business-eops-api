@@ -19,19 +19,20 @@ package v1.connectors.httpparsers
 import play.api.Logger
 import uk.gov.hmrc.http.HttpResponse
 import v1.models.errors._
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 import scala.util.{Success, Try}
 
 trait HttpParser {
 
+  val logger = Logger(getClass)
+
   implicit class KnownJsonResponse(response: HttpResponse) {
     def validateJson[T](implicit reads: Reads[T]): Option[T] = {
       Try(response.json) match {
         case Success(json: JsValue) => parseResult(json)
         case _ =>
-          Logger.warn("[KnownJsonResponse][validateJson] No JSON was returned")
+          logger.warn("[KnownJsonResponse][validateJson] No JSON was returned")
           None
       }
     }
@@ -41,32 +42,29 @@ trait HttpParser {
 
       case JsSuccess(value, _) => Some(value)
       case JsError(error) =>
-        Logger.warn(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
+        logger.warn(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
         None
     }
   }
 
   def retrieveCorrelationId(response: HttpResponse): String = response.header("CorrelationId").getOrElse("")
 
-  private val multipleErrorReads: Reads[Seq[MtdError]] = (__ \ "failures").read[Seq[MtdError]]
-  private val bvrErrorReads: Reads[Seq[MtdError]] = {
-    implicit val errorReads: Reads[MtdError] = (
-      (__ \ "id").read[String] and
-        (__ \ "text").read[String]
-      ).tupled.map(x => MtdError(x._1,x._2))
-    (__ \ "bvrfailureResponseElement" \ "validationRuleFailures").read[Seq[MtdError]]
+  private val multipleErrorReads: Reads[List[DesErrorCode]] = (__ \ "failures").read[List[DesErrorCode]]
+
+  private val bvrErrorReads: Reads[Seq[DesErrorCode]] = {
+    implicit val errorIdReads: Reads[DesErrorCode] = (__ \ "id").read[String].map(DesErrorCode(_))
+    (__ \ "bvrfailureResponseElement" \ "validationRuleFailures").read[Seq[DesErrorCode]]
   }
 
 
   def parseErrors(response: HttpResponse): DesError = {
-    val singleError = response.validateJson[MtdError].map(SingleError)
-    lazy val multipleErrors = response.validateJson(multipleErrorReads).map(MultipleErrors)
-    lazy val bvrErrors = response.validateJson(bvrErrorReads).map(BVRErrors)
+    val singleError = response.validateJson[DesErrorCode].map(err => DesErrors(List(err)))
+    lazy val multipleErrors = response.validateJson(multipleErrorReads).map(errs => DesErrors(errs))
+    lazy val bvrErrors = response.validateJson(bvrErrorReads).map(errs => DesErrors(errs.toList))
     lazy val unableToParseJsonError = {
-      Logger.warn(s"unable to parse errors from response: ${response.body}")
+      logger.warn(s"unable to parse errors from response: ${response.body}")
       OutboundError(DownstreamError)
     }
     singleError orElse multipleErrors orElse bvrErrors getOrElse unableToParseJsonError
   }
-
 }

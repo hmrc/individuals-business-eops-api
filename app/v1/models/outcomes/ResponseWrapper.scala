@@ -14,20 +14,8 @@
  * limitations under the License.
  */
 
-package utils
+package v1.models.outcomes
 
-import play.api.Logger
-
-object PagerDutyHelper {
-  val logger: Logger = Logger("PagerDutyLogger")
-
-  object PagerDutyKeys extends Enumeration {
-    val DES_INTERNAL_SERVER_ERROR: PagerDutyKeys.Value = Value
-    val DES_SERVICE_UNAVAILABLE: PagerDutyKeys.Value = Value
-    val DES_UNEXPECTED_RESPONSE: PagerDutyKeys.Value = Value
-  }
-
-  def pagerDutyLog(pagerDutyKey: PagerDutyKeys.Value, otherDetail: Option[String] = None): Unit = {
-    logger.error(s"$pagerDutyKey ${otherDetail.getOrElse("")}")
-  }
+case class ResponseWrapper[+T](correlationId: String, responseData: T){
+  def map[B](f: T => B): ResponseWrapper[B] = ResponseWrapper(correlationId, f(responseData))
 }

@@ -21,7 +21,7 @@ import mocks.MockAppConfig
 import uk.gov.hmrc.domain.Nino
 import v1.mocks._
 import v1.models.errors._
-import v1.models.outcomes.DesResponse
+import v1.models.outcomes.ResponseWrapper
 import v1.models.requestData.SubmitEndOfPeriodStatementRequest
 
 import scala.concurrent.Future
@@ -44,7 +44,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
     "a valid request is supplied" should {
       "return a successful response with the correct correlationId" in new Test {
-        val expected = Right(DesResponse(correlationId, ()))
+        val expected = Right(ResponseWrapper(correlationId, ()))
 
         MockedHttpClient
           .postEmpty(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
@@ -61,7 +61,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
     "a request returning a single error" should {
       "return an unsuccessful response with the correct correlationId and a single error" in new Test {
-        val expected = Left(DesResponse(correlationId, SingleError(NinoFormatError)))
+        val expected = Left(ResponseWrapper(correlationId, NinoFormatError))
 
         MockedHttpClient
           .postEmpty(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
@@ -77,7 +77,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
     }
     "a request returning multiple errors" should {
       "return an unsuccessful response with the correct correlationId and multiple errors" in new Test {
-        val expected = Left(DesResponse(correlationId, MultipleErrors(Seq(NinoFormatError, DownstreamError))))
+        val expected = Left(ResponseWrapper(correlationId, Seq(NinoFormatError, DownstreamError)))
 
         MockedHttpClient
           .postEmpty(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
@@ -87,9 +87,9 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         await(connector.submitPeriodStatement(
           SubmitEndOfPeriodStatementRequest(
             nino = Nino(nino),
-          validRequest)
+            validRequest)
         )) shouldBe expected
       }
     }
   }
-  }
+}

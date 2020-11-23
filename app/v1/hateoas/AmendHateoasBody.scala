@@ -16,8 +16,8 @@
 
 package v1.hateoas
 
-import config.AppConfig
-import play.api.libs.json.{JsValue, Json}
+//import config.AppConfig
+//import play.api.libs.json.{JsValue, Json}
 
 trait AmendHateoasBody extends HateoasLinks {
 

@@ -166,7 +166,7 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
           (Status.NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists", Status.NOT_FOUND, NotFoundError),
           (Status.NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found", Status.NOT_FOUND, NotFoundError),
           (Status.INTERNAL_SERVER_ERROR, "SERVER_ERROR", "DES is currently experiencing problems that require live service intervention.", Status.INTERNAL_SERVER_ERROR, DownstreamError),
-          (Status.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", Status.INTERNAL_SERVER_ERROR, DownstreamError)
+          (Status.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", Status.INTERNAL_SERVER_ERROR, DownstreamError),
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))

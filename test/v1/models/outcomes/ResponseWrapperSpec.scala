@@ -16,4 +16,26 @@
 
 package v1.models.outcomes
 
-case class DesResponse[+T](correlationId: String, responseData: T)
+import play.api.libs.json.Json
+import support.UnitSpec
+
+class ResponseWrapperSpec extends UnitSpec {
+
+  "ResponseWrapper" should {
+
+    val responseData = Json.parse(
+      """
+        |{
+        |   "who": "Knows"
+        |}
+    """.stripMargin
+    )
+
+    val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
+    val wrapper  = ResponseWrapper(correlationId, responseData)
+
+    "read in a singleError" in {
+      wrapper.map(a => a) shouldBe ResponseWrapper(correlationId, responseData)
+    }
+  }
+}

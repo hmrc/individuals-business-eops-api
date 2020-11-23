@@ -26,7 +26,7 @@ import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v1.mocks.services._
 import v1.models.errors.{DownstreamError, NotFoundError, _}
-import v1.models.outcomes.DesResponse
+import v1.models.outcomes.ResponseWrapper
 import v1.models.requestData.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -77,7 +77,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
 
           MockSubmitEndOfPeriodStatementService
             .submitEndOfPeriodStatementService(requestData)
-            .returns(Future.successful(Right(DesResponse(correlationId, Unit))))
+            .returns(Future.successful(Right(ResponseWrapper(correlationId, Unit))))
 
           val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
           status(result) shouldBe NO_CONTENT
@@ -90,7 +90,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
             s"a ${error.code} error is returned from the parser" in new Test {
               MockSubmitEndOfPeriodStatementParser
                 .parseRequest(rawData)
-                .returns(Left(ErrorWrapper(correlationId, Seq(error))))
+                .returns(Left(ErrorWrapper(correlationId, error)))
 
               val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
 
@@ -124,7 +124,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
 
               MockSubmitEndOfPeriodStatementService
                 .submitEndOfPeriodStatementService(requestData)
-                .returns(Future.successful(Left(ErrorWrapper(correlationId, Seq(mtdError)))))
+                .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
 
               val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
 

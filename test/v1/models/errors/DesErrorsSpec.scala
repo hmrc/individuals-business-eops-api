@@ -16,23 +16,27 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{Json, Reads}
+import support.UnitSpec
 
-case class DesErrorCode(code: String) {
-  def toMtd: MtdError = MtdError(code = code, message = "")
+class DesErrorsSpec extends UnitSpec {
+
+  "DesErrorCode.toMtd" should {
+    "convert the error to an MtdError" in {
+      DesErrorCode("test").toMtd shouldBe MtdError("test", "")
+    }
+  }
+
+  "DesErrors" should {
+
+    val error  = DesErrorCode("error")
+    val errors = Seq(DesErrorCode("ERROR 1"), DesErrorCode("ERROR 2"))
+
+    "read in a singleError" in {
+      DesErrors.single(error) shouldBe DesErrors(List(DesErrorCode("error")))
+    }
+
+    "read in multiple errors" in {
+      DesErrors.multiple(errors) shouldBe DesErrors(List(DesErrorCode("ERROR 1"), DesErrorCode("ERROR 2")))
+    }
+  }
 }
-
-object DesErrorCode {
-  implicit val reads: Reads[DesErrorCode] = Json.reads[DesErrorCode]
-}
-
-sealed trait DesError
-
-case class DesErrors(errors: List[DesErrorCode]) extends DesError
-
-object DesErrors {
-  def single(error: DesErrorCode): DesErrors = DesErrors(List(error))
-  def multiple(errors: Seq[DesErrorCode]): DesErrors =  DesErrors(errors.toList)
-}
-
-case class OutboundError(error: MtdError, errors: Option[Seq[MtdError]] = None) extends DesError
