@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v1.models.requestData
+package v1.models.request
 
 import play.api.libs.json.{Json, OFormat}
 import v1.models.des.TypeOfBusiness
@@ -23,10 +23,4 @@ case class SubmitEndOfPeriod(typeOfBusiness: TypeOfBusiness, businessId: String,
 
 object SubmitEndOfPeriod {
   implicit val format: OFormat[SubmitEndOfPeriod] = Json.format[SubmitEndOfPeriod]
-}
-
-case class AccountingPeriod(startDate: String, endDate: String)
-
-object AccountingPeriod {
-  implicit val format: OFormat[AccountingPeriod] = Json.format[AccountingPeriod]
 }

@@ -20,8 +20,8 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.controllers.EndpointLogContext
-import v1.models.requestData.SubmitEndOfPeriodStatementRequest
-import v1.services.{SubmitEndOfPeriodStatementService, SubmitEndOfPeriodStatementOutcome}
+import v1.models.request.SubmitEndOfPeriodStatementRequest
+import v1.services.{SubmitEndOfPeriodStatementOutcome, SubmitEndOfPeriodStatementService}
 
 import scala.concurrent.{ExecutionContext, Future}
 

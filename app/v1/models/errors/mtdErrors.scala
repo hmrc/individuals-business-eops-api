@@ -16,7 +16,13 @@
 
 package v1.models.errors
 
-//scalastyle:off
+import play.api.libs.json.{Json, OWrites}
+
+case class MtdError(code: String, message: String, paths: Option[Seq[String]] = None)
+
+object MtdError {
+  implicit val writes: OWrites[MtdError] = Json.writes[MtdError]
+}
 
 object NinoFormatError extends MtdError("FORMAT_NINO", "The provided NINO is invalid")
 object TaxYearFormatError extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid")

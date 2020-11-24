@@ -31,7 +31,7 @@ import v1.hateoas.AmendHateoasBody
 import v1.models.audit._
 import v1.models.auth.UserDetails
 import v1.models.errors._
-import v1.models.requestData.{SubmitEndOfPeriodStatementRawData}
+import v1.models.request.SubmitEndOfPeriodStatementRawData
 import v1.services._
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.models.request
 
-import play.api.libs.json.Json
-import support.UnitSpec
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.domain.Nino
 
-class ErrorSpec extends UnitSpec{
+case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod)
 
-  "writes" should {
-    "generate the correct JSON" in {
-      Json.toJson(MtdError("CODE", "some message")) shouldBe Json.parse(
-        """
-          |{
-          |   "code": "CODE",
-          |   "message": "some message"
-          |}
-        """.stripMargin
-      )
-    }
-  }
+object SubmitEndOfPeriodStatementRequest {
+  implicit val format: OFormat[SubmitEndOfPeriodStatementRequest] = Json.format[SubmitEndOfPeriodStatementRequest]
 }

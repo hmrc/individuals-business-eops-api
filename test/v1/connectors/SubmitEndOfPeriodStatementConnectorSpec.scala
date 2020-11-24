@@ -22,7 +22,7 @@ import uk.gov.hmrc.domain.Nino
 import v1.mocks._
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
-import v1.models.requestData.SubmitEndOfPeriodStatementRequest
+import v1.models.request.SubmitEndOfPeriodStatementRequest
 
 import scala.concurrent.Future
 

@@ -25,7 +25,7 @@ import v1.controllers.requestParsers.validators.validations.TypeOfBusinessValida
 import v1.controllers.requestParsers.validators.validations.DateValidation._
 import v1.controllers.requestParsers.validators.validations._
 import v1.models.errors._
-import v1.models.requestData.{AccountingPeriod, SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData}
+import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData}
 
 class SubmitEndOfPeriodStatementValidator @Inject()(appConfig: AppConfig) extends Validator[SubmitEndOfPeriodStatementRawData] {
 

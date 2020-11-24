@@ -14,18 +14,8 @@
  * limitations under the License.
  */
 
-package v1.models.errors
+package v1.models.request
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.mvc.AnyContentAsJson
 
-case class MtdError(code: String, message: String, paths: Option[Seq[String]] = None)
-
-object MtdError {
-  implicit val writes: Writes[MtdError] = Json.writes[MtdError]
-  implicit val reads: Reads[MtdError] = (
-    (__ \ "code").read[String] and
-      (__ \ "reason").read[String] and
-      (__ \ "paths").readNullable[Seq[String]]
-    ) (MtdError.apply _)
-}
+case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData
