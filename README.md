@@ -25,31 +25,17 @@ sbt it:test
 
 ## To view the RAML
 
-Start api definition services
+To view documentation locally ensure the Individuals Business EOPS API is running, and run api-documentation-frontend:
+`./run_local_with_dependencies.sh`
 
-```
-sm --start COMBINED_API_DEFINITION API_DEFINITION API_EXAMPLE_MICROSERVICE API_DOCUMENTATION_FRONTEND -f
-sm --start ASSETS_FRONTEND -r 3.11.0 -f
-```
-
-Go to http://localhost:9680/api-documentation/docs/api/preview and enter http://localhost:7785/api/conf/1.0/application.raml 
-
-## Documentation
-To view documentation locally run the following service manager profile:
-```
-MTDFB_BUSINESS_EOPS
-```
-and run api-documentation-frontend:
-```
-./run_local_with_dependencies.sh
-```
-then go to http://localhost:9680/api-documentation/docs/api/preview and using this port and version:
-```
-http://localhost:7785/api/conf/1.0/application.raml
-```
+Then go to http://localhost:9680/api-documentation/docs/api/preview and use this port and version:
+`http://localhost:7785/api/conf/1.0/application.raml`
 
 ## Reporting Issues
-You can create a GitHub issue [here](https://github.com/hmrc/individuals-expenses-api/issues)
+You can create a GitHub issue [here](https://github.com/hmrc/individuals-business-eops-api/issues)
+
+## API Reference / Documentation 
+Available on the [HMRC Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation)
 
 ## License
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
