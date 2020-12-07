@@ -13,7 +13,7 @@ The Individuals Business End of Period Statement API allows software packages to
 - [Service Manager](https://github.com/hmrc/service-manager)
 
 ## Development Setup
-To run the microservice from console, use `sbt run`. (starts on port 7785)
+To run the microservice from console, use `sbt run`. (starts on port 7785 by default)
 
 To start the service manager profile: `sm --start MTDFB_BUSINESS_EOPS`.
  
@@ -35,7 +35,7 @@ Then go to http://localhost:9680/api-documentation/docs/api/preview and use this
 You can create a GitHub issue [here](https://github.com/hmrc/individuals-business-eops-api/issues)
 
 ## API Reference / Documentation 
-Available on the [HMRC Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation)
+Available on the [HMRC Developer Hub](https://developer.staging.tax.service.gov.uk/api-documentation/docs/api/service/individuals-business-eops-api/1.0)
 
 ## License
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
