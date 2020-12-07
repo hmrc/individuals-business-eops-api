@@ -2,9 +2,7 @@ Individuals Business End of Period Statement API
 ========================
 The Individuals Business End of Period Statement API allows software packages to:
 
-```
-· to submit a declaration that the submission data for a business is complete. 
-```
+* to submit a declaration that the submission data for a business is complete. 
 
 ## Requirements
 - Scala 2.12.x
