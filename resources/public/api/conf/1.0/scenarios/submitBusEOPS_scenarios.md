@@ -67,8 +67,5 @@
             <td><p>RULE_NON_MATCHING_PERIOD</p></td>
             <td><p>Simulate scenario where an End of Period Statement without a matching accounting period cannot be submitted.</p></td>
         </tr>
-            <td><p>BUSINESS_EOPS_RULE_ALREADY_SUBMITTED</p></td>
-            <td><p>Simulate scenario where an End of Period Statement has already been submitted for the period supplied.</p></td>
-        </tr>
     </tbody>
 </table>
