@@ -20,6 +20,7 @@ import data.SubmitEndOfPeriodStatementData._
 import mocks.MockAppConfig
 import uk.gov.hmrc.domain.Nino
 import v1.mocks._
+import v1.models.des.EmptyJsonBody
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.SubmitEndOfPeriodStatementRequest
@@ -47,8 +48,8 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         val expected = Right(ResponseWrapper(correlationId, ()))
 
         MockedHttpClient
-          .postEmpty(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
+          .post(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId", EmptyJsonBody)
           .returns(Future.successful(expected))
 
         await(connector.submitPeriodStatement(
@@ -64,8 +65,8 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         val expected = Left(ResponseWrapper(correlationId, NinoFormatError))
 
         MockedHttpClient
-          .postEmpty(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
+          .post(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId", EmptyJsonBody)
           .returns(Future.successful(expected))
 
         await(connector.submitPeriodStatement(
@@ -80,8 +81,8 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         val expected = Left(ResponseWrapper(correlationId, Seq(NinoFormatError, DownstreamError)))
 
         MockedHttpClient
-          .postEmpty(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
+          .post(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId", EmptyJsonBody)
           .returns(Future.successful(expected))
 
         await(connector.submitPeriodStatement(

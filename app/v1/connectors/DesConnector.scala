@@ -20,6 +20,7 @@ import config.AppConfig
 import play.api.Logger
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import v1.models.des.EmptyJsonBody
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,7 +40,7 @@ trait DesConnector {
                                                               httpReads: HttpReads[DesOutcome[Resp]]): Future[DesOutcome[Resp]] = {
 
     def doPostEmpty(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
-      http.POSTEmpty(s"${appConfig.desBaseUrl}/${uri.value}")
+      http.POST(s"${appConfig.desBaseUrl}/${uri.value}", EmptyJsonBody)
     }
 
     doPostEmpty(desHeaderCarrier(hc, correlationId))
