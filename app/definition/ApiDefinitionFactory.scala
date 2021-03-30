@@ -57,7 +57,7 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
         versions = Seq(
           APIVersion(
             version = VERSION_1,
-            access = buildWhiteListingAccess(),
+            access = buildAllowListingAccess(),
             status = buildAPIStatus(VERSION_1),
             endpointsEnabled = appConfig.endpointsEnabled(VERSION_1))
         ),
@@ -73,8 +73,8 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
       }
   }
 
-  private[definition] def buildWhiteListingAccess(): Option[Access] = {
+  private[definition] def buildAllowListingAccess(): Option[Access] = {
     val featureSwitch = FeatureSwitch(appConfig.featureSwitch)
-    if (featureSwitch.isWhiteListingEnabled) Some(Access("PRIVATE", featureSwitch.whiteListedApplicationIds)) else None
+    if (featureSwitch.isAllowListingEnabled) Some(Access("PRIVATE", featureSwitch.allowListedApplicationIds)) else None
   }
 }
