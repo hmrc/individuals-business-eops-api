@@ -37,7 +37,6 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
   with MockMtdIdLookupService
   with MockSubmitEndOfPeriodStatementParser
   with MockSubmitEndOfPeriodStatementService
-  with MockAppConfig
   with MockAuditService
   with MockIdGenerator {
 
@@ -56,14 +55,12 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
         requestParser = mockSubmitEndOfPeriodStatementParser,
         service = mockSubmitEndOfPeriodStatementService,
         auditService = mockAuditService,
-        appConfig = mockAppConfig,
         cc = cc,
         idGenerator = mockIdGenerator
       )
 
       MockedMtdIdLookupService.lookup(nino).returns(Future.successful(Right("test-mtd-id")))
       MockedEnrolmentsAuthService.authoriseUser()
-      MockedAppConfig.apiGatewayContext.returns("individuals/business/end-of-period-statement").anyNumberOfTimes()
       MockIdGenerator.getCorrelationId.returns(correlationId)
     }
 

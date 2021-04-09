@@ -24,13 +24,13 @@ import v1.models.errors.{BusinessIdFormatError, EndDateFormatError, FinalisedFor
 import data.SubmitEndOfPeriodStatementData._
 import v1.models.request.SubmitEndOfPeriodStatementRawData
 
-class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec with MockAppConfig {
+class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
 
   private val validNino = "AA123456A"
   private val invalidNino = "Darth Sidious"
 
   class Test extends MockAppConfig {
-    val validator = new SubmitEndOfPeriodStatementValidator(mockAppConfig)
+    val validator = new SubmitEndOfPeriodStatementValidator()
 
     val emptyRequestBodyJson: JsValue = Json.parse("""{}""")
 
