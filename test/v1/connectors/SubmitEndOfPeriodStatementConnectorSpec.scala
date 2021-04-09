@@ -29,8 +29,7 @@ import scala.concurrent.Future
 
 class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
-  val nino = "AA123456A"
-  lazy val baseUrl = "test-BaseUrl"
+  val nino: String = "AA123456A"
 
   class Test extends MockHttpClient with MockAppConfig {
     val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(http = mockHttpClient, appConfig = mockAppConfig)
