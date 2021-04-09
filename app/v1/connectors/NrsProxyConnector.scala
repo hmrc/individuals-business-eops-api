@@ -30,6 +30,6 @@ class NrsProxyConnector @Inject()(http: HttpClient,
   def submit[T](nino: String, body: SubmitEndOfPeriod)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     implicit val readsEmpty: HttpReads[Unit] = (_: String, _: String, _: HttpResponse) => ()
 
-    http.POST[SubmitEndOfPeriod, Unit](s"${appConfig.mtdNrsProxyBaseUrl}/mtd-api-nrs-proxy/$nino/individuals-business-eops-api", body)
+    http.POST[SubmitEndOfPeriod, Unit](s"${appConfig.mtdNrsProxyBaseUrl}/mtd-api-nrs-proxy/$nino/itsa-eops", body)
   }
 }
