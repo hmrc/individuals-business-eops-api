@@ -17,7 +17,8 @@
 package v1.services
 
 import cats.data.EitherT
-import javax.inject.Inject
+
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.Logging
 import v1.connectors.SubmitEndOfPeriodStatementConnector
@@ -28,6 +29,7 @@ import v1.support.DesResponseMappingSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector) extends DesResponseMappingSupport with Logging {
 
   def submit(request: SubmitEndOfPeriodStatementRequest)(

@@ -17,7 +17,8 @@
 package v1.controllers.requestParsers.validators
 
 import config.AppConfig
-import javax.inject.Inject
+
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsLookupResult, JsValue}
 import v1.controllers.requestParsers.validators.validations.BusinessIdValidation._
 import v1.controllers.requestParsers.validators.validations.FinalisedValidation._
@@ -27,7 +28,8 @@ import v1.controllers.requestParsers.validators.validations._
 import v1.models.errors._
 import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData}
 
-class SubmitEndOfPeriodStatementValidator @Inject()(appConfig: AppConfig) extends Validator[SubmitEndOfPeriodStatementRawData] {
+@Singleton
+class SubmitEndOfPeriodStatementValidator extends Validator[SubmitEndOfPeriodStatementRawData] {
 
   private val validationSet = List(parameterFormatValidation, bodyFormatValidator)
 

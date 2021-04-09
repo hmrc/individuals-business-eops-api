@@ -36,13 +36,13 @@ import v1.services._
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class SubmitEndOfPeriodStatementController @Inject()(val authService: EnrolmentsAuthService,
                                                      val lookupService: MtdIdLookupService,
                                                      val idGenerator: IdGenerator,
                                                      service: SubmitEndOfPeriodStatementService,
                                                      requestParser: SubmitEndOfPeriodStatementParser,
                                                      auditService: AuditService,
-                                                     appConfig: AppConfig,
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc) with AmendHateoasBody with BaseController with Logging {
 
