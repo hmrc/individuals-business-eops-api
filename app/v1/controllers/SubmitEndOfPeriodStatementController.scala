@@ -18,7 +18,6 @@ package v1.controllers
 
 import cats.data.EitherT
 import cats.implicits._
-import config.AppConfig
 import javax.inject._
 import play.api.http.MimeTypes
 import play.api.libs.json.{JsValue, Json}
