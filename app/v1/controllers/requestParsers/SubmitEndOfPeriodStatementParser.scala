@@ -16,11 +16,12 @@
 
 package v1.controllers.requestParsers
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.domain.Nino
 import v1.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
 import v1.models.request.{SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
 
+@Singleton
 class SubmitEndOfPeriodStatementParser @Inject()(val validator: SubmitEndOfPeriodStatementValidator) extends RequestParser[SubmitEndOfPeriodStatementRawData,
   SubmitEndOfPeriodStatementRequest] {
 
