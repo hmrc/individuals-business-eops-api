@@ -17,7 +17,6 @@
 package v1.controllers
 
 import data.SubmitEndOfPeriodStatementData._
-import mocks.MockAppConfig
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, Result}
 import uk.gov.hmrc.domain.Nino

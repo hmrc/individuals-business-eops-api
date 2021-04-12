@@ -16,9 +16,7 @@
 
 package v1.controllers.requestParsers.validators
 
-import config.AppConfig
-
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 import play.api.libs.json.{JsLookupResult, JsValue}
 import v1.controllers.requestParsers.validators.validations.BusinessIdValidation._
 import v1.controllers.requestParsers.validators.validations.FinalisedValidation._

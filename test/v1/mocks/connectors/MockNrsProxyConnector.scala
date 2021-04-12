@@ -19,20 +19,20 @@ package v1.mocks.connectors
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.{DesOutcome, SubmitEndOfPeriodStatementConnector}
-import v1.models.request.SubmitEndOfPeriodStatementRequest
+import v1.connectors.NrsProxyConnector
+import v1.models.request.SubmitEndOfPeriod
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockSubmitEndOfPeriodStatementConnector extends MockFactory {
+trait MockNrsProxyConnector extends MockFactory {
 
-  val connector : SubmitEndOfPeriodStatementConnector = mock[SubmitEndOfPeriodStatementConnector]
+  val mockNrsProxyConnector: NrsProxyConnector = mock[NrsProxyConnector]
 
-  object MockSubmitEndOfPeriodStatementConnector {
+  object MockNrsProxyConnector {
 
-    def submitEndOfPeriodStatement(submitEndOfPeriodStatementRequest: SubmitEndOfPeriodStatementRequest): CallHandler[Future[DesOutcome[Unit]]] = {
-      (connector.submitPeriodStatement(_ : SubmitEndOfPeriodStatementRequest)(_ : HeaderCarrier, _: ExecutionContext, _: String))
-        .expects(submitEndOfPeriodStatementRequest, *, *, *)
+    def submit(nino: String, body: SubmitEndOfPeriod): CallHandler[Future[Unit]] = {
+      (mockNrsProxyConnector.submit(_: String, _: SubmitEndOfPeriod)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, *, *, *)
     }
   }
 }
