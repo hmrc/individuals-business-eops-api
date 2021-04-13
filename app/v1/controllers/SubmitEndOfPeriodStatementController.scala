@@ -39,6 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubmitEndOfPeriodStatementController @Inject()(val authService: EnrolmentsAuthService,
                                                      val lookupService: MtdIdLookupService,
                                                      val idGenerator: IdGenerator,
+                                                     nrsProxyService: NrsProxyService,
                                                      service: SubmitEndOfPeriodStatementService,
                                                      requestParser: SubmitEndOfPeriodStatementParser,
                                                      auditService: AuditService,
@@ -60,7 +61,10 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
       val result =
         for {
           parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawData))
-          serviceResponse <- EitherT(service.submit(parsedRequest))
+          serviceResponse <- {
+            nrsProxyService.submit(nino, parsedRequest.submitEndOfPeriod)
+            EitherT(service.submit(parsedRequest))
+          }
         } yield {
           logger.info(
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
