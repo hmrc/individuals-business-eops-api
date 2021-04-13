@@ -66,7 +66,7 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
 
     "return a 204 status code" when {
 
-      "any valid request is made" in new Test {
+      "any valid request is made with a successful NRS call" in new Test {
 
         val nrsSuccess: JsValue = Json.parse(
           s"""
@@ -84,6 +84,20 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
           MtdIdLookupStub.ninoFound(nino)
           NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
           DesStub.onSuccess(DesStub.POST, desUri(), Map("incomeSourceId" -> incomeSourceId), NO_CONTENT)
+        }
+
+        val response: WSResponse = await(request().post(fullValidJson()))
+        response.status shouldBe NO_CONTENT
+        response.header("X-CorrelationId").nonEmpty shouldBe true
+      }
+
+      "any valid request is made with a failed NRS call" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          MtdIdLookupStub.ninoFound(nino)
+          NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, DownstreamError.message)
         }
 
         val response: WSResponse = await(request().post(fullValidJson()))

@@ -44,7 +44,7 @@ class NrsProxyServiceSpec extends ServiceSpec {
         MockNrsProxyConnector.submit(nino, submitEndOfPeriodRequestBody)
           .returns(Future.successful((): Unit))
 
-        await(service.submit(nino, submitEndOfPeriodRequestBody)) shouldBe (): Unit
+        await(service.submit(nino, submitEndOfPeriodRequestBody)) shouldBe ((): Unit)
       }
     }
   }
