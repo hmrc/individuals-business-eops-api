@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package v1.connectors
+package v1.services
 
-import play.api.http.{HeaderNames, MimeTypes, Status}
-import support.UnitSpec
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.connectors.NrsProxyConnector
+import v1.models.request.SubmitEndOfPeriod
 
 import scala.concurrent.ExecutionContext
 
-trait ConnectorSpec extends UnitSpec
-  with Status
-  with MimeTypes
-  with HeaderNames {
+@Singleton
+class NrsProxyService @Inject()(val connector: NrsProxyConnector) {
 
-  lazy val baseUrl = "test-BaseUrl"
-  implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
+  def submit(nino: String, body: SubmitEndOfPeriod)(implicit hc: HeaderCarrier, ec: ExecutionContext): Unit = {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+    connector.submit(nino, body)
+  }
 }
