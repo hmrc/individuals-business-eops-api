@@ -75,7 +75,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
 
           MockNrsProxyService
             .submit(nino, validRequest)
-            .returns((): Unit)
+            .returns(Future.successful((): Unit))
 
           MockSubmitEndOfPeriodStatementService
             .submitEndOfPeriodStatementService(requestData)
@@ -126,7 +126,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
 
               MockNrsProxyService
                 .submit(nino, validRequest)
-                .returns((): Unit)
+                .returns(Future.successful((): Unit))
 
               MockSubmitEndOfPeriodStatementService
                 .submitEndOfPeriodStatementService(requestData)

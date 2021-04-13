@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v1.models.request.SubmitEndOfPeriod
 import v1.services.NrsProxyService
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 trait MockNrsProxyService extends MockFactory {
 
@@ -30,7 +30,7 @@ trait MockNrsProxyService extends MockFactory {
 
   object MockNrsProxyService {
 
-    def submit(nino: String, body: SubmitEndOfPeriod): CallHandler[Unit] = {
+    def submit(nino: String, body: SubmitEndOfPeriod): CallHandler[Future[Unit]] = {
       (mockNrsProxyService.submit(_: String, _: SubmitEndOfPeriod)(_: HeaderCarrier, _: ExecutionContext))
         .expects(nino, *, *, *)
     }
