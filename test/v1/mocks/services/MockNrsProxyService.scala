@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package v1.services
+package v1.mocks.services
 
-import javax.inject.{Inject, Singleton}
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.NrsProxyConnector
 import v1.models.request.SubmitEndOfPeriod
+import v1.services.NrsProxyService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class NrsProxyService @Inject()(val connector: NrsProxyConnector) {
+trait MockNrsProxyService extends MockFactory {
 
-  def submit(nino: String, body: SubmitEndOfPeriod)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  val mockNrsProxyService: NrsProxyService = mock[NrsProxyService]
 
-    connector.submit(nino, body)
+  object MockNrsProxyService {
+
+    def submit(nino: String, body: SubmitEndOfPeriod): CallHandler[Future[Unit]] = {
+      (mockNrsProxyService.submit(_: String, _: SubmitEndOfPeriod)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, *, *, *)
+    }
   }
 }

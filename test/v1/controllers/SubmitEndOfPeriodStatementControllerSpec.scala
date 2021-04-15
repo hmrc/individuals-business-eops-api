@@ -35,6 +35,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
   with MockEnrolmentsAuthService
   with MockMtdIdLookupService
   with MockSubmitEndOfPeriodStatementParser
+  with MockNrsProxyService
   with MockSubmitEndOfPeriodStatementService
   with MockAuditService
   with MockIdGenerator {
@@ -52,6 +53,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
         authService = mockEnrolmentsAuthService,
         lookupService = mockMtdIdLookupService,
         requestParser = mockSubmitEndOfPeriodStatementParser,
+        nrsProxyService = mockNrsProxyService,
         service = mockSubmitEndOfPeriodStatementService,
         auditService = mockAuditService,
         cc = cc,
@@ -70,6 +72,10 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
           MockSubmitEndOfPeriodStatementParser
             .parseRequest(rawData)
             .returns(Right(requestData))
+
+          MockNrsProxyService
+            .submit(nino, validRequest)
+            .returns(Future.successful((): Unit))
 
           MockSubmitEndOfPeriodStatementService
             .submitEndOfPeriodStatementService(requestData)
@@ -117,6 +123,10 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
               MockSubmitEndOfPeriodStatementParser
                 .parseRequest(rawData)
                 .returns(Right(requestData))
+
+              MockNrsProxyService
+                .submit(nino, validRequest)
+                .returns(Future.successful((): Unit))
 
               MockSubmitEndOfPeriodStatementService
                 .submitEndOfPeriodStatementService(requestData)

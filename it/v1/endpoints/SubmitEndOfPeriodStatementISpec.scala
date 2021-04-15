@@ -18,19 +18,19 @@ package v1.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
-import play.api.http.Status
+import play.api.http.Status._
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import support.IntegrationBaseSpec
 import v1.models.errors._
-import v1.stubs.{AuditStub, AuthStub, DesStub, MtdIdLookupStub}
+import v1.stubs.{AuditStub, AuthStub, DesStub, MtdIdLookupStub, NrsStub}
 import itData.SubmitEndOfPeriodStatementData._
 
 class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
-    val nino = "AA123456A"
+    val nino: String = "AA123456A"
 
     val incomeSourceId: String = "XAIS12345678910"
 
@@ -62,21 +62,46 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
     """.stripMargin
   }
 
-  "Calling the retrieve endpoint" should {
+  "Calling the submit eops endpoint" should {
 
-    "return a 200 status code" when {
+    "return a 204 status code" when {
 
-      "any valid request is made" in new Test {
+      "any valid request is made with a successful NRS call" in new Test {
+
+        val nrsSuccess: JsValue = Json.parse(
+          s"""
+             |{
+             |  "nrSubmissionId":"2dd537bc-4244-4ebf-bac9-96321be13cdc",
+             |  "cadesTSignature":"30820b4f06092a864886f70111111111c0445c464",
+             |  "timestamp":""
+             |}
+         """.stripMargin
+        )
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
-          DesStub.onSuccess(DesStub.POST, desUri(), Map("incomeSourceId" -> incomeSourceId), Status.NO_CONTENT)
+          NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
+          DesStub.onSuccess(DesStub.POST, desUri(), Map("incomeSourceId" -> incomeSourceId), NO_CONTENT)
         }
 
         val response: WSResponse = await(request().post(fullValidJson()))
-        response.status shouldBe Status.NO_CONTENT
+        response.status shouldBe NO_CONTENT
+        response.header("X-CorrelationId").nonEmpty shouldBe true
+      }
+
+      "any valid request is made with a failed NRS call" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuditStub.audit()
+          AuthStub.authorised()
+          MtdIdLookupStub.ninoFound(nino)
+          NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, DownstreamError.message)
+        }
+
+        val response: WSResponse = await(request().post(fullValidJson()))
+        response.status shouldBe NO_CONTENT
         response.header("X-CorrelationId").nonEmpty shouldBe true
       }
     }
@@ -118,16 +143,16 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
         }
 
         val input = Seq(
-          ("Badnino", fullValidJson(), Status.BAD_REQUEST, NinoFormatError),
-          ("AA123456A", fullValidJson(typeOfBusiness = "error"), Status.BAD_REQUEST, TypeOfBusinessFormatError),
-          ("AA123456A", fullValidJson(businessId = "error"), Status.BAD_REQUEST, BusinessIdFormatError),
-          ("AA123456A", fullValidJson(startDate = "error"), Status.BAD_REQUEST, StartDateFormatError),
-          ("AA123456A", fullValidJson(endDate = "error"), Status.BAD_REQUEST, EndDateFormatError),
-          ("AA123456A", fullValidJson(finalised = "\"error\""), Status.BAD_REQUEST, FinalisedFormatError),
-          ("AA123456A", Json.parse("{}"), Status.BAD_REQUEST, RuleIncorrectOrEmptyBodyError),
-          ("AA123456A", fullValidJson(endDate ="2021-04-05"), Status.BAD_REQUEST, RangeEndDateBeforeStartDateError),
-          ("AA123456A", fullValidJson(finalised = "false"), Status.BAD_REQUEST, RuleNotFinalisedError),
-          ("AA123456A", fullValidJson("error","error","error","error","\"error\""), Status.BAD_REQUEST, BadRequestError)
+          ("Badnino", fullValidJson(), BAD_REQUEST, NinoFormatError),
+          ("AA123456A", fullValidJson(typeOfBusiness = "error"), BAD_REQUEST, TypeOfBusinessFormatError),
+          ("AA123456A", fullValidJson(businessId = "error"), BAD_REQUEST, BusinessIdFormatError),
+          ("AA123456A", fullValidJson(startDate = "error"), BAD_REQUEST, StartDateFormatError),
+          ("AA123456A", fullValidJson(endDate = "error"), BAD_REQUEST, EndDateFormatError),
+          ("AA123456A", fullValidJson(finalised = "\"error\""), BAD_REQUEST, FinalisedFormatError),
+          ("AA123456A", Json.parse("{}"), BAD_REQUEST, RuleIncorrectOrEmptyBodyError),
+          ("AA123456A", fullValidJson(endDate ="2021-04-05"), BAD_REQUEST, RangeEndDateBeforeStartDateError),
+          ("AA123456A", fullValidJson(finalised = "false"), BAD_REQUEST, RuleNotFinalisedError),
+          ("AA123456A", fullValidJson("error","error","error","error","\"error\""), BAD_REQUEST, BadRequestError)
         )
 
         input.foreach(args => (validationErrorTest _).tupled(args))
@@ -152,21 +177,21 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
 
         //scalastyle:off
         val input : Seq[(Int, String, String, Int, MtdError)]= Seq(
-          (Status.BAD_REQUEST, "INVALID_CORRELATIONID", "", Status.INTERNAL_SERVER_ERROR, DownstreamError),
-          (Status.BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", Status.INTERNAL_SERVER_ERROR, DownstreamError),
-          (Status.BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", Status.BAD_REQUEST, NinoFormatError),
-          (Status.BAD_REQUEST, "INVALID_ACCOUNTINGPERIODSTARTDATE", "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.", Status.BAD_REQUEST, StartDateFormatError),
-          (Status.BAD_REQUEST, "INVALID_ACCOUNTINGPERIODENDDATE", "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.", Status.BAD_REQUEST, EndDateFormatError),
-          (Status.BAD_REQUEST, "INVALID_INCOMESOURCEID", "Submission has not passed validation. Invalid parameter incomeSourceId.", Status.BAD_REQUEST, BusinessIdFormatError),
-          (Status.BAD_REQUEST, "INVALID_INCOMESOURCETYPE", "Submission has not passed validation. Invalid parameter incomeSourceType.", Status.BAD_REQUEST, TypeOfBusinessFormatError),
-          (Status.CONFLICT, "CONFLICT", "The remote endpoint has indicated that the taxation period has already been finalised", Status.FORBIDDEN, RuleAlreadySubmittedError),
-          (Status.FORBIDDEN, "EARLY_SUBMISSION", "The remote endpoint has indicated that an early submission has been made before accounting period end date.", Status.FORBIDDEN, RuleEarlySubmissionError),
-          (Status.FORBIDDEN, "LATE_SUBMISSION", "The remote endpoint has indicated that the period to finalise has passed", Status.FORBIDDEN, RuleLateSubmissionError),
-          (Status.FORBIDDEN, "NON_MATCHING_PERIOD", "The remote endpoint has indicated that submission cannot be made with no matching accounting period.", Status.FORBIDDEN, RuleNonMatchingPeriodError),
-          (Status.NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists", Status.NOT_FOUND, NotFoundError),
-          (Status.NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found", Status.NOT_FOUND, NotFoundError),
-          (Status.INTERNAL_SERVER_ERROR, "SERVER_ERROR", "DES is currently experiencing problems that require live service intervention.", Status.INTERNAL_SERVER_ERROR, DownstreamError),
-          (Status.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", Status.INTERNAL_SERVER_ERROR, DownstreamError),
+          (BAD_REQUEST, "INVALID_CORRELATIONID", "", INTERNAL_SERVER_ERROR, DownstreamError),
+          (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, DownstreamError),
+          (BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", BAD_REQUEST, NinoFormatError),
+          (BAD_REQUEST, "INVALID_ACCOUNTINGPERIODSTARTDATE", "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.", BAD_REQUEST, StartDateFormatError),
+          (BAD_REQUEST, "INVALID_ACCOUNTINGPERIODENDDATE", "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.", BAD_REQUEST, EndDateFormatError),
+          (BAD_REQUEST, "INVALID_INCOMESOURCEID", "Submission has not passed validation. Invalid parameter incomeSourceId.", BAD_REQUEST, BusinessIdFormatError),
+          (BAD_REQUEST, "INVALID_INCOMESOURCETYPE", "Submission has not passed validation. Invalid parameter incomeSourceType.", BAD_REQUEST, TypeOfBusinessFormatError),
+          (CONFLICT, "CONFLICT", "The remote endpoint has indicated that the taxation period has already been finalised", FORBIDDEN, RuleAlreadySubmittedError),
+          (FORBIDDEN, "EARLY_SUBMISSION", "The remote endpoint has indicated that an early submission has been made before accounting period end date.", FORBIDDEN, RuleEarlySubmissionError),
+          (FORBIDDEN, "LATE_SUBMISSION", "The remote endpoint has indicated that the period to finalise has passed", FORBIDDEN, RuleLateSubmissionError),
+          (FORBIDDEN, "NON_MATCHING_PERIOD", "The remote endpoint has indicated that submission cannot be made with no matching accounting period.", FORBIDDEN, RuleNonMatchingPeriodError),
+          (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists", NOT_FOUND, NotFoundError),
+          (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found", NOT_FOUND, NotFoundError),
+          (INTERNAL_SERVER_ERROR, "SERVER_ERROR", "DES is currently experiencing problems that require live service intervention.", INTERNAL_SERVER_ERROR, DownstreamError),
+          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, DownstreamError),
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))
@@ -272,16 +297,16 @@ class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
         )
 
         val input : Seq[(Int, JsValue, Int, MtdError)]= Seq(
-          (Status.FORBIDDEN, bvr("C55503"), Status.FORBIDDEN, RuleConsolidatedExpensesError),
-          (Status.FORBIDDEN, bvr("C55316"), Status.FORBIDDEN, RuleConsolidatedExpensesError),
-          (Status.FORBIDDEN, bvr("C55008"), Status.FORBIDDEN, RuleMismatchedStartDateError),
-          (Status.FORBIDDEN, bvr("C55013"), Status.FORBIDDEN, RuleMismatchedEndDateError),
-          (Status.FORBIDDEN, bvr("C55014"), Status.FORBIDDEN, RuleMismatchedEndDateError),
-          (Status.FORBIDDEN, bvr("C55317"), Status.FORBIDDEN, RuleClass4Over16Error),
-          (Status.FORBIDDEN, bvr("C55318"), Status.FORBIDDEN, RuleClass4PensionAge),
-          (Status.FORBIDDEN, bvr("C55501"), Status.FORBIDDEN, RuleFHLPrivateUseAdjustment),
-          (Status.FORBIDDEN, bvr("C55502"), Status.FORBIDDEN, RuleNonFHLPrivateUseAdjustment),
-          (Status.FORBIDDEN, bvrMultiple, Status.FORBIDDEN, BVRError)
+          (FORBIDDEN, bvr("C55503"), FORBIDDEN, RuleConsolidatedExpensesError),
+          (FORBIDDEN, bvr("C55316"), FORBIDDEN, RuleConsolidatedExpensesError),
+          (FORBIDDEN, bvr("C55008"), FORBIDDEN, RuleMismatchedStartDateError),
+          (FORBIDDEN, bvr("C55013"), FORBIDDEN, RuleMismatchedEndDateError),
+          (FORBIDDEN, bvr("C55014"), FORBIDDEN, RuleMismatchedEndDateError),
+          (FORBIDDEN, bvr("C55317"), FORBIDDEN, RuleClass4Over16Error),
+          (FORBIDDEN, bvr("C55318"), FORBIDDEN, RuleClass4PensionAge),
+          (FORBIDDEN, bvr("C55501"), FORBIDDEN, RuleFHLPrivateUseAdjustment),
+          (FORBIDDEN, bvr("C55502"), FORBIDDEN, RuleNonFHLPrivateUseAdjustment),
+          (FORBIDDEN, bvrMultiple, FORBIDDEN, BVRError)
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))

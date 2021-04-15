@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package v1.services
+package v1.stubs
 
-import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.NrsProxyConnector
-import v1.models.request.SubmitEndOfPeriod
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.libs.json.JsValue
+import support.WireMockMethods
 
-import scala.concurrent.{ExecutionContext, Future}
+object NrsStub extends WireMockMethods {
 
-@Singleton
-class NrsProxyService @Inject()(val connector: NrsProxyConnector) {
+  def onSuccess(method: HTTPMethod, uri: String, status: Int, body: JsValue): StubMapping = {
+    when(method = method, uri = uri)
+      .thenReturn(status = status, body)
+  }
 
-  def submit(nino: String, body: SubmitEndOfPeriod)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-
-    connector.submit(nino, body)
+  def onError(method: HTTPMethod, uri: String, errorStatus: Int, errorBody: String): StubMapping = {
+    when(method = method, uri = uri)
+      .thenReturn(status = errorStatus, errorBody)
   }
 }
