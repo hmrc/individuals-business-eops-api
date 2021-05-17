@@ -24,6 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v1.mocks.services._
+import v1.models.audit.{AuditError, AuditEvent, AuditResponse, GenericAuditDetail}
 import v1.models.errors.{DownstreamError, NotFoundError, _}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
@@ -45,6 +46,19 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
 
     private val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
     private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
+
+  def event(auditResponse: AuditResponse): AuditEvent[GenericAuditDetail] =
+    AuditEvent(
+      auditType = "submitEndOfPeriodStatementAuditType",
+      transactionName = "submit-end-of-period-statement-transaction-type",
+      detail = GenericAuditDetail(
+        userType = "Individual",
+        agentReferenceNumber = None,
+        nino,
+        correlationId,
+        auditResponse
+      )
+    )
 
     trait Test {
       val hc: HeaderCarrier = HeaderCarrier()
@@ -137,6 +151,9 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
               status(result) shouldBe expectedStatus
               contentAsJson(result) shouldBe Json.toJson(mtdError)
               header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+              val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
+              MockedAuditService.verifyAuditEvent(event(auditResponse)).once
             }
           }
 
