@@ -68,7 +68,9 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
         } yield {
           logger.info(
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
-              s"Success response recieved with CorrelationId: ${serviceResponse.correlationId}")
+              s"Success response received with CorrelationId: ${serviceResponse.correlationId}")
+
+          auditSubmission(createAuditDetails(rawData, NO_CONTENT, serviceResponse.correlationId, request.userDetails, None))
 
           NoContent.withApiHeaders(serviceResponse.correlationId)
             .as(MimeTypes.JSON)
