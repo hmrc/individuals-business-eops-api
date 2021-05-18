@@ -70,7 +70,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
               s"Success response received with CorrelationId: ${serviceResponse.correlationId}")
 
-          auditSubmission(createAuditDetails(rawData, NO_CONTENT, serviceResponse.correlationId, request.userDetails, None))
+          auditSubmission(GenericAuditDetail(request.userDetails, nino, request.body,
+            correlationId, AuditResponse(NO_CONTENT, Right(None))))
 
           NoContent.withApiHeaders(serviceResponse.correlationId)
             .as(MimeTypes.JSON)
@@ -84,7 +85,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
           s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
             s"Error response received with CorrelationId: $correlationId")
 
-        auditSubmission(createAuditDetails(rawData, result.header.status, correlationId, request.userDetails, Some(errorWrapper)))
+        auditSubmission(GenericAuditDetail(request.userDetails, nino, request.body,
+          correlationId, AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
 
         result
       }.merge
@@ -123,19 +125,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     }
   }
 
-  private def createAuditDetails(rawData: SubmitEndOfPeriodStatementRawData,
-                                 statusCode: Int,
-                                 correlationId: String,
-                                 userDetails: UserDetails,
-                                 errorWrapper: Option[ErrorWrapper],
-                                 responseBody: Option[JsValue] = None): GenericAuditDetail = {
-
-    val response = errorWrapper.map( wrapper => AuditResponse(statusCode, Some(wrapper.auditErrors), None)).getOrElse(AuditResponse(statusCode, None, None))
-    GenericAuditDetail(userDetails.userType, userDetails.agentReferenceNumber, rawData.nino, correlationId, response)
-  }
-
   private def auditSubmission(details: GenericAuditDetail)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuditResult] = {
-    val event = AuditEvent("submitEndOfPeriodStatementAuditType", "submit-end-of-period-statement-transaction-type", details)
+    val event = AuditEvent("SubmitEndOfPeriodStatementAuditType", "submit-end-of-period-statement-transaction-type", details)
     auditService.auditEvent(event)
   }
 }

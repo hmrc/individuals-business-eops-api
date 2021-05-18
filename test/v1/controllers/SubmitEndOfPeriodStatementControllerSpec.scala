@@ -49,12 +49,13 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
 
   def event(auditResponse: AuditResponse): AuditEvent[GenericAuditDetail] =
     AuditEvent(
-      auditType = "submitEndOfPeriodStatementAuditType",
+      auditType = "SubmitEndOfPeriodStatementAuditType",
       transactionName = "submit-end-of-period-statement-transaction-type",
       detail = GenericAuditDetail(
         userType = "Individual",
         agentReferenceNumber = None,
         nino,
+        fullValidJson(),
         correlationId,
         auditResponse
       )
