@@ -55,7 +55,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
         userType = "Individual",
         agentReferenceNumber = None,
         nino,
-        fullValidJson(),
+        fullValidAuditJson(),
         correlationId,
         auditResponse
       )

@@ -20,7 +20,7 @@ import cats.data.EitherT
 import cats.implicits._
 import javax.inject._
 import play.api.http.MimeTypes
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsDefined, JsObject, JsUndefined, JsValue, Json}
 import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -28,7 +28,6 @@ import utils.{IdGenerator, Logging}
 import v1.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v1.hateoas.AmendHateoasBody
 import v1.models.audit._
-import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.request.SubmitEndOfPeriodStatementRawData
 import v1.services._
@@ -57,6 +56,12 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
         s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s"with CorrelationId: $correlationId")
 
+      val auditRequestJson = request.body \ "finalised" match {
+        case JsDefined(finalised) =>
+          request.body.as[JsObject] - "finalised" ++ Json.obj("endOfPeriodStatementFinalised" -> finalised)
+        case _: JsUndefined       => request.body
+      }
+
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
       val result =
         for {
@@ -70,7 +75,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
               s"Success response received with CorrelationId: ${serviceResponse.correlationId}")
 
-          auditSubmission(GenericAuditDetail(request.userDetails, nino, request.body,
+          auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson,
             correlationId, AuditResponse(NO_CONTENT, Right(None))))
 
           NoContent.withApiHeaders(serviceResponse.correlationId)
@@ -85,7 +90,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
           s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
             s"Error response received with CorrelationId: $correlationId")
 
-        auditSubmission(GenericAuditDetail(request.userDetails, nino, request.body,
+        auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson,
           correlationId, AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
 
         result

@@ -23,9 +23,9 @@ case class GenericAuditDetail(
                              userType: String,
                              agentReferenceNumber: Option[String],
                              nino: String,
-                             request: JsValue,
+                             endOfPeriodStatementRequestBody: JsValue,
                              `X-CorrelationId`: String,
-                             response: AuditResponse
+                             endOfPeriodStatementResponseBody: AuditResponse
                            )
 
 object GenericAuditDetail {
@@ -41,7 +41,7 @@ object GenericAuditDetail {
       userType = userDetails.userType,
       agentReferenceNumber = userDetails.agentReferenceNumber,
       nino = nino,
-      request = request,
+      endOfPeriodStatementRequestBody = request,
       `X-CorrelationId`,
       auditResponse
     )
