@@ -56,6 +56,12 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
         s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s"with CorrelationId: $correlationId")
 
+      val auditRequestJson = request.body \ "finalised" match {
+        case JsDefined(finalised) =>
+          request.body.as[JsObject] - "finalised" ++ Json.obj("endOfPeriodStatementFinalised" -> finalised)
+        case _: JsUndefined       => request.body
+      }
+
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
       val result =
         for {
@@ -69,7 +75,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
               s"Success response received with CorrelationId: ${serviceResponse.correlationId}")
 
-          auditSubmission(GenericAuditDetail(request.userDetails, nino, request.body,
+          auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson,
             correlationId, AuditResponse(NO_CONTENT, Right(None))))
 
           NoContent.withApiHeaders(serviceResponse.correlationId)
@@ -83,12 +89,6 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
         logger.warn(
           s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
             s"Error response received with CorrelationId: $correlationId")
-
-        val auditRequestJson = request.body \ "finalised" match {
-          case JsDefined(finalised) =>
-            request.body.as[JsObject] - "finalised" ++ Json.obj("endOfPeriodStatementFinalised" -> finalised)
-          case _: JsUndefined       => request.body
-        }
 
         auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson,
           correlationId, AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
