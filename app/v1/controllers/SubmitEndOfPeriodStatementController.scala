@@ -84,13 +84,13 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
           s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
             s"Error response received with CorrelationId: $correlationId")
 
-        val json2 = request.body \ "finalised" match {
+        val auditRequestJson = request.body \ "finalised" match {
           case JsDefined(finalised) =>
             request.body.as[JsObject] - "finalised" ++ Json.obj("endOfPeriodStatementFinalised" -> finalised)
           case _: JsUndefined       => request.body
         }
 
-        auditSubmission(GenericAuditDetail(request.userDetails, nino, json2,
+        auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson,
           correlationId, AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
 
         result
