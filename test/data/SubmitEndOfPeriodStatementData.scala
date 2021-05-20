@@ -64,4 +64,23 @@ object SubmitEndOfPeriodStatementData {
       |}""".stripMargin
 
   )
+
+  def fullValidAuditJson(typeOfBusiness: String = "self-employment",
+                    businessId: String = "XAIS12345678910",
+                    startDate: String = "2021-04-06",
+                    endDate: String = "2022-04-05",
+                    finalised: String = "true"
+
+                   ): JsValue = Json.parse(
+    s"""{
+       | "typeOfBusiness":"$typeOfBusiness",
+       | "businessId":"$businessId",
+       | "accountingPeriod": {
+       |   "startDate": "$startDate",
+       |   "endDate":"$endDate"
+       | },
+       | "endOfPeriodStatementFinalised": $finalised
+       |}
+       |""".stripMargin
+  )
 }

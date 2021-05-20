@@ -20,7 +20,7 @@ import cats.data.EitherT
 import cats.implicits._
 import javax.inject._
 import play.api.http.MimeTypes
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsDefined, JsObject, JsUndefined, JsValue, Json}
 import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -28,7 +28,6 @@ import utils.{IdGenerator, Logging}
 import v1.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v1.hateoas.AmendHateoasBody
 import v1.models.audit._
-import v1.models.auth.UserDetails
 import v1.models.errors._
 import v1.models.request.SubmitEndOfPeriodStatementRawData
 import v1.services._
@@ -85,7 +84,13 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
           s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
             s"Error response received with CorrelationId: $correlationId")
 
-        auditSubmission(GenericAuditDetail(request.userDetails, nino, request.body,
+        val json2 = request.body \ "finalised" match {
+          case JsDefined(finalised) =>
+            request.body.as[JsObject] - "finalised" ++ Json.obj("endOfPeriodStatementFinalised" -> finalised)
+          case _: JsUndefined       => request.body
+        }
+
+        auditSubmission(GenericAuditDetail(request.userDetails, nino, json2,
           correlationId, AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
 
         result
