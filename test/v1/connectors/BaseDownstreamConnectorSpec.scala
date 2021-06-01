@@ -63,14 +63,14 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
       "AnotherHeader" -> "HeaderValue"
     )
 
-    "making a HTTP request to a downstream service (i.e IFS)" must {
+    "making a HTTP request to a downstream service (i.e DES)" must {
       testHttpMethods(dummyDesHeaderCarrierConfig, requiredHeaders, excludedHeaders, Some(allowedDesHeaders))
 
       "exclude all `otherHeaders` when no external service header allow-list is found" should {
         val requiredHeaders: Seq[(String, String)] = Seq(
-          "Environment" -> "ifs-environment",
-          "Authorization" -> s"Bearer ifs-token",
-          "User-Agent" -> "other-deductions-api",
+          "Environment" -> "des-environment",
+          "Authorization" -> s"Bearer des-token",
+          "User-Agent" -> "individuals-business-eops-api",
           "CorrelationId" -> correlationId,
         )
 
