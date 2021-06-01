@@ -41,7 +41,7 @@ class NrsProxyConnectorSpec extends ConnectorSpec {
       appConfig = mockAppConfig
     )
 
-    MockedAppConfig.mtdNrsProxyBaseUrl returns baseUrl
+    MockAppConfig.mtdNrsProxyBaseUrl returns baseUrl
   }
 
   "NrsProxyConnector" when {

@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package v1.services
+package utils
 
-import javax.inject.{ Inject, Singleton }
-import v1.models.domain.Nino
-import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.{MtdIdLookupConnector, MtdIdLookupOutcome}
-import v1.models.errors.NinoFormatError
+import support.UnitSpec
 
-import scala.concurrent.{ExecutionContext, Future}
+class IdGeneratorSpec extends UnitSpec {
 
-@Singleton
-class MtdIdLookupService @Inject()(val connector: MtdIdLookupConnector) {
+  val generator: IdGenerator = new IdGenerator
 
-  def lookup(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupOutcome] = {
-    if (Nino.isValid(nino)) {
-      connector.getMtdId(nino)
-    } else {
-      Future.successful(Left(NinoFormatError))
+  "IdGenerator" should {
+    "generate a correlation id" when {
+      "generateCorrelationId is called" in {
+        generator.generateCorrelationId.matches("^[A-Za-z0-9\\-]{36}$") shouldBe true
+      }
     }
   }
 }

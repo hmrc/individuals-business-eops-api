@@ -16,40 +16,35 @@
 
 package utils
 
-import javax.inject.{Inject, Singleton}
+import play.api.Configuration
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.mvc.Results._
-import play.api.mvc.{RequestHeader, Result}
-import play.api.{Configuration, Logger}
+import play.api.mvc.{ RequestHeader, Result }
 import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 import uk.gov.hmrc.play.bootstrap.backend.http.JsonErrorHandler
+import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import v1.models.errors._
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent._
 
 @Singleton
-class ErrorHandler @Inject()(
-                              config: Configuration,
-                              auditConnector: AuditConnector,
-                              httpAuditEvent: HttpAuditEvent
-                            )
-                            (implicit ec: ExecutionContext) extends JsonErrorHandler(auditConnector, httpAuditEvent, config) {
+class ErrorHandler @Inject()(config: Configuration, auditConnector: AuditConnector, httpAuditEvent: HttpAuditEvent)(implicit ec: ExecutionContext)
+  extends JsonErrorHandler(auditConnector, httpAuditEvent, config)
+    with Logging {
 
   import httpAuditEvent.dataEvent
 
-  val logger = Logger(getClass)
-
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
-
-    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     logger.warn(s"[ErrorHandler][onClientError] error in version 1, for (${request.method}) [${request.uri}] with status:" +
           s" $statusCode and message: $message")
+
     statusCode match {
       case BAD_REQUEST =>
         auditConnector.sendEvent(dataEvent("ServerValidationError",
@@ -80,17 +75,19 @@ class ErrorHandler @Inject()(
   }
 
   override def onServerError(request: RequestHeader, ex: Throwable): Future[Result] = {
-    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     logger.warn(s"[ErrorHandler][onServerError] Internal server error in version 1, for (${request.method}) [${request.uri}] -> ", ex)
 
     val (status, errorCode, eventType) = ex match {
-      case _: NotFoundException => (NOT_FOUND, NotFoundError, "ResourceNotFound")
+      case _: NotFoundException      => (NOT_FOUND, NotFoundError, "ResourceNotFound")
       case _: AuthorisationException => (UNAUTHORIZED, UnauthorisedError, "ClientError")
-      case _: JsValidationException => (BAD_REQUEST, BadRequestError, "ServerValidationError")
-      case e: HttpException => (e.responseCode, BadRequestError, "ServerValidationError")
-      case e: Upstream4xxResponse => (e.reportAs, BadRequestError, "ServerValidationError")
-      case e: Upstream5xxResponse => (e.reportAs, DownstreamError, "ServerInternalError")
+      case _: JsValidationException  => (BAD_REQUEST, BadRequestError, "ServerValidationError")
+      case e: HttpException          => (e.responseCode, BadRequestError, "ServerValidationError")
+      case e: UpstreamErrorResponse if UpstreamErrorResponse.Upstream4xxResponse.unapply(e).isDefined =>
+        (e.reportAs, BadRequestError, "ServerValidationError")
+      case e: UpstreamErrorResponse if UpstreamErrorResponse.Upstream5xxResponse.unapply(e).isDefined =>
+        (e.reportAs, DownstreamError, "ServerInternalError")
       case _ => (INTERNAL_SERVER_ERROR, DownstreamError, "ServerInternalError")
     }
 

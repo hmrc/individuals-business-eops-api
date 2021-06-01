@@ -16,8 +16,8 @@
 
 package v1.models.request
 
-import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.domain.Nino
+import play.api.libs.json.{ Json, OFormat }
+import v1.models.domain.Nino
 
 case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod)
 

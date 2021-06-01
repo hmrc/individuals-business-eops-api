@@ -18,7 +18,7 @@ package v1.services
 
 import cats.data.EitherT
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.Logging
 import v1.connectors.SubmitEndOfPeriodStatementConnector

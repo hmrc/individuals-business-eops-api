@@ -17,7 +17,7 @@
 package v1.services
 
 import data.SubmitEndOfPeriodStatementData.validRequest
-import uk.gov.hmrc.domain.Nino
+import v1.models.domain.Nino
 import v1.mocks.connectors.MockSubmitEndOfPeriodStatementConnector
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
@@ -27,13 +27,13 @@ import scala.concurrent.Future
 
 class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
 
-  val nino: Nino = Nino("AA123456A")
+  val nino = "AA123456A"
 
   trait Test extends MockSubmitEndOfPeriodStatementConnector {
     val service = new SubmitEndOfPeriodStatementService(connector)
   }
 
-  val requestData: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(nino,validRequest)
+  val requestData: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(Nino(nino),validRequest)
 
 
   "service" when {

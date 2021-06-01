@@ -24,7 +24,7 @@ import play.api.libs.json.{JsDefined, JsObject, JsUndefined, JsValue, Json}
 import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import utils.{IdGenerator, Logging}
+import utils.{ IdGenerator, Logging }
 import v1.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v1.hateoas.AmendHateoasBody
 import v1.models.audit._
@@ -51,7 +51,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
   def handleRequest(nino: String): Action[JsValue] =
     authorisedAction(nino).async(parse.json) { implicit request =>
 
-      implicit val correlationId: String = idGenerator.getCorrelationId
+      implicit val correlationId: String = idGenerator.generateCorrelationId
       logger.info(
         s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
           s"with CorrelationId: $correlationId")
@@ -83,12 +83,11 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
         }
 
       result.leftMap { errorWrapper =>
-        val correlationId = errorWrapper.correlationId
-        val result = errorResult(errorWrapper).withApiHeaders(correlationId)
-
+        val resCorrelationId = errorWrapper.correlationId
+        val result = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
         logger.warn(
           s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
-            s"Error response received with CorrelationId: $correlationId")
+            s"Error response received with CorrelationId: $resCorrelationId")
 
         auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson,
           correlationId, AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))

@@ -24,11 +24,13 @@ import v1.models.request.SubmitEndOfPeriodStatementRequest
 import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends DesConnector {
+class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient,
+                                                    val appConfig: AppConfig) extends BaseDesConnector {
 
-  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(implicit hc: HeaderCarrier,
-                                                                        ec: ExecutionContext,
-                                                                        correlationId: String): Future[DesOutcome[Unit]] = {
+  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)
+                           (implicit hc: HeaderCarrier,
+                            ec: ExecutionContext,
+                            correlationId: String): Future[DownstreamOutcome[Unit]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
 

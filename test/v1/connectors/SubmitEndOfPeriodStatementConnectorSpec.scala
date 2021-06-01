@@ -18,7 +18,7 @@ package v1.connectors
 
 import data.SubmitEndOfPeriodStatementData._
 import mocks.MockAppConfig
-import uk.gov.hmrc.domain.Nino
+import v1.models.domain.Nino
 import v1.mocks._
 import v1.models.des.EmptyJsonBody
 import v1.models.errors._
@@ -35,9 +35,10 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
     val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(http = mockHttpClient, appConfig = mockAppConfig)
 
     val desRequestHeaders: Seq[(String, String)] = Seq("Environment" -> "des-environment", "Authorization" -> s"Bearer des-token")
-    MockedAppConfig.desBaseUrl returns baseUrl
-    MockedAppConfig.desToken returns "des-token"
-    MockedAppConfig.desEnvironment returns "des-environment"
+    MockAppConfig.desBaseUrl returns baseUrl
+    MockAppConfig.desToken returns "des-token"
+    MockAppConfig.desEnvironment returns "des-environment"
+    MockAppConfig.desEnvironmentHeaders returns Some(allowedDesHeaders)
   }
 
   "Submit end of period statement" when {
