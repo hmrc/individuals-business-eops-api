@@ -23,7 +23,6 @@ import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 import scala.concurrent.Future
 
-
 class NrsProxyConnectorSpec extends ConnectorSpec {
 
   val nino: String = "AA123456A"
