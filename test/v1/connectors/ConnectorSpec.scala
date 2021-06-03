@@ -38,7 +38,7 @@ trait ConnectorSpec extends UnitSpec
   implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders)
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  val dummyDesHeaderCarrierConfig: HeaderCarrier.Config =
+  val dummyHeaderCarrierConfig: HeaderCarrier.Config =
     HeaderCarrier.Config(
       Seq("^not-test-BaseUrl?$".r),
       Seq.empty[String],
@@ -46,7 +46,7 @@ trait ConnectorSpec extends UnitSpec
     )
 
   val requiredDesHeaders: Seq[(String, String)] = Seq(
-    "Authorization" -> "Bearer ifs-token",
+    "Authorization" -> "Bearer des-token",
     "Environment" -> "des-environment",
     "User-Agent" -> "individuals-business-eops-api",
     "CorrelationId" -> correlationId,

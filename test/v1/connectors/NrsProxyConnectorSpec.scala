@@ -23,6 +23,7 @@ import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 import scala.concurrent.Future
 
+
 class NrsProxyConnectorSpec extends ConnectorSpec {
 
   val nino: String = "AA123456A"
@@ -51,6 +52,7 @@ class NrsProxyConnectorSpec extends ConnectorSpec {
         MockedHttpClient
           .post(
             url = s"$baseUrl/mtd-api-nrs-proxy/$nino/itsa-eops",
+            config = dummyHeaderCarrierConfig,
             body = submitEndOfPeriodRequestBody
           ).returns(Future.successful((): Unit))
 

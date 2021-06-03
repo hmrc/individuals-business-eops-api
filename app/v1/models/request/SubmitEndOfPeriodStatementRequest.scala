@@ -16,11 +16,6 @@
 
 package v1.models.request
 
-import play.api.libs.json.{ Json, OFormat }
 import v1.models.domain.Nino
 
 case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod)
-
-object SubmitEndOfPeriodStatementRequest {
-  implicit val format: OFormat[SubmitEndOfPeriodStatementRequest] = Json.format[SubmitEndOfPeriodStatementRequest]
-}

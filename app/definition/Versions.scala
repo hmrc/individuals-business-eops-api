@@ -18,7 +18,6 @@ package definition
 
 import play.api.http.HeaderNames.ACCEPT
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.http.HeaderCarrier
 
 object Versions {
   val VERSION_1 = "1.0"
@@ -29,6 +28,6 @@ object Versions {
   def getFromRequest(request: RequestHeader): Option[String] =
     getFrom(request.headers.headers)
 
-  private def getFrom(headers: Seq[(String, String)]) =
+  private def getFrom(headers: Seq[(String, String)]): Option[String] =
     headers.collectFirst { case (ACCEPT, versionRegex(ver)) => ver }
 }

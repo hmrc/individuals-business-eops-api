@@ -40,7 +40,7 @@ class MtdIdLookupConnectorSpec extends ConnectorSpec {
       "the http client returns a mtd id" in new Test {
         MockedHttpClient.get[MtdIdLookupOutcome](
           url = s"$baseUrl/mtd-identifier-lookup/nino/$nino",
-          config = dummyDesHeaderCarrierConfig
+          config = dummyHeaderCarrierConfig
         ).returns(Future.successful(Right(mtdId)))
 
         val result: MtdIdLookupOutcome = await(connector.getMtdId(nino))
@@ -52,7 +52,7 @@ class MtdIdLookupConnectorSpec extends ConnectorSpec {
       "the http client returns a DownstreamError" in new Test {
         MockedHttpClient.get[MtdIdLookupOutcome](
           url = s"$baseUrl/mtd-identifier-lookup/nino/$nino",
-          config = dummyDesHeaderCarrierConfig
+          config = dummyHeaderCarrierConfig
         ).returns(Future.successful(Left(DownstreamError)))
 
         val result: MtdIdLookupOutcome = await(connector.getMtdId(nino))

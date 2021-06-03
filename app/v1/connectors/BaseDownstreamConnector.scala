@@ -17,19 +17,18 @@
 package v1.connectors
 
 import config.AppConfig
-import play.api.Logger
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
-import v1.models.des.EmptyJsonBody
+import play.api.libs.json.Writes
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import utils.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseDesConnector {
+trait BaseDownstreamConnector extends Logging {
   val http: HttpClient
   val appConfig: AppConfig
 
-  val logger: Logger = Logger(this.getClass)
-
-  private[connectors] def desHeaderCarrier(additionalHeaders: Seq[String] = Seq.empty)(implicit hc: HeaderCarrier, correlationId: String): HeaderCarrier = {
+  private def desHeaderCarrier(additionalHeaders: Seq[String] = Seq("Content-Type"))(implicit hc: HeaderCarrier,
+                                                                                     correlationId: String): HeaderCarrier = {
 
     HeaderCarrier(
       extraHeaders = hc.extraHeaders ++
@@ -44,15 +43,14 @@ trait BaseDesConnector {
     )
   }
 
-  def postEmpty[Resp]( uri: DesUri[Resp])(implicit ec: ExecutionContext,
-                                          hc: HeaderCarrier,
-                                          httpReads: HttpReads[DownstreamOutcome[Resp]],
-                                          correlationId: String): Future[DownstreamOutcome[Resp]] = {
-
-    def doPostEmpty(implicit hc: HeaderCarrier): Future[DownstreamOutcome[Resp]] = {
-      http.POST(s"${appConfig.desBaseUrl}/${uri.value}", EmptyJsonBody)
+  def post[Body: Writes, Resp](body: Body, uri: DesUri[Resp])(implicit ec: ExecutionContext,
+                                                              hc: HeaderCarrier,
+                                                              httpReads: HttpReads[DownstreamOutcome[Resp]],
+                                                              correlationId: String): Future[DownstreamOutcome[Resp]] = {
+    def doPost(implicit hc: HeaderCarrier): Future[DownstreamOutcome[Resp]] = {
+      http.POST(url = s"${appConfig.desBaseUrl}/${uri.value}", body)
     }
 
-    doPostEmpty(desHeaderCarrier())
+    doPost(desHeaderCarrier())
   }
 }
