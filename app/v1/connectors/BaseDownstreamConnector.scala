@@ -45,9 +45,9 @@ trait BaseDownstreamConnector extends Logging {
 
   def post[Body: Writes, Resp](body: Body, uri: DesUri[Resp])(implicit ec: ExecutionContext,
                                                               hc: HeaderCarrier,
-                                                              httpReads: HttpReads[DownstreamOutcome[Resp]],
-                                                              correlationId: String): Future[DownstreamOutcome[Resp]] = {
-    def doPost(implicit hc: HeaderCarrier): Future[DownstreamOutcome[Resp]] = {
+                                                              httpReads: HttpReads[DesOutcome[Resp]],
+                                                              correlationId: String): Future[DesOutcome[Resp]] = {
+    def doPost(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
       http.POST(url = s"${appConfig.desBaseUrl}/${uri.value}", body)
     }
 

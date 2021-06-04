@@ -65,11 +65,6 @@ class AppConfigImpl @Inject()(config: ServicesConfig, configuration: Configurati
   val mtdNrsProxyBaseUrl: String = config.baseUrl("mtd-api-nrs-proxy")
 }
 
-trait FixedConfig {
-  // Minimum tax year for MTD
-  val minimumTaxYear = 2018
-}
-
 case class ConfidenceLevelConfig(definitionEnabled: Boolean, authValidationEnabled: Boolean)
 object ConfidenceLevelConfig {
   implicit val configLoader: ConfigLoader[ConfidenceLevelConfig] = (rootConfig: Config, path: String) => {

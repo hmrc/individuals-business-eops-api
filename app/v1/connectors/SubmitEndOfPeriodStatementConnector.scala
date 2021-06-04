@@ -32,7 +32,7 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient,
   def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)
                            (implicit hc: HeaderCarrier,
                             ec: ExecutionContext,
-                            correlationId: String): Future[DownstreamOutcome[Unit]] = {
+                            correlationId: String): Future[DesOutcome[Unit]] = {
 
     import v1.connectors.httpparsers.StandardDesHttpParser._
 
