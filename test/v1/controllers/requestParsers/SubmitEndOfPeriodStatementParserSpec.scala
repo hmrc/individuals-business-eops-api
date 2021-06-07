@@ -18,7 +18,7 @@ package v1.controllers.requestParsers
 
 import data.SubmitEndOfPeriodStatementData
 import support.UnitSpec
-import uk.gov.hmrc.domain.Nino
+import v1.models.domain.Nino
 import v1.models.errors.{BadRequestError, ErrorWrapper, NinoFormatError, TypeOfBusinessFormatError}
 import play.api.mvc.AnyContentAsJson
 import v1.mocks.MockSubmitEndOfPeriodStatementParser

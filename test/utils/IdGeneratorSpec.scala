@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-package v1.models.request
+package utils
 
-import v1.models.domain.Nino
+import support.UnitSpec
 
-case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod)
+class IdGeneratorSpec extends UnitSpec {
+
+  val generator: IdGenerator = new IdGenerator
+
+  "IdGenerator" should {
+    "generate a correlation id" when {
+      "generateCorrelationId is called" in {
+        generator.generateCorrelationId.matches("^[A-Za-z0-9\\-]{36}$") shouldBe true
+      }
+    }
+  }
+}

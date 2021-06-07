@@ -17,11 +17,10 @@
 package utils
 
 import java.util.UUID
-
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 
 @Singleton
-class IdGenerator @Inject()() {
+class IdGenerator{
 
-  def getCorrelationId: String = UUID.randomUUID().toString
+  def generateCorrelationId: String = UUID.randomUUID().toString
 }

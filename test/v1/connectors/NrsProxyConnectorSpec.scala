@@ -41,7 +41,7 @@ class NrsProxyConnectorSpec extends ConnectorSpec {
       appConfig = mockAppConfig
     )
 
-    MockedAppConfig.mtdNrsProxyBaseUrl returns baseUrl
+    MockAppConfig.mtdNrsProxyBaseUrl returns baseUrl
   }
 
   "NrsProxyConnector" when {
@@ -51,6 +51,7 @@ class NrsProxyConnectorSpec extends ConnectorSpec {
         MockedHttpClient
           .post(
             url = s"$baseUrl/mtd-api-nrs-proxy/$nino/itsa-eops",
+            config = dummyHeaderCarrierConfig,
             body = submitEndOfPeriodRequestBody
           ).returns(Future.successful((): Unit))
 

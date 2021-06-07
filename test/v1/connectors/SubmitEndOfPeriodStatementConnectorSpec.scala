@@ -18,7 +18,8 @@ package v1.connectors
 
 import data.SubmitEndOfPeriodStatementData._
 import mocks.MockAppConfig
-import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.HeaderCarrier
+import v1.models.domain.Nino
 import v1.mocks._
 import v1.models.des.EmptyJsonBody
 import v1.models.errors._
@@ -34,22 +35,30 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
   class Test extends MockHttpClient with MockAppConfig {
     val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(http = mockHttpClient, appConfig = mockAppConfig)
 
-    val desRequestHeaders: Seq[(String, String)] = Seq("Environment" -> "des-environment", "Authorization" -> s"Bearer des-token")
-    MockedAppConfig.desBaseUrl returns baseUrl
-    MockedAppConfig.desToken returns "des-token"
-    MockedAppConfig.desEnvironment returns "des-environment"
+    MockAppConfig.desBaseUrl returns baseUrl
+    MockAppConfig.desToken returns "des-token"
+    MockAppConfig.desEnvironment returns "des-environment"
+    MockAppConfig.desEnvironmentHeaders returns Some(allowedDesHeaders)
   }
 
   "Submit end of period statement" when {
+
+    implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
+    val requiredDesHeadersPost: Seq[(String, String)] = requiredDesHeaders ++ Seq("Content-Type" -> "application/json")
 
     "a valid request is supplied" should {
       "return a successful response with the correct correlationId" in new Test {
         val expected = Right(ResponseWrapper(correlationId, ()))
 
         MockedHttpClient
-          .post(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId", EmptyJsonBody)
-          .returns(Future.successful(expected))
+          .post(
+            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+            config = dummyHeaderCarrierConfig,
+            body = EmptyJsonBody,
+            requiredHeaders = requiredDesHeadersPost,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.successful(expected))
 
         await(connector.submitPeriodStatement(
           SubmitEndOfPeriodStatementRequest(
@@ -64,9 +73,14 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         val expected = Left(ResponseWrapper(correlationId, NinoFormatError))
 
         MockedHttpClient
-          .post(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId", EmptyJsonBody)
-          .returns(Future.successful(expected))
+          .post(
+            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+            config = dummyHeaderCarrierConfig,
+            body = EmptyJsonBody,
+            requiredHeaders = requiredDesHeadersPost,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.successful(expected))
 
         await(connector.submitPeriodStatement(
           SubmitEndOfPeriodStatementRequest(
@@ -80,9 +94,14 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         val expected = Left(ResponseWrapper(correlationId, Seq(NinoFormatError, DownstreamError)))
 
         MockedHttpClient
-          .post(s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId", EmptyJsonBody)
-          .returns(Future.successful(expected))
+          .post(
+            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+            config = dummyHeaderCarrierConfig,
+            body = EmptyJsonBody,
+            requiredHeaders = requiredDesHeadersPost,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          ).returns(Future.successful(expected))
 
         await(connector.submitPeriodStatement(
           SubmitEndOfPeriodStatementRequest(
