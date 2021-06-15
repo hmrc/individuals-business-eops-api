@@ -15,9 +15,10 @@
       "example": "self-employment"
     },
     "businessId": {
-      "description": "An identifier for the business, unique to the customer. Must conform to the regular expression ^X[A-Z0-9]{1}IS[0-9]{11}$. For example: XAIS12345678910",
+      "description": "An identifier for the business, unique to the customer.",
       "type": "string",
-      "example": "XAIS12345678910"
+      "example": "XAIS12345678910",
+      "pattern": "^X[A-Z0-9]{1}IS[0-9]{11}$"
     },
     "accountingPeriod": {
       "type": "object",
