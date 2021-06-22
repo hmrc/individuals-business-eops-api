@@ -29,8 +29,13 @@ To view documentation locally ensure the Individuals Business EOPS API is runnin
 Then go to http://localhost:9680/api-documentation/docs/api/preview and use this port and version:
 `http://localhost:7785/api/conf/1.0/application.raml`
 
-## Reporting Issues
-You can create a GitHub issue [here](https://github.com/hmrc/individuals-business-eops-api/issues)
+## Changelog
+
+You can see our changelog [here](https://github.com/hmrc/income-tax-mtd-changelog/wiki)
+
+## Support and Reporting Issues
+
+You can create a GitHub issue [here](https://github.com/hmrc/income-tax-mtd-changelog/issues)
 
 ## API Reference / Documentation 
 Available on the [HMRC Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/individuals-business-eops-api/1.0)
