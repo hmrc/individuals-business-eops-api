@@ -41,7 +41,7 @@
       ]
     },
     "finalised": {
-      "description": "Declaration for the finalised statement. Limited to the following possible values: true or false",
+      "description": "Indicates the declaration for the finalised statement. The value can only be set to true.",
       "type": "boolean",
       "example": "true"
     }
