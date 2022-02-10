@@ -11,8 +11,7 @@
         "self-employment",
         "uk-property",
         "foreign-property"
-      ],
-      "example": "self-employment"
+      ]
     },
     "businessId": {
       "description": "An identifier for the business, unique to the customer.",
