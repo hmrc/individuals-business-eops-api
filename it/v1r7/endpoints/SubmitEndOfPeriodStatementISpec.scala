@@ -263,6 +263,10 @@ class SubmitEndOfPeriodStatementISpec extends V1R7IntegrationBaseSpec {
             |                "type": "ERR",
             |                "text": "C55316 text"
             |            },{
+            |                "id": "C55525",
+            |                "type": "ERR",
+            |                "text": "C55525 text"
+            |            },{
             |                "id": "C55008",
             |                "type": "ERR",
             |                "text": "C55008 text"
@@ -300,6 +304,7 @@ class SubmitEndOfPeriodStatementISpec extends V1R7IntegrationBaseSpec {
         val input : Seq[(Int, JsValue, Int, MtdError)]= Seq(
           (FORBIDDEN, bvr("C55503"), FORBIDDEN, RuleConsolidatedExpensesError),
           (FORBIDDEN, bvr("C55316"), FORBIDDEN, RuleConsolidatedExpensesError),
+          (FORBIDDEN, bvr("C55525"), FORBIDDEN, RuleConsolidatedExpensesError),
           (FORBIDDEN, bvr("C55008"), FORBIDDEN, RuleMismatchedStartDateError),
           (FORBIDDEN, bvr("C55013"), FORBIDDEN, RuleMismatchedEndDateError),
           (FORBIDDEN, bvr("C55014"), FORBIDDEN, RuleMismatchedEndDateError),

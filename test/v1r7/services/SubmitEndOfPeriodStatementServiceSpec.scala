@@ -71,6 +71,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
           ("LATE_SUBMISSION", RuleLateSubmissionError),
           ("C55503", RuleConsolidatedExpensesError),
           ("C55316", RuleConsolidatedExpensesError),
+          ("C55525", RuleConsolidatedExpensesError),
           ("C55008", RuleMismatchedStartDateError),
           ("C55013", RuleMismatchedEndDateError),
           ("C55014", RuleMismatchedEndDateError),
