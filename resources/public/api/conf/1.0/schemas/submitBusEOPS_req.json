@@ -5,14 +5,13 @@
   "type": "object",
   "properties": {
     "typeOfBusiness": {
-      "description": "The type of business the the declaration is for. Limited to the following possible values: self-employment, uk-property and foreign-property",
+      "description": "The type of business the the declaration is for.",
       "type": "string",
       "enum": [
         "self-employment",
         "uk-property",
         "foreign-property"
-      ],
-      "example": "self-employment"
+      ]
     },
     "businessId": {
       "description": "An identifier for the business, unique to the customer.",
@@ -25,12 +24,12 @@
       "description": "Object containing the accounting period start and end dates",
       "properties": {
         "startDate": {
-          "description": "The date the accounting period started. Must be in the format YYYY-MM-DD. For example: 2021-04-06",
+          "description": "The date the accounting period started. Must be in the format YYYY-MM-DD.",
           "type": "string",
           "example": "2021-04-06"
         },
         "endDate": {
-          "description": "The date the accounting period ended. Must be in the format YYYY-MM-DD. For example: 2022-04-05",
+          "description": "The date the accounting period ended. Must be in the format YYYY-MM-DD.",
           "type": "string",
           "example": "2022-04-05"
         }
@@ -41,7 +40,7 @@
       ]
     },
     "finalised": {
-      "description": "Declaration for the finalised statement. Limited to the following possible values: true or false",
+      "description": "Indicates the declaration for the finalised statement. The value can only be set to true.",
       "type": "boolean",
       "example": "true"
     }

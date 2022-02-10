@@ -61,7 +61,7 @@
         </tr>
         <tr>
             <td><p>RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT</p></td>
-            <td><p>Simulate scenario for UK non-Furnished Holiday Lettings, the private use adjustment must not exceed the total allowable expenses</p></td>
+            <td><p>Simulate scenario for UK non-Furnished Holiday Lettings, the private use adjustment must not exceed the total allowable expenses.</p></td>
         </tr>
         <tr>
             <td><p>RULE_NON_MATCHING_PERIOD</p></td>
