@@ -1,0 +1,1 @@
+POST     /:nino      v1r7.controllers.SubmitEndOfPeriodStatementController.handleRequest(nino: String)
