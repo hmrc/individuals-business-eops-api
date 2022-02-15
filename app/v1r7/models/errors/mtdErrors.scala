@@ -89,12 +89,12 @@ object RuleNotFinalisedError extends MtdError(
 )
 object RuleAlreadySubmittedError extends MtdError(
   code = "RULE_ALREADY_SUBMITTED",
-  message = "An End of Period Statement already exists for this business' accounting period."
+  message = "An End of Period Statement already exists for this business' accounting period"
 )
 
 object RuleEarlySubmissionError extends MtdError(
   code = "RULE_EARLY_SUBMISSION",
-  message = "An End Of Period Statement cannot be submitted before the end of the accounting period."
+  message = "An End Of Period Statement cannot be submitted before the end of the accounting period"
 )
 
 object RuleLateSubmissionError extends MtdError(

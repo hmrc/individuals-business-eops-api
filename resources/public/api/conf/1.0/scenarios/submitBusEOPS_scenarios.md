@@ -41,7 +41,7 @@
         </tr>
         <tr>
             <td><p>MISMATCHED_START_DATE</p></td>
-            <td><p>Simulate scenario where the period submission start date must match the accounting period start date.</p></td>
+            <td><p>Simulate scenario where the period submission start date does not match the accounting period start date.</p></td>
         </tr>
         <tr>
             <td><p>MISMATCHED_END_DATE</p></td>
@@ -53,7 +53,7 @@
         </tr>
         <tr>
             <td><p>NON_FHL_PRIVATE_USE_ADJUSTMENT</p></td>
-            <td><p>Simulate scenario for UK non-Furnished Holiday Lettings, the private use adjustment must not exceed the total allowable expenses.</p></td>
+            <td><p>Simulate scenario for UK non-Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.</p></td>
         </tr>
         <tr>
             <td><p>NON_MATCHING_PERIOD</p></td>
