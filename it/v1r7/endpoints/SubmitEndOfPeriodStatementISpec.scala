@@ -41,7 +41,7 @@ class SubmitEndOfPeriodStatementISpec extends V1R7IntegrationBaseSpec {
                accountingPeriodStartDate: String = "2021-04-06",
                accountingPeriodEndDate: String = "2022-04-05"
               ): String = {
-      s"/income-sources/nino/" +
+      s"/income-tax/income-sources/nino/" +
         s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration"
     }
 

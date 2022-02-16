@@ -44,7 +44,7 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient,
 
     post(
       body = EmptyJsonBody,
-      uri = IfsUri[Unit]("income-sources/nino/" +
+      uri = IfsUri[Unit]("income-tax/income-sources/nino/" +
           s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
     )
   }
