@@ -55,7 +55,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         MockedHttpClient
           .post(
-            url = s"$baseUrl/income-sources/nino/$nino/$incomeSourceType/" +
+            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
             s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
@@ -77,7 +77,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         MockedHttpClient
           .post(
-            url = s"$baseUrl/income-sources/nino/$nino/$incomeSourceType/" +
+            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
             s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
@@ -99,7 +99,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         MockedHttpClient
           .post(
-            url = s"$baseUrl/income-sources/nino/$nino/$incomeSourceType/" +
+            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
             s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
