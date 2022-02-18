@@ -53,7 +53,6 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
     "INVALID_ACCOUNTINGPERIODENDDATE" -> EndDateFormatError,
     "INVALID_INCOMESOURCEID" -> BusinessIdFormatError,
     "INVALID_INCOMESOURCETYPE" -> TypeOfBusinessFormatError,
-    "MISSING_INCOMESOURCEID" -> DownstreamError,
     "INVALID_CORRELATIONID" -> DownstreamError,
     "CONFLICT" -> RuleAlreadySubmittedError,
     "EARLY_SUBMISSION" -> RuleEarlySubmissionError,
@@ -71,6 +70,7 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
     "C55317" -> RuleClass4Over16Error,
     "C55318" -> RuleClass4PensionAge,
     "C55501" -> RuleFHLPrivateUseAdjustment,
-    "C55502" -> RuleNonFHLPrivateUseAdjustment
+    "C55502" -> RuleNonFHLPrivateUseAdjustment,
+    "BVR_UNKNOWN_ID" -> RuleBusinessValidationFailure
   )
 }

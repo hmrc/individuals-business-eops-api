@@ -19,7 +19,7 @@ package v1r7.connectors.httpparsers
 import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
 import utils.Logging
-import v1r7.models.errors._
+import v1r7.models.errors.{IfsErrors, _}
 
 import scala.util.{Success, Try}
 
@@ -49,6 +49,10 @@ trait HttpParser extends Logging {
 
   private val multipleErrorReads: Reads[List[IfsErrorCode]] = (__ \ "failures").read[List[IfsErrorCode]]
 
+  private val allowedBvrList =
+    List(
+      "C55503", "C55316", "C55525", "C55008", "C55013", "C55014", "C55317", "C55318", "C55501", "C55502"
+    )
   private val bvrErrorReads: Reads[Seq[IfsErrorCode]] = {
     implicit val errorIdReads: Reads[IfsErrorCode] = (__ \ "id").read[String].map(IfsErrorCode(_))
     (__ \ "bvrfailureResponseElement" \ "validationRuleFailures").read[Seq[IfsErrorCode]]
@@ -58,7 +62,15 @@ trait HttpParser extends Logging {
   def parseErrors(response: HttpResponse): IfsError = {
     val singleError = response.validateJson[IfsErrorCode].map(err => IfsErrors(List(err)))
     lazy val multipleErrors = response.validateJson(multipleErrorReads).map(errs => IfsErrors(errs))
-    lazy val bvrErrors = response.validateJson(bvrErrorReads).map(errs => IfsErrors(errs.toList))
+    lazy val bvrErrors = response.validateJson(bvrErrorReads)
+      .map(errs => {
+        val bvrErrorList = errs.map {
+          case err if allowedBvrList.contains(err.code) => err
+          case _@err => err.copy(code = "BVR_UNKNOWN_ID")
+        }
+        IfsErrors(bvrErrorList.toList)
+      })
+
     lazy val unableToParseJsonError = {
       logger.warn(s"unable to parse errors from response: ${response.body}")
       OutboundError(DownstreamError)

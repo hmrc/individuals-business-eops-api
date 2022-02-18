@@ -104,7 +104,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
            StartDateFormatError |
            EndDateFormatError |
            FinalisedFormatError |
-           RuleIncorrectOrEmptyBodyError |
+           CustomMtdError(RuleIncorrectOrEmptyBodyError.code) |
            RangeEndDateBeforeStartDateError |
            RuleNotFinalisedError
                 => BadRequest(Json.toJson(errorWrapper))
@@ -120,7 +120,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
            RuleClass4Over16Error |
            RuleClass4PensionAge |
            RuleFHLPrivateUseAdjustment |
-           RuleNonFHLPrivateUseAdjustment
+           RuleNonFHLPrivateUseAdjustment |
+           RuleBusinessValidationFailure
                 => Forbidden(Json.toJson(errorWrapper))
 
       case NotFoundError => NotFound(Json.toJson(errorWrapper))

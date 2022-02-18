@@ -245,6 +245,17 @@ traits:
                 description: For UK non-Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
                 value:
                   code: RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT
+  ruleBusinessValidationFailure:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleBusinessValidationFailure:
+                description: There are business validation rule failures, please trigger and retrieve an in-year tax calculation and refer to any warnings and errors in the messages section.
+                value:
+                  code: RULE_BUSINESS_VALIDATION_FAILURE
   formatTaxYear:
     responses:
       400:

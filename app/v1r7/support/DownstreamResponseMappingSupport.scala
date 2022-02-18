@@ -53,7 +53,8 @@ trait DownstreamResponseMappingSupport {
               RuleClass4Over16Error,
               RuleClass4PensionAge,
               RuleFHLPrivateUseAdjustment,
-              RuleNonFHLPrivateUseAdjustment
+              RuleNonFHLPrivateUseAdjustment,
+              RuleBusinessValidationFailure
             )
           allowedErrorList.exists(mtdErrors.contains(_)) match {
             case true => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))

@@ -173,6 +173,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
           (RuleClass4PensionAge, FORBIDDEN),
           (RuleFHLPrivateUseAdjustment, FORBIDDEN),
           (RuleNonFHLPrivateUseAdjustment, FORBIDDEN),
+          (RuleBusinessValidationFailure, FORBIDDEN),
           (NotFoundError, NOT_FOUND),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
