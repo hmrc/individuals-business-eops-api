@@ -183,7 +183,6 @@ class SubmitEndOfPeriodStatementISpec extends V1R7IntegrationBaseSpec {
           (BAD_REQUEST, "INVALID_ACCOUNTINGPERIODENDDATE", "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.", BAD_REQUEST, EndDateFormatError),
           (BAD_REQUEST, "INVALID_INCOMESOURCEID", "Submission has not passed validation. Invalid parameter incomeSourceId.", BAD_REQUEST, BusinessIdFormatError),
           (BAD_REQUEST, "INVALID_INCOMESOURCETYPE", "Submission has not passed validation. Invalid parameter incomeSourceType.", BAD_REQUEST, TypeOfBusinessFormatError),
-          (BAD_REQUEST, "MISSING_INCOMESOURCEID", "The remote endpoint has indicated that required query parameters are missing.", INTERNAL_SERVER_ERROR, DownstreamError),
           (BAD_REQUEST, "INVALID_CORRELATIONID", "Submission has not passed validation. Invalid header CorrelationId.", INTERNAL_SERVER_ERROR, DownstreamError),
           (FORBIDDEN, "EARLY_SUBMISSION", "The remote endpoint has indicated that an early submission has been made before accounting period end date.", FORBIDDEN, RuleEarlySubmissionError),
           (FORBIDDEN, "LATE_SUBMISSION", "The remote endpoint has indicated that the period to finalise has passed.", FORBIDDEN, RuleLateSubmissionError),
@@ -312,6 +311,7 @@ class SubmitEndOfPeriodStatementISpec extends V1R7IntegrationBaseSpec {
           (FORBIDDEN, bvr("C55318"), FORBIDDEN, RuleClass4PensionAge),
           (FORBIDDEN, bvr("C55501"), FORBIDDEN, RuleFHLPrivateUseAdjustment),
           (FORBIDDEN, bvr("C55502"), FORBIDDEN, RuleNonFHLPrivateUseAdjustment),
+          (FORBIDDEN, bvr("C555022"), FORBIDDEN, RuleBusinessValidationFailure),
           (FORBIDDEN, bvrMultiple, FORBIDDEN, BVRError)
         )
 

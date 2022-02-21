@@ -59,5 +59,9 @@
             <td><p>NON_MATCHING_PERIOD</p></td>
             <td><p>Simulate scenario where an End of Period Statement without a matching accounting period cannot be submitted.</p></td>
         </tr>
+        <tr>
+            <td><p>BUSINESS_VALIDATION_FAILURE</p></td>
+            <td><p>Simulate scenario where the user has received business validation failures.</p></td>
+        </tr>
     </tbody>
 </table>
