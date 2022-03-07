@@ -58,4 +58,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(PlayKeys.playDefaultPort := 7785)
   .settings(SilencerSettings())
 
+scalacOptions ++= Seq("-Xfatal-warnings", "-Wconf:src=routes/.*:silent")
+
 dependencyUpdatesFilter -= moduleFilter(name = "bootstrap-backend-play-28")
