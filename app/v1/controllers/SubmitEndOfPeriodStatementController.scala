@@ -97,7 +97,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
-    (errorWrapper.error: @unchecked) match {
+    (errorWrapper.error) match {
       case BadRequestError |
            NinoFormatError |
            TypeOfBusinessFormatError |
@@ -124,8 +124,9 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
            RuleNonFHLPrivateUseAdjustment
                 => Forbidden(Json.toJson(errorWrapper))
 
-      case NotFoundError => NotFound(Json.toJson(errorWrapper))
+      case NotFoundError   => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
+      case _               => unhandledError(errorWrapper)
     }
   }
 
