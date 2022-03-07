@@ -96,7 +96,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
-    (errorWrapper.error: @unchecked) match {
+    (errorWrapper.error) match {
       case BadRequestError |
            NinoFormatError |
            TypeOfBusinessFormatError |
