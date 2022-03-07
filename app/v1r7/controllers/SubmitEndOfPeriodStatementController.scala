@@ -124,8 +124,9 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
            RuleBusinessValidationFailure
                 => Forbidden(Json.toJson(errorWrapper))
 
-      case NotFoundError => NotFound(Json.toJson(errorWrapper))
+      case NotFoundError   => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
+      case _               => unhandledError(errorWrapper)
     }
   }
 
