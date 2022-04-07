@@ -26,7 +26,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.{ IdGenerator, Logging }
 import v1.controllers.requestParsers.SubmitEndOfPeriodStatementParser
-import v1.hateoas.AmendHateoasBody
 import v1.models.audit._
 import v1.models.errors._
 import v1.models.request.SubmitEndOfPeriodStatementRawData
@@ -43,7 +42,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
                                                      requestParser: SubmitEndOfPeriodStatementParser,
                                                      auditService: AuditService,
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
-    extends AuthorisedController(cc) with AmendHateoasBody with BaseController with Logging {
+    extends AuthorisedController(cc) with BaseController with Logging {
 
   implicit val endpointLogContext: EndpointLogContext = EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController",
     endpointName = "Submit end of period statement")
@@ -105,7 +104,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
            StartDateFormatError |
            EndDateFormatError |
            FinalisedFormatError |
-           RuleIncorrectOrEmptyBodyError |
+           CustomMtdError(RuleIncorrectOrEmptyBodyError.code) |
            RangeEndDateBeforeStartDateError |
            RuleNotFinalisedError
                 => BadRequest(Json.toJson(errorWrapper))
@@ -121,7 +120,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
            RuleClass4Over16Error |
            RuleClass4PensionAge |
            RuleFHLPrivateUseAdjustment |
-           RuleNonFHLPrivateUseAdjustment
+           RuleNonFHLPrivateUseAdjustment |
+           RuleBusinessValidationFailure
                 => Forbidden(Json.toJson(errorWrapper))
 
       case NotFoundError   => NotFound(Json.toJson(errorWrapper))

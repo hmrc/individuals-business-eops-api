@@ -19,38 +19,37 @@ package v1.connectors
 import config.AppConfig
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
-import utils.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait BaseDownstreamConnector extends Logging {
+trait BaseDownstreamConnector {
   val http: HttpClient
   val appConfig: AppConfig
 
-  private def desHeaderCarrier(additionalHeaders: Seq[String] = Seq("Content-Type"))(implicit hc: HeaderCarrier,
+  private def ifsHeaderCarrier(additionalHeaders: Seq[String] = Seq("Content-Type"))(implicit hc: HeaderCarrier,
                                                                                      correlationId: String): HeaderCarrier = {
 
     HeaderCarrier(
       extraHeaders = hc.extraHeaders ++
         // Contract headers
         Seq(
-          "Authorization" -> s"Bearer ${appConfig.desToken}",
-          "Environment" -> appConfig.desEnv,
+          "Authorization" -> s"Bearer ${appConfig.ifsToken}",
+          "Environment" -> appConfig.ifsEnv,
           "CorrelationId" -> correlationId
         ) ++
         // Other headers (i.e Gov-Test-Scenario, Content-Type)
-        hc.headers(additionalHeaders ++ appConfig.desEnvironmentHeaders.getOrElse(Seq.empty))
+        hc.headers(additionalHeaders ++ appConfig.ifsEnvironmentHeaders.getOrElse(Seq.empty))
     )
   }
 
-  def post[Body: Writes, Resp](body: Body, uri: DesUri[Resp])(implicit ec: ExecutionContext,
+  def post[Body: Writes, Resp](body: Body, uri: IfsUri[Resp])(implicit ec: ExecutionContext,
                                                               hc: HeaderCarrier,
-                                                              httpReads: HttpReads[DesOutcome[Resp]],
-                                                              correlationId: String): Future[DesOutcome[Resp]] = {
-    def doPost(implicit hc: HeaderCarrier): Future[DesOutcome[Resp]] = {
-      http.POST(url = s"${appConfig.desBaseUrl}/${uri.value}", body)
+                                                              httpReads: HttpReads[DownstreamOutcome[Resp]],
+                                                              correlationId: String): Future[DownstreamOutcome[Resp]] = {
+    def doPost(implicit hc: HeaderCarrier): Future[DownstreamOutcome[Resp]] = {
+      http.POST(url = s"${appConfig.ifsBaseUrl}/${uri.value}", body)
     }
 
-    doPost(desHeaderCarrier())
+    doPost(ifsHeaderCarrier())
   }
 }

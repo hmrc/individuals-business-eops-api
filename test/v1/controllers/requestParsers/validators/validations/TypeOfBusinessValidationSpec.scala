@@ -49,5 +49,4 @@ class TypeOfBusinessValidationSpec extends UnitSpec {
       }
     }
   }
-
 }

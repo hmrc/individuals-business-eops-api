@@ -49,7 +49,4 @@ class MinTaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
       }
     }
   }
-
-
-
 }

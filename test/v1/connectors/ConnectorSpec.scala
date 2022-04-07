@@ -45,15 +45,15 @@ trait ConnectorSpec extends UnitSpec
       Some("individuals-business-eops-api")
     )
 
-  val requiredDesHeaders: Seq[(String, String)] = Seq(
-    "Authorization" -> "Bearer des-token",
-    "Environment" -> "des-environment",
+  val requiredIfsHeaders: Seq[(String, String)] = Seq(
+    "Authorization" -> "Bearer ifs-token",
+    "Environment" -> "ifs-environment",
     "User-Agent" -> "individuals-business-eops-api",
     "CorrelationId" -> correlationId,
     "Gov-Test-Scenario" -> "DEFAULT"
   )
 
-  val allowedDesHeaders: Seq[String] = Seq(
+  val allowedIfsHeaders: Seq[String] = Seq(
     "Accept",
     "Gov-Test-Scenario",
     "Content-Type",

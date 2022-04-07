@@ -83,6 +83,5 @@ class TaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
       validationResult.length shouldBe 1
       validationResult.head shouldBe TaxYearFormatError
     }
-
   }
 }

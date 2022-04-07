@@ -20,7 +20,7 @@ import play.api.http.Status.{BAD_REQUEST, CONFLICT, FORBIDDEN, NOT_FOUND, UNPROC
 import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
-import v1.models.errors.{DesErrorCode, DesErrors}
+import v1.models.errors.{IfsErrorCode, IfsErrors}
 
 class HttpParserSpec extends UnitSpec {
 
@@ -52,12 +52,69 @@ class HttpParserSpec extends UnitSpec {
     """.stripMargin
   )
 
+  val expectedBvrErrorsJson: JsValue = Json.parse(
+    """
+      |{
+      |   "bvrfailureResponseElement":{
+      |      "code":"BVR_FAILURE_EXISTS",
+      |      "reason":"The period submission ...",
+      |      "validationRuleFailures":[
+      |         {
+      |            "id":"C55013",
+      |            "type":"ERR",
+      |            "text":"Period submission ..."
+      |         }
+      |      ]
+      |   }
+      |}
+    """.stripMargin
+  )
+
+  val multipleBvrErrorsJson: JsValue = Json.parse(
+    """
+      |{
+      |   "bvrfailureResponseElement":{
+      |      "code":"BVR_FAILURE_EXISTS",
+      |      "reason":"The period submission ...",
+      |      "validationRuleFailures":[
+      |         {
+      |            "id":"C55013",
+      |            "type":"ERR",
+      |            "text":"Period submission ..."
+      |         },
+      |         {
+      |            "id":"C550136",
+      |            "type":"ERR",
+      |            "text":"Period submission ..."
+      |         }
+      |      ]
+      |   }
+      |}
+    """.stripMargin
+  )
+
+  val notExpectedBvrErrorsJson: JsValue = Json.parse(
+    """
+      |{
+      |   "bvrfailureResponseElement":{
+      |      "code":"BVR_FAILURE_EXISTS",
+      |      "reason":"The period submission ...",
+      |      "validationRuleFailures":[
+      |         {
+      |            "id":"C550136",
+      |            "type":"ERR",
+      |            "text":"Period submission ..."
+      |         }
+      |      ]
+      |   }
+      |}
+    """.stripMargin
+  )
+
   "The generic HTTP parser for empty response" when {
     val httpParser: HttpParser = new HttpParser {}
 
-
     handleErrorsCorrectly(httpParser)
-
   }
 
   private def handleErrorsCorrectly[A](httpParser: HttpParser): Unit =
@@ -67,14 +124,32 @@ class HttpParserSpec extends UnitSpec {
           "be able to parse a single error" in {
             val httpResponse = HttpResponse(responseCode, singleErrorJson, Map("CorrelationId" -> Seq(correlationId)))
 
-            httpParser.parseErrors(httpResponse) shouldBe DesErrors(List(DesErrorCode("CODE")))
+            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("CODE")))
           }
 
           "be able to parse multiple errors" in {
             val httpResponse = HttpResponse(responseCode, multipleErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
 
-            httpParser.parseErrors(httpResponse) shouldBe
-              DesErrors(List(DesErrorCode("CODE 1"), DesErrorCode("CODE 2")))
-            }
-          })
+            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("CODE 1"), IfsErrorCode("CODE 2")))
+          }
+
+          "be able to parse expected bvr errors" in {
+            val httpResponse = HttpResponse(responseCode, expectedBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
+
+            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("C55013")))
+          }
+
+          "be able to parse bvr errors but not expected error code" in {
+            val httpResponse = HttpResponse(responseCode, notExpectedBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
+
+            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("BVR_UNKNOWN_ID")))
+          }
+
+          "be able to parse multiple bvr errors but contains unexpected error code" in {
+            val httpResponse = HttpResponse(responseCode, multipleBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
+
+            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("C55013"), IfsErrorCode("BVR_UNKNOWN_ID")))
+          }
+        }
+    )
 }

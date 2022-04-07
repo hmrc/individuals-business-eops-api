@@ -22,7 +22,7 @@ import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import support.IntegrationBaseSpec
-import v1.stubs.{AuditStub, AuthStub, DesStub, MtdIdLookupStub}
+import v1.stubs.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 
 class AuthISpec extends IntegrationBaseSpec {
 
@@ -34,8 +34,8 @@ class AuthISpec extends IntegrationBaseSpec {
 
     def uri: String = s"/$nino"
 
-    def desUri(nino: String = nino,
-               incomeSourceType:String = "self-employment",
+    def ifsUri(nino: String = nino,
+               incomeSourceType: String = "self-employment",
                accountingPeriodStartDate: String = "2021-04-06",
                accountingPeriodEndDate: String = "2022-04-05"
               ): String = {
@@ -53,14 +53,14 @@ class AuthISpec extends IntegrationBaseSpec {
 
     def errorBody(code: String, message: String): String =
       s"""
-         |      {
-         |        "code": "$code",
-         |        "reason": "$message"
-         |      }
+         |{
+         |  "code": "$code",
+         |  "reason": "$message"
+         |}
     """.stripMargin
   }
 
-  "Calling the sample endpoint" when {
+  "Calling the submit eops endpoint" when {
 
     "the NINO cannot be converted to a MTD ID" should {
 
@@ -84,7 +84,7 @@ class AuthISpec extends IntegrationBaseSpec {
           AuditStub.audit()
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
-          DesStub.onSuccess(DesStub.POST, desUri(), Map("incomeSourceId" -> incomeSourceId), Status.NO_CONTENT)
+          DownstreamStub.onSuccess(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), Status.NO_CONTENT)
         }
 
         val response: WSResponse = await(request().post(fullValidJson()))
