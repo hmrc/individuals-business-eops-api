@@ -97,5 +97,4 @@ class ErrorWrapperSpec extends UnitSpec {
       error.auditErrors shouldBe Seq(AuditError("FORMAT_NINO"))
     }
   }
-
 }

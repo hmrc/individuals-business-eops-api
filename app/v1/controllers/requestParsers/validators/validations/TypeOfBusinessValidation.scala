@@ -18,7 +18,7 @@ package v1.controllers.requestParsers.validators.validations
 
 import play.api.Logger
 import play.api.libs.json.Json
-import v1.models.des.TypeOfBusiness
+import v1.models.downstream.TypeOfBusiness
 import v1.models.errors.{MtdError, TypeOfBusinessFormatError}
 
 object TypeOfBusinessValidation {
@@ -37,5 +37,4 @@ object TypeOfBusinessValidation {
       List(TypeOfBusinessFormatError)
     }
   }
-
 }

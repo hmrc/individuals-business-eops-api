@@ -20,6 +20,5 @@ import v1.models.errors.ErrorWrapper
 import v1.models.outcomes.ResponseWrapper
 
 package object services {
-
   type SubmitEndOfPeriodStatementOutcome = Either[ErrorWrapper, ResponseWrapper[Unit]]
 }

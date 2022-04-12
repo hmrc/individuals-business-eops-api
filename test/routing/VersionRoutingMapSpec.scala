@@ -16,47 +16,27 @@
 
 package routing
 
-import com.typesafe.config.ConfigFactory
 import definition.Versions
-import mocks.MockAppConfig
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Configuration
 import play.api.routing.Router
 import support.UnitSpec
 
-class VersionRoutingMapSpec extends UnitSpec with MockAppConfig with GuiceOneAppPerSuite {
+class VersionRoutingMapSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   val defaultRouter: Router = mock[Router]
-  val v1Routes: v1.Routes = app.injector.instanceOf[v1.Routes]
-  val v1WithRelease7Routes: v1WithRelease7.Routes = app.injector.instanceOf[v1WithRelease7.Routes]
-
-  class Test(isRelease7Enabled: Boolean) {
-
-    MockAppConfig.featureSwitch.returns(Some(Configuration(ConfigFactory.parseString(s"""
-                                                                                        |release-7.enabled = $isRelease7Enabled
-                                                                                        |""".stripMargin))))
-    val versionRoutingMap: VersionRoutingMapImpl = VersionRoutingMapImpl(
-      appConfig = mockAppConfig,
-      defaultRouter = defaultRouter,
-      v1Router = v1Routes,
-      v1RouterWithRelease7 = v1WithRelease7Routes
-    )
-  }
+  val v1Routes: v1.Routes   = app.injector.instanceOf[v1.Routes]
 
   "map" when {
-    "routing to v1" when {
-      def test(isRelease7Enabled: Boolean, routes: Any): Unit = {
-        s"release 7 feature switch is set to $isRelease7Enabled" should {
-          s"route to ${routes.toString}" in new Test(isRelease7Enabled) {
-            versionRoutingMap.map(Versions.VERSION_1) shouldBe routes
-          }
-        }
-      }
+    "routing to v1" should {
+      s"route to ${v1Routes.toString}" in {
 
-      Seq(
-        (false, v1Routes),
-        (true, v1WithRelease7Routes)
-      ).foreach(args => (test _).tupled(args))
+        val versionRoutingMap: VersionRoutingMapImpl = VersionRoutingMapImpl(
+          defaultRouter = defaultRouter,
+          v1Router = v1Routes
+        )
+
+        versionRoutingMap.map(Versions.VERSION_1) shouldBe v1Routes
+      }
     }
   }
 }

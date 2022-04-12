@@ -25,33 +25,35 @@ import v1.connectors.SubmitEndOfPeriodStatementConnector
 import v1.controllers.EndpointLogContext
 import v1.models.errors._
 import v1.models.request.SubmitEndOfPeriodStatementRequest
-import v1.support.DesResponseMappingSupport
+import v1.support.DownstreamResponseMappingSupport
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector) extends DesResponseMappingSupport with Logging {
+class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector)
+  extends DownstreamResponseMappingSupport with Logging {
 
   def submit(request: SubmitEndOfPeriodStatementRequest)(
-       implicit hc: HeaderCarrier,
-       ec: ExecutionContext,
-       logContext: EndpointLogContext,
-       correlationId: String): Future[SubmitEndOfPeriodStatementOutcome] = {
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext,
+    logContext: EndpointLogContext,
+    correlationId: String): Future[SubmitEndOfPeriodStatementOutcome] = {
 
     val result = for {
-      desResponseWrapper <- EitherT(connector.submitPeriodStatement(request)).leftMap(mapDesErrors(desErrorMap))
-    } yield desResponseWrapper
+      downstreamResponseWrapper <- EitherT(connector.submitPeriodStatement(request)).leftMap(mapDownstreamErrors(downstreamErrorMap))
+    } yield downstreamResponseWrapper
+
     result.value
   }
 
-  private def desErrorMap : Map[String, MtdError] =
-    Map(
+  private def downstreamErrorMap: Map[String, MtdError] = Map(
     "INVALID_IDTYPE" -> DownstreamError,
     "INVALID_IDVALUE" -> NinoFormatError,
     "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
     "INVALID_ACCOUNTINGPERIODENDDATE" -> EndDateFormatError,
     "INVALID_INCOMESOURCEID" -> BusinessIdFormatError,
     "INVALID_INCOMESOURCETYPE" -> TypeOfBusinessFormatError,
+    "INVALID_CORRELATIONID" -> DownstreamError,
     "CONFLICT" -> RuleAlreadySubmittedError,
     "EARLY_SUBMISSION" -> RuleEarlySubmissionError,
     "LATE_SUBMISSION" -> RuleLateSubmissionError,
@@ -61,12 +63,14 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
     "SERVICE_UNAVAILABLE" -> DownstreamError,
     "C55503" -> RuleConsolidatedExpensesError,
     "C55316" -> RuleConsolidatedExpensesError,
+    "C55525" -> RuleConsolidatedExpensesError,
     "C55008" -> RuleMismatchedStartDateError,
     "C55013" -> RuleMismatchedEndDateError,
     "C55014" -> RuleMismatchedEndDateError,
     "C55317" -> RuleClass4Over16Error,
     "C55318" -> RuleClass4PensionAge,
     "C55501" -> RuleFHLPrivateUseAdjustment,
-    "C55502" -> RuleNonFHLPrivateUseAdjustment
+    "C55502" -> RuleNonFHLPrivateUseAdjustment,
+    "BVR_UNKNOWN_ID" -> RuleBusinessValidationFailure
   )
 }

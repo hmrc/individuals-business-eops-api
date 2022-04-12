@@ -44,5 +44,4 @@ object MtdIdLookupStub extends WireMockMethods {
     when(method = GET, uri = lookupUrl(nino))
       .thenReturn(status = INTERNAL_SERVER_ERROR, body = Json.obj())
   }
-
 }

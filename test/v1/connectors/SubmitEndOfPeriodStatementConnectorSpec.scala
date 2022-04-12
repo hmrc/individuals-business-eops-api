@@ -16,12 +16,12 @@
 
 package v1.connectors
 
-import data.SubmitEndOfPeriodStatementData._
 import mocks.MockAppConfig
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.data.SubmitEndOfPeriodStatementData._
 import v1.models.domain.Nino
 import v1.mocks._
-import v1.models.des.EmptyJsonBody
+import v1.models.downstream.EmptyJsonBody
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.SubmitEndOfPeriodStatementRequest
@@ -33,18 +33,21 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
   val nino: String = "AA123456A"
 
   class Test extends MockHttpClient with MockAppConfig {
-    val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(http = mockHttpClient, appConfig = mockAppConfig)
+    val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(
+      http = mockHttpClient,
+      appConfig = mockAppConfig
+    )
 
-    MockAppConfig.desBaseUrl returns baseUrl
-    MockAppConfig.desToken returns "des-token"
-    MockAppConfig.desEnvironment returns "des-environment"
-    MockAppConfig.desEnvironmentHeaders returns Some(allowedDesHeaders)
+    MockAppConfig.ifsBaseUrl returns baseUrl
+    MockAppConfig.ifsToken returns "ifs-token"
+    MockAppConfig.ifsEnvironment returns "ifs-environment"
+    MockAppConfig.ifsEnvironmentHeaders returns Some(allowedIfsHeaders)
   }
 
   "Submit end of period statement" when {
 
     implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
-    val requiredDesHeadersPost: Seq[(String, String)] = requiredDesHeaders ++ Seq("Content-Type" -> "application/json")
+    val requiredIfsHeadersPost: Seq[(String, String)] = requiredIfsHeaders ++ Seq("Content-Type" -> "application/json")
 
     "a valid request is supplied" should {
       "return a successful response with the correct correlationId" in new Test {
@@ -56,7 +59,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
             s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
-            requiredHeaders = requiredDesHeadersPost,
+            requiredHeaders = requiredIfsHeadersPost,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
           ).returns(Future.successful(expected))
 
@@ -78,7 +81,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
             s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
-            requiredHeaders = requiredDesHeadersPost,
+            requiredHeaders = requiredIfsHeadersPost,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
           ).returns(Future.successful(expected))
 
@@ -89,6 +92,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         )) shouldBe expected
       }
     }
+
     "a request returning multiple errors" should {
       "return an unsuccessful response with the correct correlationId and multiple errors" in new Test {
         val expected = Left(ResponseWrapper(correlationId, Seq(NinoFormatError, DownstreamError)))
@@ -99,7 +103,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
             s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
-            requiredHeaders = requiredDesHeadersPost,
+            requiredHeaders = requiredIfsHeadersPost,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
           ).returns(Future.successful(expected))
 

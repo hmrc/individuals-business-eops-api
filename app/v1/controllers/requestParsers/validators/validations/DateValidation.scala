@@ -46,7 +46,7 @@ object DateValidation {
       case _: Exception => None
     }
 
-    (startLocalDate,endLocalDate) match {
+    (startLocalDate, endLocalDate) match {
       case (Some(startDate), Some(endDate)) =>
 
         if(endDate.isBefore(startDate)){
@@ -59,5 +59,4 @@ object DateValidation {
       case _ => validateStartDate(startLocalDate) ++ validateEndDate(endLocalDate)
     }
   }
-
 }

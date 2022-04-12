@@ -16,9 +16,13 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{ Json, OWrites }
+import play.api.libs.json.{Json, OWrites}
 
 case class MtdError(code: String, message: String, paths: Option[Seq[String]] = None)
+
+object CustomMtdError {
+  def unapply(arg: MtdError): Option[String] = Some(arg.code)
+}
 
 object MtdError {
   implicit val writes: OWrites[MtdError] = Json.writes[MtdError]
@@ -89,12 +93,12 @@ object RuleNotFinalisedError extends MtdError(
 )
 object RuleAlreadySubmittedError extends MtdError(
   code = "RULE_ALREADY_SUBMITTED",
-  message = "An End of Period Statement already exists for this business' accounting period."
+  message = "An End of Period Statement already exists for this business' accounting period"
 )
 
 object RuleEarlySubmissionError extends MtdError(
   code = "RULE_EARLY_SUBMISSION",
-  message = "An End Of Period Statement cannot be submitted before the end of the accounting period."
+  message = "An End Of Period Statement cannot be submitted before the end of the accounting period"
 )
 
 object RuleLateSubmissionError extends MtdError(
@@ -140,6 +144,11 @@ object RuleFHLPrivateUseAdjustment extends MtdError(
 object RuleNonFHLPrivateUseAdjustment extends MtdError(
   code = "RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT",
   message = "For UK non-Furnished Holiday Lettings, the private use adjustment must not exceed the total allowable expenses"
+)
+
+object RuleBusinessValidationFailure extends MtdError(
+  code = "RULE_BUSINESS_VALIDATION_FAILURE",
+  message = "Business validation rule failures. Please see tax calculation for details"
 )
 
 //Standard Errors

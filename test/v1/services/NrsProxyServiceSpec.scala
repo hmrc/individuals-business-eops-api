@@ -17,7 +17,7 @@
 package v1.services
 
 import v1.mocks.connectors.MockNrsProxyConnector
-import v1.models.des.TypeOfBusiness.`foreign-property`
+import v1.models.downstream.TypeOfBusiness.`foreign-property`
 import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 import scala.concurrent.Future
@@ -29,7 +29,10 @@ class NrsProxyServiceSpec extends ServiceSpec {
   val submitEndOfPeriodRequestBody: SubmitEndOfPeriod = SubmitEndOfPeriod(
     typeOfBusiness = `foreign-property`,
     businessId = "XAIS12345678910",
-    accountingPeriod = AccountingPeriod(startDate = "2021-04-06", endDate = "2022-04-05"),
+    accountingPeriod = AccountingPeriod(
+      startDate = "2021-04-06",
+      endDate = "2022-04-05"
+    ),
     finalised = true
   )
 

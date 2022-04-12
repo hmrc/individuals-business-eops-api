@@ -20,8 +20,8 @@ import mocks.MockAppConfig
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsJson
 import support.UnitSpec
-import v1.models.errors.{BusinessIdFormatError, EndDateFormatError, FinalisedFormatError, NinoFormatError, RangeEndDateBeforeStartDateError, RuleIncorrectOrEmptyBodyError, RuleNotFinalisedError, StartDateFormatError, TypeOfBusinessFormatError}
-import data.SubmitEndOfPeriodStatementData._
+import v1.models.errors._
+import v1.data.SubmitEndOfPeriodStatementData._
 import v1.models.request.SubmitEndOfPeriodStatementRawData
 
 class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
@@ -35,27 +35,39 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
     val emptyRequestBodyJson: JsValue = Json.parse("""{}""")
 
     val partialJson: JsValue = Json.parse(
-      """{
-        | "typeOfBusiness":"invalid"
-        |}""".stripMargin)
+      """
+        |{
+        |  "typeOfBusiness": "invalid"
+        |}
+      """.stripMargin
+    )
 
     val businessIdPartialJson: JsValue = Json.parse(
-      """{
-        | "businessId":"invalid"
-        |}""".stripMargin)
+      """
+        |{
+        |  "businessId": "invalid"
+        |}
+      """.stripMargin
+    )
 
     val accountingPeriodPartialJson: JsValue = Json.parse(
-      """{
-        | "accountingPeriod": {
+      """
+        |{
+        |  "accountingPeriod": {
         |    "startDate": "XXXX",
         |    "endDate":"XXXX"
-        | }
-        |}""".stripMargin)
+        |  }
+        |}
+      """.stripMargin
+    )
 
     val finalisedPartialJson: JsValue = Json.parse(
-      """{
+      """
+        |{
         | "finalised": "XXXX"
-        |}""".stripMargin)
+        |}
+      """.stripMargin
+    )
   }
 
   "Running a validation" should {
@@ -171,7 +183,7 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
           endDate = "XXXXXX",
           finalised = "false"
         )))) shouldBe List(
-          BusinessIdFormatError,StartDateFormatError,EndDateFormatError, RuleNotFinalisedError
+          BusinessIdFormatError,StartDateFormatError,EndDateFormatError,RuleNotFinalisedError
         )
       }
     }

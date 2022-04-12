@@ -31,5 +31,4 @@ class MockSubmitEndOfPeriodStatementParser extends MockFactory {
       (mockValidator.validate(_: SubmitEndOfPeriodStatementRawData)).expects(data)
     }
   }
-
 }

@@ -16,11 +16,11 @@
 
 package v1.controllers.requestParsers
 
-import data.SubmitEndOfPeriodStatementData
 import support.UnitSpec
+import play.api.mvc.AnyContentAsJson
+import v1.data.SubmitEndOfPeriodStatementData
 import v1.models.domain.Nino
 import v1.models.errors.{BadRequestError, ErrorWrapper, NinoFormatError, TypeOfBusinessFormatError}
-import play.api.mvc.AnyContentAsJson
 import v1.mocks.MockSubmitEndOfPeriodStatementParser
 import v1.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
 
@@ -36,7 +36,6 @@ class SubmitEndOfPeriodStatementParserSpec extends UnitSpec{
   }
 
   "parse" should {
-
     "return a request object" when {
       "valid request data is supplied" in new Test {
         MockValidator.validate(inputData).returns(Nil)
@@ -48,7 +47,6 @@ class SubmitEndOfPeriodStatementParserSpec extends UnitSpec{
     }
 
     "return an ErrorWrapper" when {
-
       "a single validation error occurs" in new Test {
         MockValidator.validate(inputData).returns(List(NinoFormatError))
 

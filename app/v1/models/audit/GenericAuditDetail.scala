@@ -19,14 +19,12 @@ package v1.models.audit
 import play.api.libs.json.{JsValue, Json, OWrites}
 import v1.models.auth.UserDetails
 
-case class GenericAuditDetail(
-                             userType: String,
-                             agentReferenceNumber: Option[String],
-                             nino: String,
-                             endOfPeriodStatementRequestBody: JsValue,
-                             `X-CorrelationId`: String,
-                             endOfPeriodStatementResponseBody: AuditResponse
-                           )
+case class GenericAuditDetail(userType: String,
+                              agentReferenceNumber: Option[String],
+                              nino: String,
+                              endOfPeriodStatementRequestBody: JsValue,
+                              `X-CorrelationId`: String,
+                              endOfPeriodStatementResponseBody: AuditResponse)
 
 object GenericAuditDetail {
   implicit val writes: OWrites[GenericAuditDetail] = Json.writes[GenericAuditDetail]
@@ -47,4 +45,3 @@ object GenericAuditDetail {
     )
   }
 }
-

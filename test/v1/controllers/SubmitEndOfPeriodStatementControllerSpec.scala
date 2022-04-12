@@ -16,15 +16,15 @@
 
 package v1.controllers
 
-import data.SubmitEndOfPeriodStatementData._
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, Result}
-import v1.models.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
+import v1.data.SubmitEndOfPeriodStatementData._
 import v1.mocks.MockIdGenerator
 import v1.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v1.mocks.services._
 import v1.models.audit.{AuditError, AuditEvent, AuditResponse, GenericAuditDetail}
+import v1.models.domain.Nino
 import v1.models.errors.{DownstreamError, NotFoundError, _}
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
@@ -41,11 +41,11 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
   with MockAuditService
   with MockIdGenerator {
 
-    private val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
-    private val nino = "AA123456A"
+  private val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
+  private val nino = "AA123456A"
 
-    private val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
-    private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
+  private val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
+  private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
 
   def event(auditResponse: AuditResponse): AuditEvent[GenericAuditDetail] =
     AuditEvent(
@@ -61,120 +61,125 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
       )
     )
 
-    trait Test {
-      val hc: HeaderCarrier = HeaderCarrier()
+  trait Test {
+    val hc: HeaderCarrier = HeaderCarrier()
 
-      val controller = new SubmitEndOfPeriodStatementController(
-        authService = mockEnrolmentsAuthService,
-        lookupService = mockMtdIdLookupService,
-        requestParser = mockSubmitEndOfPeriodStatementParser,
-        nrsProxyService = mockNrsProxyService,
-        service = mockSubmitEndOfPeriodStatementService,
-        auditService = mockAuditService,
-        cc = cc,
-        idGenerator = mockIdGenerator
-      )
+    val controller = new SubmitEndOfPeriodStatementController(
+      authService = mockEnrolmentsAuthService,
+      lookupService = mockMtdIdLookupService,
+      requestParser = mockSubmitEndOfPeriodStatementParser,
+      nrsProxyService = mockNrsProxyService,
+      service = mockSubmitEndOfPeriodStatementService,
+      auditService = mockAuditService,
+      cc = cc,
+      idGenerator = mockIdGenerator
+    )
 
-      MockedMtdIdLookupService.lookup(nino).returns(Future.successful(Right("test-mtd-id")))
-      MockedEnrolmentsAuthService.authoriseUser()
-      MockIdGenerator.generateCorrelationId.returns(correlationId)
-    }
+    MockedMtdIdLookupService.lookup(nino).returns(Future.successful(Right("test-mtd-id")))
+    MockedEnrolmentsAuthService.authoriseUser()
+    MockIdGenerator.generateCorrelationId.returns(correlationId)
+  }
 
-    "submit" should {
-      "return a successful response with header X-CorrelationId" when {
-        "the request received is valid" in new Test {
+  "submit" should {
+    "return a successful response with header X-CorrelationId" when {
+      "the request received is valid" in new Test {
 
-          MockSubmitEndOfPeriodStatementParser
-            .parseRequest(rawData)
-            .returns(Right(requestData))
+        MockSubmitEndOfPeriodStatementParser
+          .parseRequest(rawData)
+          .returns(Right(requestData))
 
-          MockNrsProxyService
-            .submit(nino, validRequest)
-            .returns(Future.successful((): Unit))
+        MockNrsProxyService
+          .submit(nino, validRequest)
+          .returns(Future.successful((): Unit))
 
-          MockSubmitEndOfPeriodStatementService
-            .submitEndOfPeriodStatementService(requestData)
-            .returns(Future.successful(Right(ResponseWrapper(correlationId, Unit))))
+        MockSubmitEndOfPeriodStatementService
+          .submitEndOfPeriodStatementService(requestData)
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, Unit))))
 
-          val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
-          status(result) shouldBe NO_CONTENT
-          header("X-CorrelationId", result) shouldBe Some(correlationId)
-        }
-      }
-      "return the error as per the spec" when {
-        "parser errors occur" should {
-          def errorsFromParserTester(error: MtdError, expectedStatus: Int): Unit = {
-            s"a ${error.code} error is returned from the parser" in new Test {
-              MockSubmitEndOfPeriodStatementParser
-                .parseRequest(rawData)
-                .returns(Left(ErrorWrapper(correlationId, error)))
-
-              val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
-
-              status(result) shouldBe expectedStatus
-              contentAsJson(result) shouldBe Json.toJson(error)
-              header("X-CorrelationId", result) shouldBe Some(correlationId)
-            }
-          }
-
-          val input = Seq(
-            (BadRequestError, BAD_REQUEST),
-            (NinoFormatError, BAD_REQUEST),
-            (TypeOfBusinessFormatError, BAD_REQUEST),
-            (BusinessIdFormatError, BAD_REQUEST),
-            (StartDateFormatError, BAD_REQUEST),
-            (EndDateFormatError, BAD_REQUEST),
-            (FinalisedFormatError, BAD_REQUEST),
-            (RuleIncorrectOrEmptyBodyError, BAD_REQUEST),
-            (RangeEndDateBeforeStartDateError, BAD_REQUEST),
-            (RuleNotFinalisedError, BAD_REQUEST)
-          )
-          input.foreach(args => (errorsFromParserTester _).tupled(args))
-        }
-        "service errors occur" should {
-          def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
-            s"a $mtdError error is returned from the service" in new Test {
-
-              MockSubmitEndOfPeriodStatementParser
-                .parseRequest(rawData)
-                .returns(Right(requestData))
-
-              MockNrsProxyService
-                .submit(nino, validRequest)
-                .returns(Future.successful((): Unit))
-
-              MockSubmitEndOfPeriodStatementService
-                .submitEndOfPeriodStatementService(requestData)
-                .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
-
-              val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
-
-              status(result) shouldBe expectedStatus
-              contentAsJson(result) shouldBe Json.toJson(mtdError)
-              header("X-CorrelationId", result) shouldBe Some(correlationId)
-
-              val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
-              MockedAuditService.verifyAuditEvent(event(auditResponse)).once
-            }
-          }
-
-          val input = Seq(
-            (RuleAlreadySubmittedError, FORBIDDEN),
-            (RuleEarlySubmissionError, FORBIDDEN),
-            (RuleLateSubmissionError, FORBIDDEN),
-            (RuleNonMatchingPeriodError, FORBIDDEN),
-            (RuleConsolidatedExpensesError, FORBIDDEN),
-            (RuleMismatchedStartDateError, FORBIDDEN),
-            (RuleMismatchedEndDateError, FORBIDDEN),
-            (RuleClass4Over16Error, FORBIDDEN),
-            (RuleClass4PensionAge, FORBIDDEN),
-            (RuleFHLPrivateUseAdjustment, FORBIDDEN),
-            (RuleNonFHLPrivateUseAdjustment, FORBIDDEN),
-            (NotFoundError, NOT_FOUND),
-            (DownstreamError, INTERNAL_SERVER_ERROR)
-          )
-          input.foreach(args => (serviceErrors _).tupled(args))
-        }
+        val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
+        status(result) shouldBe NO_CONTENT
+        header("X-CorrelationId", result) shouldBe Some(correlationId)
       }
     }
+
+    "return the error as per the spec" when {
+      "parser errors occur" should {
+        def errorsFromParserTester(error: MtdError, expectedStatus: Int): Unit = {
+          s"a ${error.code} error is returned from the parser" in new Test {
+            MockSubmitEndOfPeriodStatementParser
+              .parseRequest(rawData)
+              .returns(Left(ErrorWrapper(correlationId, error)))
+
+            val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
+
+            status(result) shouldBe expectedStatus
+            contentAsJson(result) shouldBe Json.toJson(error)
+            header("X-CorrelationId", result) shouldBe Some(correlationId)
+          }
+        }
+
+        val input = Seq(
+          (BadRequestError, BAD_REQUEST),
+          (NinoFormatError, BAD_REQUEST),
+          (TypeOfBusinessFormatError, BAD_REQUEST),
+          (BusinessIdFormatError, BAD_REQUEST),
+          (StartDateFormatError, BAD_REQUEST),
+          (EndDateFormatError, BAD_REQUEST),
+          (FinalisedFormatError, BAD_REQUEST),
+          (RuleIncorrectOrEmptyBodyError, BAD_REQUEST),
+          (RangeEndDateBeforeStartDateError, BAD_REQUEST),
+          (RuleNotFinalisedError, BAD_REQUEST)
+        )
+
+        input.foreach(args => (errorsFromParserTester _).tupled(args))
+      }
+
+      "service errors occur" should {
+        def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
+          s"a $mtdError error is returned from the service" in new Test {
+
+            MockSubmitEndOfPeriodStatementParser
+              .parseRequest(rawData)
+              .returns(Right(requestData))
+
+            MockNrsProxyService
+              .submit(nino, validRequest)
+              .returns(Future.successful((): Unit))
+
+            MockSubmitEndOfPeriodStatementService
+              .submitEndOfPeriodStatementService(requestData)
+              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
+
+            val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
+
+            status(result) shouldBe expectedStatus
+            contentAsJson(result) shouldBe Json.toJson(mtdError)
+            header("X-CorrelationId", result) shouldBe Some(correlationId)
+
+            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
+            MockedAuditService.verifyAuditEvent(event(auditResponse)).once
+          }
+        }
+
+        val input = Seq(
+          (RuleAlreadySubmittedError, FORBIDDEN),
+          (RuleEarlySubmissionError, FORBIDDEN),
+          (RuleLateSubmissionError, FORBIDDEN),
+          (RuleNonMatchingPeriodError, FORBIDDEN),
+          (RuleConsolidatedExpensesError, FORBIDDEN),
+          (RuleMismatchedStartDateError, FORBIDDEN),
+          (RuleMismatchedEndDateError, FORBIDDEN),
+          (RuleClass4Over16Error, FORBIDDEN),
+          (RuleClass4PensionAge, FORBIDDEN),
+          (RuleFHLPrivateUseAdjustment, FORBIDDEN),
+          (RuleNonFHLPrivateUseAdjustment, FORBIDDEN),
+          (RuleBusinessValidationFailure, FORBIDDEN),
+          (NotFoundError, NOT_FOUND),
+          (DownstreamError, INTERNAL_SERVER_ERROR)
+        )
+
+        input.foreach(args => (serviceErrors _).tupled(args))
+      }
+    }
+  }
 }

@@ -72,6 +72,5 @@ class MtdIdLookupServiceSpec extends ServiceSpec {
         result shouldBe connectorResponse
       }
     }
-
   }
 }

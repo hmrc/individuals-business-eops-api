@@ -116,7 +116,6 @@ class ValidatorSpec extends UnitSpec with MockFactory {
       }
     }
   }
-
 }
 
 class MockFunctionObject(name: String) {

@@ -16,7 +16,7 @@
 
 package v1.services
 
-import data.SubmitEndOfPeriodStatementData.validRequest
+import v1.data.SubmitEndOfPeriodStatementData.validRequest
 import v1.models.domain.Nino
 import v1.mocks.connectors.MockSubmitEndOfPeriodStatementConnector
 import v1.models.errors._
@@ -33,8 +33,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
     val service = new SubmitEndOfPeriodStatementService(connector)
   }
 
-  val requestData: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(Nino(nino),validRequest)
-
+  val requestData: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
 
   "service" when {
     "service call successful" must {
@@ -45,45 +44,49 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
         await(service.submit(requestData)) shouldBe Right(ResponseWrapper(correlationId, ()))
       }
     }
-  }
 
-  "unsuccessful" must {
-    "map errors according to spec" when {
+    "unsuccessful" must {
+      "map errors according to spec" when {
 
-      def serviceError(desErrorCode: String, error: MtdError): Unit =
-        s"a $desErrorCode error is returned from the service" in new Test {
+        def serviceError(ifsErrorCode: String, error: MtdError): Unit =
+          s"a $ifsErrorCode error is returned from the service" in new Test {
 
-          MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(requestData)
-            .returns(Future.successful(Left(ResponseWrapper(correlationId, DesErrors.single(DesErrorCode(desErrorCode))))))
+            MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(requestData)
+              .returns(Future.successful(Left(ResponseWrapper(correlationId, IfsErrors.single(IfsErrorCode(ifsErrorCode))))))
 
-          await(service.submit(requestData)) shouldBe Left(ErrorWrapper(correlationId, error))
-        }
+            await(service.submit(requestData)) shouldBe Left(ErrorWrapper(correlationId, error))
+          }
 
-      val input = Seq(
-        "INVALID_IDTYPE" -> DownstreamError,
-        "INVALID_IDVALUE" -> NinoFormatError,
-        "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
-        "INVALID_ACCOUNTINGPERIODENDDATE" -> EndDateFormatError,
-        "INVALID_INCOMESOURCEID" -> BusinessIdFormatError,
-        "INVALID_INCOMESOURCETYPE" -> TypeOfBusinessFormatError,
-        "CONFLICT" -> RuleAlreadySubmittedError,
-        "EARLY_SUBMISSION" -> RuleEarlySubmissionError,
-        "LATE_SUBMISSION" -> RuleLateSubmissionError,
-        "C55503" -> RuleConsolidatedExpensesError,
-        "C55316" -> RuleConsolidatedExpensesError,
-        "C55008" -> RuleMismatchedStartDateError,
-        "C55013" -> RuleMismatchedEndDateError,
-        "C55014" -> RuleMismatchedEndDateError,
-        "C55317" -> RuleClass4Over16Error,
-        "C55318" -> RuleClass4PensionAge,
-        "C55501" -> RuleFHLPrivateUseAdjustment,
-        "C55502" -> RuleNonFHLPrivateUseAdjustment,
-        "NON_MATCHING_PERIOD" -> RuleNonMatchingPeriodError,
-        "NOT_FOUND" -> NotFoundError,
-        "SERVER_ERROR" -> DownstreamError,
-        "SERVICE_UNAVAILABLE" -> DownstreamError
-      )
+        val input = Seq(
+          ("INVALID_IDTYPE", DownstreamError),
+          ("INVALID_IDVALUE", NinoFormatError),
+          ("INVALID_ACCOUNTINGPERIODSTARTDATE", StartDateFormatError),
+          ("INVALID_ACCOUNTINGPERIODENDDATE", EndDateFormatError),
+          ("INVALID_INCOMESOURCEID", BusinessIdFormatError),
+          ("INVALID_INCOMESOURCETYPE", TypeOfBusinessFormatError),
+          ("INVALID_CORRELATIONID", DownstreamError),
+          ("CONFLICT", RuleAlreadySubmittedError),
+          ("EARLY_SUBMISSION", RuleEarlySubmissionError),
+          ("LATE_SUBMISSION", RuleLateSubmissionError),
+          ("C55503", RuleConsolidatedExpensesError),
+          ("C55316", RuleConsolidatedExpensesError),
+          ("C55525", RuleConsolidatedExpensesError),
+          ("C55008", RuleMismatchedStartDateError),
+          ("C55013", RuleMismatchedEndDateError),
+          ("C55014", RuleMismatchedEndDateError),
+          ("C55317", RuleClass4Over16Error),
+          ("C55318", RuleClass4PensionAge),
+          ("C55501", RuleFHLPrivateUseAdjustment),
+          ("C55502", RuleNonFHLPrivateUseAdjustment),
+          ("BVR_UNKNOWN_ID", RuleBusinessValidationFailure),
+          ("NON_MATCHING_PERIOD", RuleNonMatchingPeriodError),
+          ("NOT_FOUND", NotFoundError),
+          ("SERVER_ERROR", DownstreamError),
+          ("SERVICE_UNAVAILABLE", DownstreamError)
+        )
 
-      input.foreach(args => (serviceError _).tupled(args))
+        input.foreach(args => (serviceError _).tupled(args))
+      }
     }
-  }}
+  }
+}
