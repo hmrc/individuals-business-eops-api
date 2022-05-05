@@ -25,9 +25,9 @@ import v1.models.errors._
 import v1.stubs.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub, NrsStub}
 import itData.SubmitEndOfPeriodStatementData._
 import play.api.test.Helpers.AUTHORIZATION
-import support.IntegrationBaseSpec
+import support.V1IntegrationBaseSpec
 
-class SubmitEndOfPeriodStatementISpec extends IntegrationBaseSpec {
+class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
 
   private trait Test {
 
