@@ -11,7 +11,7 @@ traits:
           application/json:
             type: types.errorResponse
             example:
-              description: The matching resource is not found.
+              description: Matching resource not found.
               value:
                 code: MATCHING_RESOURCE_NOT_FOUND
   clientOrAgentNotAuthorised:
@@ -44,7 +44,7 @@ traits:
             type: types.errorResponse
             examples:
               formatTypeOfBuisness:
-                description: The format of the supplied Type of Business field is not valid.
+                description: The format of the supplied type of business is not valid.
                 value:
                   code: FORMAT_TYPE_OF_BUSINESS
   formatBusinessId:
@@ -66,7 +66,7 @@ traits:
             type: types.errorResponse
             examples:
               formatStartDate:
-                description: The Accounting Period Start date is not a valid ISO format date.
+                description: The format of the supplied accounting period start date is invalid.
                 value:
                   code: FORMAT_START_DATE
   formatEndDate:
@@ -77,7 +77,7 @@ traits:
             type: types.errorResponse
             examples:
               formatEndDate:
-                description: The Accounting Period End date is not a valid ISO format date.
+                description: The format of the supplied accounting period end date is invalid.
                 value:
                   code: FORMAT_END_DATE
   formatFinalised:
@@ -99,7 +99,7 @@ traits:
             type: types.errorResponse
             examples:
               ruleIncorrectOrEmptyBodySubmitted:
-                description: The user's submission is missing one or more expected fields.
+                description: An empty or non-matching body was submitted.
                 value:
                   code: RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED
   ruleEndDateBeforeStartDate:
@@ -113,17 +113,6 @@ traits:
                 description: The End date is before the Start date.
                 value:
                   code: RANGE_END_DATE_BEFORE_START_DATE
-  ruleNotFinalised:
-    responses:
-      400:
-        body:
-          application/json:
-            type: types.errorResponse
-            examples:
-              ruleNotFinalised:
-                description: The user has not declared the submission for this business is complete.
-                value:
-                  code: RULE_NOT_FINALISED
   ruleAlreadySubmitted:
     responses:
       403:
@@ -168,17 +157,6 @@ traits:
                 description: An End of Period Statement without a matching accounting period cannot be submitted.
                 value:
                   code: RULE_NON_MATCHING_PERIOD
-  ruleConsolidatedExpenses:
-    responses:
-      403:
-        body:
-          application/json:
-            type: types.errorResponse
-            examples:
-              ruleConsolidatedExpenses:
-                description: Consolidated expenses are not allowed if the cumulative turnover amount exceeds the threshold.
-                value:
-                  code: RULE_CONSOLIDATED_EXPENSES
   ruleMismatchedStartDate:
     responses:
       403:
@@ -190,61 +168,6 @@ traits:
                 description: The period submission start date does not match the accounting period start date.
                 value:
                   code: RULE_MISMATCHED_START_DATE
-  ruleMismatchedEndDate:
-    responses:
-      403:
-        body:
-          application/json:
-            type: types.errorResponse
-            examples:
-              ruleMismatchedEndDate:
-                description: The period submission end date does not match the accounting period end date.
-                value:
-                  code: RULE_MISMATCHED_END_DATE
-  ruleClass4Over16:
-    responses:
-      403:
-        body:
-          application/json:
-            type: types.errorResponse
-            examples:
-              ruleClass4Over16:
-                description: The user has requested a National Insurance Class 4 exemption but the individual’s age is greater than or equal to 16 years old on the 6th April of the current tax year.
-                value:
-                  code: RULE_CLASS4_OVER_16
-  ruleClass4PensionAge:
-    responses:
-      403:
-        body:
-          application/json:
-            type: types.errorResponse
-            examples:
-              ruleClass4PensionAge:
-                description: The user has requested a National Insurance Class 4 exemption but the individual's age is less than their State Pension age on the 6th April of the current tax year.
-                value:
-                  code: RULE_CLASS4_PENSION_AGE
-  ruleFHLPrivateUseAdjustment:
-    responses:
-      403:
-        body:
-          application/json:
-            type: types.errorResponse
-            examples:
-              ruleFHLPrivateUseAdjustment:
-                description: For UK Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
-                value:
-                  code: RULE_FHL_PRIVATE_USE_ADJUSTMENT
-  ruleNonFHLPrivateUseAdjustment:
-    responses:
-      403:
-        body:
-          application/json:
-            type: types.errorResponse
-            examples:
-              ruleNonFHLPrivateUseAdjustment:
-                description: For UK non-Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
-                value:
-                  code: RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT
   ruleBusinessValidationFailure:
     responses:
       403:
@@ -253,7 +176,7 @@ traits:
             type: types.errorResponse
             examples:
               ruleBusinessValidationFailure:
-                description: There are business validation rule failures, please trigger and retrieve an in-year tax calculation and refer to any warnings and errors in the messages section.
+                description: There are business validation rule failures. See error response for details.
                 value:
                   code: RULE_BUSINESS_VALIDATION_FAILURE
   formatTaxYear:
