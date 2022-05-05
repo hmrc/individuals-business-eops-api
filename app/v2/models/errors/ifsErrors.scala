@@ -16,11 +16,9 @@
 
 package v2.models.errors
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{ Json, Reads }
 
-case class IfsErrorCode(code: String) {
-  def toMtd: MtdError = MtdError(code = code, message = "")
-}
+case class IfsErrorCode(code: String, id: Option[String] = None, message: Option[String] = None)
 
 object IfsErrorCode {
   implicit val reads: Reads[IfsErrorCode] = Json.reads[IfsErrorCode]
@@ -31,8 +29,8 @@ sealed trait IfsError
 case class IfsErrors(errors: List[IfsErrorCode]) extends IfsError
 
 object IfsErrors {
-  def single(error: IfsErrorCode): IfsErrors = IfsErrors(List(error))
-  def multiple(errors: Seq[IfsErrorCode]): IfsErrors =  IfsErrors(errors.toList)
+  def single(error: IfsErrorCode): IfsErrors         = IfsErrors(List(error))
+  def multiple(errors: Seq[IfsErrorCode]): IfsErrors = IfsErrors(errors.toList)
 }
 
 case class OutboundError(error: MtdError, errors: Option[Seq[MtdError]] = None) extends IfsError

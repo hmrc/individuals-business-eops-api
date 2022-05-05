@@ -20,12 +20,6 @@ import support.UnitSpec
 
 class IfsErrorsSpec extends UnitSpec {
 
-  "IfsErrorCode.toMtd" should {
-    "convert the error to an MtdError" in {
-      IfsErrorCode("test").toMtd shouldBe MtdError("test", "")
-    }
-  }
-
   "IfsErrors" should {
 
     val error  = IfsErrorCode("error")
