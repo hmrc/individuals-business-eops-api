@@ -17,16 +17,16 @@
 package v2.controllers.requestParsers.validators
 
 import mocks.MockAppConfig
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc.AnyContentAsJson
 import support.UnitSpec
-import v2.models.errors._
 import v2.data.SubmitEndOfPeriodStatementData._
+import v2.models.errors._
 import v2.models.request.SubmitEndOfPeriodStatementRawData
 
 class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
 
-  private val validNino = "AA123456A"
+  private val validNino   = "AA123456A"
   private val invalidNino = "Darth Sidious"
 
   class Test extends MockAppConfig {
@@ -96,7 +96,8 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
           BusinessIdFormatError
         )
         validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(accountingPeriodPartialJson))) shouldBe List(
-          StartDateFormatError,EndDateFormatError
+          StartDateFormatError,
+          EndDateFormatError
         )
         validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(finalisedPartialJson))) shouldBe List(
           FinalisedFormatError
@@ -116,7 +117,7 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
 
       "an invalid rule for finalised is supplied" in new Test {
         validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(finalised = "false")))) shouldBe List(
-          RuleNotFinalisedError
+          ???
         )
       }
       "an invalid typeOfBusiness is supplied" in new Test {
@@ -145,45 +146,67 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
         )
       }
       "an invalid start date with end date is supplied" in new Test {
-        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(
-          startDate = "2020-10-10",
-          endDate = "2020-10-09"
-        )))) shouldBe List(
+        validator.validate(
+          SubmitEndOfPeriodStatementRawData(validNino,
+                                            AnyContentAsJson(
+                                              fullValidJson(
+                                                startDate = "2020-10-10",
+                                                endDate = "2020-10-09"
+                                              )))) shouldBe List(
           RangeEndDateBeforeStartDateError
         )
       }
 
       "multiple fields are invalid that wont map the request body to the model" in new Test {
-        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(
-          typeOfBusiness = "XXXXXX",
-          businessId = "XXXXXX",
-          startDate = "XXXXXX",
-          endDate = "XXXXXX",
-          finalised = "\"XXXXXX\""
-        )))) shouldBe List(
-          FinalisedFormatError,StartDateFormatError,EndDateFormatError,TypeOfBusinessFormatError,BusinessIdFormatError
+        validator.validate(
+          SubmitEndOfPeriodStatementRawData(validNino,
+                                            AnyContentAsJson(
+                                              fullValidJson(
+                                                typeOfBusiness = "XXXXXX",
+                                                businessId = "XXXXXX",
+                                                startDate = "XXXXXX",
+                                                endDate = "XXXXXX",
+                                                finalised = "\"XXXXXX\""
+                                              )))) shouldBe List(
+          FinalisedFormatError,
+          StartDateFormatError,
+          EndDateFormatError,
+          TypeOfBusinessFormatError,
+          BusinessIdFormatError
         )
       }
       "multiple fields are invalid that wont map the request body to the model when wrong type" in new Test {
-        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(
-          typeOfBusiness = "XXXXXX",
-          businessId = "XXXXXX",
-          startDate = "XXXXXX",
-          endDate = "XXXXXX",
-          finalised = "8"
-        )))) shouldBe List(
-          FinalisedFormatError,StartDateFormatError,EndDateFormatError,TypeOfBusinessFormatError,BusinessIdFormatError
+        validator.validate(
+          SubmitEndOfPeriodStatementRawData(validNino,
+                                            AnyContentAsJson(
+                                              fullValidJson(
+                                                typeOfBusiness = "XXXXXX",
+                                                businessId = "XXXXXX",
+                                                startDate = "XXXXXX",
+                                                endDate = "XXXXXX",
+                                                finalised = "8"
+                                              )))) shouldBe List(
+          FinalisedFormatError,
+          StartDateFormatError,
+          EndDateFormatError,
+          TypeOfBusinessFormatError,
+          BusinessIdFormatError
         )
       }
       "multiple fields are invalid that do map to the request body to the model" in new Test {
-        validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(fullValidJson(
-          typeOfBusiness = "uk-property",
-          businessId = "XXXXXX",
-          startDate = "XXXXXX",
-          endDate = "XXXXXX",
-          finalised = "false"
-        )))) shouldBe List(
-          BusinessIdFormatError,StartDateFormatError,EndDateFormatError,RuleNotFinalisedError
+        validator.validate(
+          SubmitEndOfPeriodStatementRawData(validNino,
+                                            AnyContentAsJson(
+                                              fullValidJson(
+                                                typeOfBusiness = "uk-property",
+                                                businessId = "XXXXXX",
+                                                startDate = "XXXXXX",
+                                                endDate = "XXXXXX",
+                                                finalised = "false"
+                                              )))) shouldBe List(
+          BusinessIdFormatError,
+          StartDateFormatError,
+          EndDateFormatError
         )
       }
     }

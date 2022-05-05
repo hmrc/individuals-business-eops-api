@@ -38,7 +38,8 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
   "service" when {
     "service call successful" must {
       "return mapped result" in new Test {
-        MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(requestData)
+        MockSubmitEndOfPeriodStatementConnector
+          .submitEndOfPeriodStatement(requestData)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, ()))))
 
         await(service.submit(requestData)) shouldBe Right(ResponseWrapper(correlationId, ()))
@@ -48,13 +49,17 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
     "unsuccessful" must {
       "map errors according to spec" when {
 
-        def serviceError(ifsErrorCode: String, error: MtdError): Unit =
-          s"a $ifsErrorCode error is returned from the service" in new Test {
+        def checkServiceErrorForCode(ifsErrorCode: String, singleMtdError: MtdError): Unit =
+          checkServiceError(IfsErrors.single(IfsErrorCode(ifsErrorCode)), ErrorWrapper(correlationId, singleMtdError))
 
-            MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(requestData)
-              .returns(Future.successful(Left(ResponseWrapper(correlationId, IfsErrors.single(IfsErrorCode(ifsErrorCode))))))
+        def checkServiceError(ifsError: IfsError, expectedErrorWrapper: ErrorWrapper): Unit =
+          s"a $ifsError error is returned from the service" in new Test {
 
-            await(service.submit(requestData)) shouldBe Left(ErrorWrapper(correlationId, error))
+            MockSubmitEndOfPeriodStatementConnector
+              .submitEndOfPeriodStatement(requestData)
+              .returns(Future.successful(Left(ResponseWrapper(correlationId, ifsError))))
+
+            await(service.submit(requestData)) shouldBe Left(expectedErrorWrapper)
           }
 
         val input = Seq(
@@ -65,27 +70,38 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
           ("INVALID_INCOMESOURCEID", BusinessIdFormatError),
           ("INVALID_INCOMESOURCETYPE", TypeOfBusinessFormatError),
           ("INVALID_CORRELATIONID", DownstreamError),
-          ("CONFLICT", RuleAlreadySubmittedError),
           ("EARLY_SUBMISSION", RuleEarlySubmissionError),
           ("LATE_SUBMISSION", RuleLateSubmissionError),
-          ("C55503", RuleConsolidatedExpensesError),
-          ("C55316", RuleConsolidatedExpensesError),
-          ("C55525", RuleConsolidatedExpensesError),
-          ("C55008", RuleMismatchedStartDateError),
-          ("C55013", RuleMismatchedEndDateError),
-          ("C55014", RuleMismatchedEndDateError),
-          ("C55317", RuleClass4Over16Error),
-          ("C55318", RuleClass4PensionAge),
-          ("C55501", RuleFHLPrivateUseAdjustment),
-          ("C55502", RuleNonFHLPrivateUseAdjustment),
-          ("BVR_UNKNOWN_ID", RuleBusinessValidationFailure),
           ("NON_MATCHING_PERIOD", RuleNonMatchingPeriodError),
           ("NOT_FOUND", NotFoundError),
+          ("CONFLICT", RuleAlreadySubmittedError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)
         )
 
-        input.foreach(args => (serviceError _).tupled(args))
+        input.foreach(args => (checkServiceErrorForCode _).tupled(args))
+
+        checkServiceError(
+          IfsErrors.single(IfsErrorCode("RULE_BUSINESS_VALIDATION_FAILURE", Some("C55001"), Some("Custom message"))),
+          ErrorWrapper(correlationId, RuleBusinessValidationFailure(message = "Custom message", id = "C55001"))
+        )
+
+        checkServiceError(
+          IfsErrors.multiple(
+            Seq(
+              IfsErrorCode("RULE_BUSINESS_VALIDATION_FAILURE", Some("C55001"), Some("Custom message1")),
+              IfsErrorCode("RULE_BUSINESS_VALIDATION_FAILURE", Some("C55002"), Some("Custom message2")),
+            )),
+          ErrorWrapper(
+            correlationId,
+            BadRequestError,
+            Some(
+              Seq(
+                RuleBusinessValidationFailure(message = "Custom message1", id = "C55001"),
+                RuleBusinessValidationFailure(message = "Custom message2", id = "C55002"),
+              ))
+          )
+        )
       }
     }
   }

@@ -19,10 +19,10 @@ package v2.endpoints
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.libs.ws.{WSRequest, WSResponse}
+import play.api.libs.json.{ JsObject, JsValue, Json }
+import play.api.libs.ws.{ WSRequest, WSResponse }
 import v2.models.errors._
-import v2.stubs.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub, NrsStub}
+import v2.stubs.{ AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub, NrsStub }
 import itData.SubmitEndOfPeriodStatementData._
 import play.api.test.Helpers.AUTHORIZATION
 import support.V2IntegrationBaseSpec
@@ -40,8 +40,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
     def ifsUri(nino: String = nino,
                incomeSourceType: String = "self-employment",
                accountingPeriodStartDate: String = "2021-04-06",
-               accountingPeriodEndDate: String = "2022-04-05"
-              ): String = {
+               accountingPeriodEndDate: String = "2022-04-05"): String = {
       s"/income-tax/income-sources/nino/" +
         s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration"
     }
@@ -51,9 +50,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri)
-        .withHttpHeaders(
-          (ACCEPT, "application/vnd.hmrc.2.0+json"),
-          (AUTHORIZATION, "Bearer 123")) // some bearer token))
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123")) // some bearer token))
     }
 
     def errorBody(code: String, message: String): String =
@@ -112,11 +109,8 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
     "return error according to spec" when {
 
       "validation error" when {
-        def validationErrorTest(requestNino: String, requestBody: JsValue,
-                                expectedStatus: Int, expectedBody: MtdError): Unit = {
-          s"validation fails with ${expectedBody.code} error ${
-            if(expectedBody.equals(TaxYearFormatError)) java.util.UUID.randomUUID else ""
-          }" in new Test {
+        def validationErrorTest(requestNino: String, requestBody: JsValue, expectedStatus: Int, expectedBody: MtdError): Unit = {
+          s"validation fails with ${expectedBody.code} error ${if (expectedBody.equals(TaxYearFormatError)) java.util.UUID.randomUUID else ""}" in new Test {
 
             override val nino: String = requestNino
 
@@ -129,7 +123,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
             val response: WSResponse = await(request().post(requestBody))
             response.status shouldBe expectedStatus
 
-            if(expectedBody.equals(BadRequestError)){
+            if (expectedBody.equals(BadRequestError)) {
               lazy val multipleErrors: Seq[MtdError] = Seq(
                 FinalisedFormatError,
                 StartDateFormatError,
@@ -153,13 +147,14 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
           ("AA123456A", fullValidJson(endDate = "error"), BAD_REQUEST, EndDateFormatError),
           ("AA123456A", fullValidJson(finalised = "\"error\""), BAD_REQUEST, FinalisedFormatError),
           ("AA123456A", Json.parse("{}"), BAD_REQUEST, RuleIncorrectOrEmptyBodyError),
-          ("AA123456A", fullValidJson(endDate ="2021-04-05"), BAD_REQUEST, RangeEndDateBeforeStartDateError),
-          ("AA123456A", fullValidJson(finalised = "false"), BAD_REQUEST, RuleNotFinalisedError),
-          ("AA123456A", fullValidJson("error","error","error","error","\"error\""), BAD_REQUEST, BadRequestError)
+          ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RangeEndDateBeforeStartDateError),
+          ("AA123456A", fullValidJson("error", "error", "error", "error", "\"error\""), BAD_REQUEST, BadRequestError)
         )
 
         input.foreach(args => (validationErrorTest _).tupled(args))
       }
+
+      "how should we validate finalised?" in fail("if it's a string/number then RuleIncorrectOrEmptyBodyError surely?")
 
       "ifs service error" when {
         def serviceErrorTest(ifsStatus: Int, ifsCode: String, ifsMessage: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
@@ -169,7 +164,11 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
               AuditStub.audit()
               AuthStub.authorised()
               MtdIdLookupStub.ninoFound(nino)
-              DownstreamStub.onError(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), ifsStatus, errorBody(ifsCode, ifsMessage))
+              DownstreamStub.onError(DownstreamStub.POST,
+                                     ifsUri(),
+                                     Map("incomeSourceId" -> incomeSourceId),
+                                     ifsStatus,
+                                     errorBody(ifsCode, ifsMessage))
             }
 
             val response: WSResponse = await(request().post(fullValidJson()))
@@ -179,21 +178,61 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
         }
 
         //scalastyle:off
-        val input : Seq[(Int, String, String, Int, MtdError)]= Seq(
+        val input: Seq[(Int, String, String, Int, MtdError)] = Seq(
           (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, DownstreamError),
           (BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", BAD_REQUEST, NinoFormatError),
-          (BAD_REQUEST, "INVALID_ACCOUNTINGPERIODSTARTDATE", "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.", BAD_REQUEST, StartDateFormatError),
-          (BAD_REQUEST, "INVALID_ACCOUNTINGPERIODENDDATE", "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.", BAD_REQUEST, EndDateFormatError),
-          (BAD_REQUEST, "INVALID_INCOMESOURCEID", "Submission has not passed validation. Invalid parameter incomeSourceId.", BAD_REQUEST, BusinessIdFormatError),
-          (BAD_REQUEST, "INVALID_INCOMESOURCETYPE", "Submission has not passed validation. Invalid parameter incomeSourceType.", BAD_REQUEST, TypeOfBusinessFormatError),
-          (BAD_REQUEST, "INVALID_CORRELATIONID", "Submission has not passed validation. Invalid header CorrelationId.", INTERNAL_SERVER_ERROR, DownstreamError),
-          (FORBIDDEN, "EARLY_SUBMISSION", "The remote endpoint has indicated that an early submission has been made before accounting period end date.", FORBIDDEN, RuleEarlySubmissionError),
-          (FORBIDDEN, "LATE_SUBMISSION", "The remote endpoint has indicated that the period to finalise has passed.", FORBIDDEN, RuleLateSubmissionError),
-          (FORBIDDEN, "NON_MATCHING_PERIOD", "The remote endpoint has indicated that submission cannot be made with no matching accounting period.", FORBIDDEN, RuleNonMatchingPeriodError),
+          (BAD_REQUEST,
+           "INVALID_ACCOUNTINGPERIODSTARTDATE",
+           "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.",
+           BAD_REQUEST,
+           StartDateFormatError),
+          (BAD_REQUEST,
+           "INVALID_ACCOUNTINGPERIODENDDATE",
+           "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.",
+           BAD_REQUEST,
+           EndDateFormatError),
+          (BAD_REQUEST,
+           "INVALID_INCOMESOURCEID",
+           "Submission has not passed validation. Invalid parameter incomeSourceId.",
+           BAD_REQUEST,
+           BusinessIdFormatError),
+          (BAD_REQUEST,
+           "INVALID_INCOMESOURCETYPE",
+           "Submission has not passed validation. Invalid parameter incomeSourceType.",
+           BAD_REQUEST,
+           TypeOfBusinessFormatError),
+          (BAD_REQUEST,
+           "INVALID_CORRELATIONID",
+           "Submission has not passed validation. Invalid header CorrelationId.",
+           INTERNAL_SERVER_ERROR,
+           DownstreamError),
+          (FORBIDDEN,
+           "EARLY_SUBMISSION",
+           "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
+           FORBIDDEN,
+           RuleEarlySubmissionError),
+          (FORBIDDEN,
+           "LATE_SUBMISSION",
+           "The remote endpoint has indicated that the period to finalise has passed.",
+           FORBIDDEN,
+           RuleLateSubmissionError),
+          (FORBIDDEN,
+           "NON_MATCHING_PERIOD",
+           "The remote endpoint has indicated that submission cannot be made with no matching accounting period.",
+           FORBIDDEN,
+           RuleNonMatchingPeriodError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found.", NOT_FOUND, NotFoundError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists.", NOT_FOUND, NotFoundError),
-          (CONFLICT, "CONFLICT", "The remote endpoint has indicated that the taxation period has already been finalised.", FORBIDDEN, RuleAlreadySubmittedError),
-          (INTERNAL_SERVER_ERROR, "SERVER_ERROR", "IF is currently experiencing problems that require live service intervention.", INTERNAL_SERVER_ERROR, DownstreamError),
+          (CONFLICT,
+           "CONFLICT",
+           "The remote endpoint has indicated that the taxation period has already been finalised.",
+           FORBIDDEN,
+           RuleAlreadySubmittedError),
+          (INTERNAL_SERVER_ERROR,
+           "SERVER_ERROR",
+           "IF is currently experiencing problems that require live service intervention.",
+           INTERNAL_SERVER_ERROR,
+           DownstreamError),
           (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, DownstreamError),
         )
 
@@ -201,7 +240,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
       }
 
       "bvr service error" when {
-        def serviceErrorTest(ifsStatus: Int, bvrError: JsValue, expectedStatus: Int, expectedBody: MtdError): Unit = {
+        def serviceErrorTest(ifsStatus: Int, bvrError: JsValue, expectedStatus: Int, expectedBody: JsValue): Unit = {
           s"ifs returns a bvr error and status $ifsStatus with message - ${bvrError.toString()}" in new Test {
 
             override def setupStubs(): StubMapping = {
@@ -213,112 +252,82 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
 
             val response: WSResponse = await(request().post(fullValidJson()))
             response.status shouldBe expectedStatus
-
-            if(expectedBody.equals(BVRError)){
-              lazy val multipleErrors: Seq[MtdError] = Seq(
-                RuleConsolidatedExpensesError,
-                RuleMismatchedStartDateError,
-                RuleMismatchedEndDateError,
-                RuleClass4Over16Error,
-                RuleClass4PensionAge,
-                RuleFHLPrivateUseAdjustment,
-                RuleNonFHLPrivateUseAdjustment
-              )
-              lazy val multipleErrorsJson = Json.toJson(expectedBody).as[JsObject] + ("errors" -> Json.toJson(multipleErrors))
-              response.json shouldBe multipleErrorsJson
-            } else {
-              response.json shouldBe Json.toJson(expectedBody)
-            }
+            response.json shouldBe expectedBody
           }
         }
 
-        def bvr(code: String, text: String = "text") = Json.parse(
-          s"""
-            |{
-            |    "bvrfailureResponseElement": {
-            |        "code": "BVR_FAILURE_EXISTS",
-            |        "reason": "The remote endpoint has indicated that there are bvr failures",
-            |        "validationRuleFailures": [
-            |            {
-            |                "id": "$code",
-            |                "type": "ERR",
-            |                "text": "$text"
-            |            }
-            |        ]
-            |    }
-            |}
-            |""".stripMargin)
+        "the error is a single error" when {
+          val id      = "C55123"
+          val text    = "Custom message"
+          val ifsJson = Json.parse(s"""
+                        |{
+                        |    "bvrfailureResponseElement": {
+                        |        "code": "BVR_FAILURE_EXISTS",
+                        |        "reason": "The remote endpoint has indicated that there are bvr failures",
+                        |        "validationRuleFailures": [
+                        |            {
+                        |                "id": "$id",
+                        |                "type": "ERR",
+                        |                "text": "$text"
+                        |            }
+                        |        ]
+                        |    }
+                        |}
+                        |""".stripMargin)
 
-        val bvrMultiple = Json.parse(
-          """
-            |{
-            |    "bvrfailureResponseElement": {
-            |        "code": "BVR_FAILURE_EXISTS",
-            |        "reason": "The remote endpoint has indicated that there are bvr failures",
-            |        "validationRuleFailures": [
-            |            {
-            |                "id": "C55503",
-            |                "type": "ERR",
-            |                "text": "C55503 text"
-            |            },{
-            |                "id": "C55316",
-            |                "type": "ERR",
-            |                "text": "C55316 text"
-            |            },{
-            |                "id": "C55525",
-            |                "type": "ERR",
-            |                "text": "C55525 text"
-            |            },{
-            |                "id": "C55008",
-            |                "type": "ERR",
-            |                "text": "C55008 text"
-            |            },{
-            |                "id": "C55013",
-            |                "type": "ERR",
-            |                "text": "C55013 text"
-            |            },{
-            |                "id": "C55014",
-            |                "type": "ERR",
-            |                "text": "C55014 text"
-            |            },{
-            |                "id": "C55317",
-            |                "type": "ERR",
-            |                "text": "C55317 text"
-            |            },{
-            |                "id": "C55318",
-            |                "type": "ERR",
-            |                "text": "C55318 text"
-            |            },{
-            |                "id": "C55501",
-            |                "type": "ERR",
-            |                "text": "C55501 text"
-            |            },{
-            |                "id": "C55502",
-            |                "type": "ERR",
-            |                "text": "C55502 text"
-            |            }
-            |        ]
-            |    }
-            |}
-          """.stripMargin
-        )
+          val mtdErrorJson = Json.parse(s"""{
+                                          |   "code":"RULE_BUSINESS_VALIDATION_FAILURE",
+                                          |   "errorId":"$id",
+                                          |   "message":"$text"
+                                          |}""".stripMargin)
 
-        val input : Seq[(Int, JsValue, Int, MtdError)]= Seq(
-          (FORBIDDEN, bvr("C55503"), FORBIDDEN, RuleConsolidatedExpensesError),
-          (FORBIDDEN, bvr("C55316"), FORBIDDEN, RuleConsolidatedExpensesError),
-          (FORBIDDEN, bvr("C55525"), FORBIDDEN, RuleConsolidatedExpensesError),
-          (FORBIDDEN, bvr("C55008"), FORBIDDEN, RuleMismatchedStartDateError),
-          (FORBIDDEN, bvr("C55013"), FORBIDDEN, RuleMismatchedEndDateError),
-          (FORBIDDEN, bvr("C55014"), FORBIDDEN, RuleMismatchedEndDateError),
-          (FORBIDDEN, bvr("C55317"), FORBIDDEN, RuleClass4Over16Error),
-          (FORBIDDEN, bvr("C55318"), FORBIDDEN, RuleClass4PensionAge),
-          (FORBIDDEN, bvr("C55501"), FORBIDDEN, RuleFHLPrivateUseAdjustment),
-          (FORBIDDEN, bvr("C55502"), FORBIDDEN, RuleNonFHLPrivateUseAdjustment),
-          (FORBIDDEN, bvr("C555022"), FORBIDDEN, RuleBusinessValidationFailure),
-          (FORBIDDEN, bvrMultiple, FORBIDDEN, BVRError)
-        )
+          serviceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
+        }
 
-        input.foreach(args => (serviceErrorTest _).tupled(args))
+        "the error is a multiple errors" when {
+          val id1     = "C55111"
+          val id2     = "C55222"
+          val text1   = "Custom message1"
+          val text2   = "Custom message2"
+          val ifsJson = Json.parse(s"""
+              |{
+              |    "bvrfailureResponseElement": {
+              |        "code": "BVR_FAILURE_EXISTS",
+              |        "reason": "The remote endpoint has indicated that there are bvr failures",
+              |        "validationRuleFailures": [
+              |            {
+              |                "id": "$id1",
+              |                "type": "ERR",
+              |                "text": "$text1"
+              |            },{
+              |                "id": "$id2",
+              |                "type": "ERR",
+              |                "text": "$text2"
+              |            }
+              |        ]
+              |    }
+              |}
+          """.stripMargin)
+
+          val mtdErrorJson = Json.parse(s"""{
+                                           |   "code":"INVALID_REQUEST",
+                                           |   "message":"Invalid request",
+                                           |   "errors":[
+                                           |      {
+                                           |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
+                                           |         "errorId": "$id1",
+                                           |         "message":"$text1"
+                                           |      },
+                                           |      {
+                                           |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
+                                           |         "errorId": "$id2",
+                                           |         "message":"$text2"
+                                           |      }
+                                           |   ]
+                                           |}""".stripMargin)
+
+          serviceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
+        }
       }
     }
   }

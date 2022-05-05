@@ -25,7 +25,7 @@ trait DownstreamResponseMappingSupport {
   self: Logging =>
 
   final def mapDownstreamErrors[D](errorCodeMap: PartialFunction[String, MtdError])(downstreamResponseWrapper: ResponseWrapper[IfsError])(
-    implicit logContext: EndpointLogContext): ErrorWrapper = {
+      implicit logContext: EndpointLogContext): ErrorWrapper = {
 
     lazy val defaultErrorCodeMapping: String => MtdError = { code =>
       logger.warn(s"[${logContext.controllerName}] [${logContext.endpointName}] - No mapping found for error code $code")
@@ -45,21 +45,22 @@ trait DownstreamResponseMappingSupport {
               s" - downstream returned ${errorCodes.map(_.code).mkString(",")}. Revert to ISE")
           ErrorWrapper(correlationId, DownstreamError, None)
         } else {
-          val allowedErrorList =
-            List(
-              RuleConsolidatedExpensesError,
-              RuleMismatchedStartDateError,
-              RuleMismatchedEndDateError,
-              RuleClass4Over16Error,
-              RuleClass4PensionAge,
-              RuleFHLPrivateUseAdjustment,
-              RuleNonFHLPrivateUseAdjustment,
-              RuleBusinessValidationFailure
-            )
-          allowedErrorList.exists(mtdErrors.contains(_)) match {
-            case true => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-            case false => ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
-          }
+          ???
+//          val allowedErrorList =
+//            List(
+//              RuleConsolidatedExpensesError,
+//              RuleMismatchedStartDateError,
+//              RuleMismatchedEndDateError,
+//              RuleClass4Over16Error,
+//              RuleClass4PensionAge,
+//              RuleFHLPrivateUseAdjustment,
+//              RuleNonFHLPrivateUseAdjustment,
+//              RuleBusinessValidationFailure
+//            )
+//          allowedErrorList.exists(mtdErrors.contains(_)) match {
+//            case true => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+//            case false => ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
+//          }
         }
 
       case ResponseWrapper(correlationId, OutboundError(error, errors)) =>

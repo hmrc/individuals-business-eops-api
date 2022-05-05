@@ -17,34 +17,35 @@
 package v2.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, Result}
+import play.api.mvc.{ AnyContentAsJson, Result }
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.data.SubmitEndOfPeriodStatementData._
 import v2.mocks.MockIdGenerator
 import v2.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v2.mocks.services._
-import v2.models.audit.{AuditError, AuditEvent, AuditResponse, GenericAuditDetail}
+import v2.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
 import v2.models.domain.Nino
-import v2.models.errors.{DownstreamError, NotFoundError, _}
+import v2.models.errors.{ DownstreamError, NotFoundError, _ }
 import v2.models.outcomes.ResponseWrapper
-import v2.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
+import v2.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
-  with MockEnrolmentsAuthService
-  with MockMtdIdLookupService
-  with MockSubmitEndOfPeriodStatementParser
-  with MockNrsProxyService
-  with MockSubmitEndOfPeriodStatementService
-  with MockAuditService
-  with MockIdGenerator {
+class SubmitEndOfPeriodStatementControllerSpec
+    extends ControllerBaseSpec
+    with MockEnrolmentsAuthService
+    with MockMtdIdLookupService
+    with MockSubmitEndOfPeriodStatementParser
+    with MockNrsProxyService
+    with MockSubmitEndOfPeriodStatementService
+    with MockAuditService
+    with MockIdGenerator {
 
   private val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
-  private val nino = "AA123456A"
+  private val nino          = "AA123456A"
 
-  private val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
+  private val rawData     = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
   private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
 
   def event(auditResponse: AuditResponse): AuditEvent[GenericAuditDetail] =
@@ -127,8 +128,7 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
           (EndDateFormatError, BAD_REQUEST),
           (FinalisedFormatError, BAD_REQUEST),
           (RuleIncorrectOrEmptyBodyError, BAD_REQUEST),
-          (RangeEndDateBeforeStartDateError, BAD_REQUEST),
-          (RuleNotFinalisedError, BAD_REQUEST)
+          (RangeEndDateBeforeStartDateError, BAD_REQUEST)
         )
 
         input.foreach(args => (errorsFromParserTester _).tupled(args))
@@ -162,19 +162,17 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
         }
 
         val input = Seq(
-          (RuleAlreadySubmittedError, FORBIDDEN),
+          (NinoFormatError, BAD_REQUEST),
+          (StartDateFormatError, BAD_REQUEST),
+          (EndDateFormatError, BAD_REQUEST),
+          (BusinessIdFormatError, BAD_REQUEST),
+          (TypeOfBusinessFormatError, BAD_REQUEST),
           (RuleEarlySubmissionError, FORBIDDEN),
           (RuleLateSubmissionError, FORBIDDEN),
+          (RuleBusinessValidationFailure("some message", "C54321"), FORBIDDEN),
           (RuleNonMatchingPeriodError, FORBIDDEN),
-          (RuleConsolidatedExpensesError, FORBIDDEN),
-          (RuleMismatchedStartDateError, FORBIDDEN),
-          (RuleMismatchedEndDateError, FORBIDDEN),
-          (RuleClass4Over16Error, FORBIDDEN),
-          (RuleClass4PensionAge, FORBIDDEN),
-          (RuleFHLPrivateUseAdjustment, FORBIDDEN),
-          (RuleNonFHLPrivateUseAdjustment, FORBIDDEN),
-          (RuleBusinessValidationFailure, FORBIDDEN),
           (NotFoundError, NOT_FOUND),
+          (RuleAlreadySubmittedError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 

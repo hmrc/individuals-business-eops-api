@@ -27,17 +27,17 @@ import v2.models.errors._
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 import v2.support.DownstreamResponseMappingSupport
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector)
-  extends DownstreamResponseMappingSupport with Logging {
+    extends DownstreamResponseMappingSupport
+    with Logging {
 
-  def submit(request: SubmitEndOfPeriodStatementRequest)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext,
-    logContext: EndpointLogContext,
-    correlationId: String): Future[SubmitEndOfPeriodStatementOutcome] = {
+  def submit(request: SubmitEndOfPeriodStatementRequest)(implicit hc: HeaderCarrier,
+                                                         ec: ExecutionContext,
+                                                         logContext: EndpointLogContext,
+                                                         correlationId: String): Future[SubmitEndOfPeriodStatementOutcome] = {
 
     val result = for {
       downstreamResponseWrapper <- EitherT(connector.submitPeriodStatement(request)).leftMap(mapDownstreamErrors(downstreamErrorMap))
@@ -47,30 +47,19 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
   }
 
   private def downstreamErrorMap: Map[String, MtdError] = Map(
-    "INVALID_IDTYPE" -> DownstreamError,
-    "INVALID_IDVALUE" -> NinoFormatError,
+    "INVALID_IDTYPE"                    -> DownstreamError,
+    "INVALID_IDVALUE"                   -> NinoFormatError,
     "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
-    "INVALID_ACCOUNTINGPERIODENDDATE" -> EndDateFormatError,
-    "INVALID_INCOMESOURCEID" -> BusinessIdFormatError,
-    "INVALID_INCOMESOURCETYPE" -> TypeOfBusinessFormatError,
-    "INVALID_CORRELATIONID" -> DownstreamError,
-    "CONFLICT" -> RuleAlreadySubmittedError,
-    "EARLY_SUBMISSION" -> RuleEarlySubmissionError,
-    "LATE_SUBMISSION" -> RuleLateSubmissionError,
-    "NON_MATCHING_PERIOD" -> RuleNonMatchingPeriodError,
-    "NOT_FOUND" -> NotFoundError,
-    "SERVER_ERROR" -> DownstreamError,
-    "SERVICE_UNAVAILABLE" -> DownstreamError,
-    "C55503" -> RuleConsolidatedExpensesError,
-    "C55316" -> RuleConsolidatedExpensesError,
-    "C55525" -> RuleConsolidatedExpensesError,
-    "C55008" -> RuleMismatchedStartDateError,
-    "C55013" -> RuleMismatchedEndDateError,
-    "C55014" -> RuleMismatchedEndDateError,
-    "C55317" -> RuleClass4Over16Error,
-    "C55318" -> RuleClass4PensionAge,
-    "C55501" -> RuleFHLPrivateUseAdjustment,
-    "C55502" -> RuleNonFHLPrivateUseAdjustment,
-    "BVR_UNKNOWN_ID" -> RuleBusinessValidationFailure
+    "INVALID_ACCOUNTINGPERIODENDDATE"   -> EndDateFormatError,
+    "INVALID_INCOMESOURCEID"            -> BusinessIdFormatError,
+    "INVALID_INCOMESOURCETYPE"          -> TypeOfBusinessFormatError,
+    "INVALID_CORRELATIONID"             -> DownstreamError,
+    "CONFLICT"                          -> RuleAlreadySubmittedError,
+    "EARLY_SUBMISSION"                  -> RuleEarlySubmissionError,
+    "LATE_SUBMISSION"                   -> RuleLateSubmissionError,
+    "NON_MATCHING_PERIOD"               -> RuleNonMatchingPeriodError,
+    "NOT_FOUND"                         -> NotFoundError,
+    "SERVER_ERROR"                      -> DownstreamError,
+    "SERVICE_UNAVAILABLE"               -> DownstreamError
   )
 }
