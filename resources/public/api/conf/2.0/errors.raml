@@ -1,0 +1,335 @@
+#%RAML 1.0 Library
+
+uses:
+  types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+
+traits:
+  notFound:
+    responses:
+      404:
+        body:
+          application/json:
+            type: types.errorResponse
+            example:
+              description: The matching resource is not found.
+              value:
+                code: MATCHING_RESOURCE_NOT_FOUND
+  clientOrAgentNotAuthorised:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              clientOrAgentNotAuthorised:
+                description: 'The client or agent is not authorised. This is because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf'
+                value:
+                  code: CLIENT_OR_AGENT_NOT_AUTHORISED
+  formatNino:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              formatNino:
+                description: The format of the supplied NINO field is not valid.
+                value:
+                  code: FORMAT_NINO
+  formatTypeOfBuisness:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              formatTypeOfBuisness:
+                description: The format of the supplied Type of Business field is not valid.
+                value:
+                  code: FORMAT_TYPE_OF_BUSINESS
+  formatBusinessId:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              formatBusinessId:
+                description: The format of the supplied Business ID field is not valid.
+                value:
+                  code: FORMAT_BUSINESS_ID
+  formatStartDate:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              formatStartDate:
+                description: The Accounting Period Start date is not a valid ISO format date.
+                value:
+                  code: FORMAT_START_DATE
+  formatEndDate:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              formatEndDate:
+                description: The Accounting Period End date is not a valid ISO format date.
+                value:
+                  code: FORMAT_END_DATE
+  formatFinalised:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              formatFinalised:
+                description: The format of the supplied Finalised field is not valid.
+                value:
+                  code: FORMAT_FINALISED
+  ruleIncorrectOrEmptyBodySubmitted:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleIncorrectOrEmptyBodySubmitted:
+                description: The user's submission is missing one or more expected fields.
+                value:
+                  code: RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED
+  ruleEndDateBeforeStartDate:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleEndDateBeforeStartDate:
+                description: The End date is before the Start date.
+                value:
+                  code: RANGE_END_DATE_BEFORE_START_DATE
+  ruleNotFinalised:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleNotFinalised:
+                description: The user has not declared the submission for this business is complete.
+                value:
+                  code: RULE_NOT_FINALISED
+  ruleAlreadySubmitted:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleAlreadySubmitted:
+                description: The user has previously submitted an End of Period Statement for this business' accounting period.
+                value:
+                  code: RULE_ALREADY_SUBMITTED
+  ruleEarlySubmission:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleEarlySubmission:
+                description: The user has tried to make their End of Period Statement declaration before the accounting period has ended.
+                value:
+                  code: RULE_EARLY_SUBMISSION
+  ruleLateSubmission:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleLateSubmission:
+                description: The user has tried to make their End of Period Statement declaration too late.
+                value:
+                  code: RULE_LATE_SUBMISSION
+  ruleNonMatchingPeriod:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleNonMatchingPeriod:
+                description: An End of Period Statement without a matching accounting period cannot be submitted.
+                value:
+                  code: RULE_NON_MATCHING_PERIOD
+  ruleConsolidatedExpenses:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleConsolidatedExpenses:
+                description: Consolidated expenses are not allowed if the cumulative turnover amount exceeds the threshold.
+                value:
+                  code: RULE_CONSOLIDATED_EXPENSES
+  ruleMismatchedStartDate:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleMismatchedStartDate:
+                description: The period submission start date does not match the accounting period start date.
+                value:
+                  code: RULE_MISMATCHED_START_DATE
+  ruleMismatchedEndDate:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleMismatchedEndDate:
+                description: The period submission end date does not match the accounting period end date.
+                value:
+                  code: RULE_MISMATCHED_END_DATE
+  ruleClass4Over16:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleClass4Over16:
+                description: The user has requested a National Insurance Class 4 exemption but the individual’s age is greater than or equal to 16 years old on the 6th April of the current tax year.
+                value:
+                  code: RULE_CLASS4_OVER_16
+  ruleClass4PensionAge:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleClass4PensionAge:
+                description: The user has requested a National Insurance Class 4 exemption but the individual's age is less than their State Pension age on the 6th April of the current tax year.
+                value:
+                  code: RULE_CLASS4_PENSION_AGE
+  ruleFHLPrivateUseAdjustment:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleFHLPrivateUseAdjustment:
+                description: For UK Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
+                value:
+                  code: RULE_FHL_PRIVATE_USE_ADJUSTMENT
+  ruleNonFHLPrivateUseAdjustment:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleNonFHLPrivateUseAdjustment:
+                description: For UK non-Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
+                value:
+                  code: RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT
+  ruleBusinessValidationFailure:
+    responses:
+      403:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleBusinessValidationFailure:
+                description: There are business validation rule failures, please trigger and retrieve an in-year tax calculation and refer to any warnings and errors in the messages section.
+                value:
+                  code: RULE_BUSINESS_VALIDATION_FAILURE
+  formatTaxYear:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              formatTaxYear:
+                description: The format of the supplied tax year field is not valid
+                value:
+                  code: FORMAT_TAX_YEAR
+  incorrectOrEmptyBody:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              incorrectOrEmptyBody:
+                description: An empty or non-matching body was submitted
+                value:
+                  code: RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED
+  ruleTaxYearNotSupported:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              rule_TaxYearNotSupported:
+                description: The specified tax year is not supported. That is, the tax year specified is before the minimum tax year value.
+                value:
+                  code: RULE_TAX_YEAR_NOT_SUPPORTED
+  ruleTaxYearRangeExceeded:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleTaxYearRangeExceeded:
+                description: Tax year range exceeded. A tax year range of one year is required.
+                value:
+                  code: RULE_TAX_YEAR_RANGE_EXCEEDED
+  ruleTaxYearNotEnded:
+      responses:
+        400:
+          body:
+            application/json:
+              type: types.errorResponse
+              examples:
+                ruleTaxYearNotEnded:
+                  description: A brought forward loss is entered before the end of the tax year in which it was generated.
+                  value:
+                    code: RULE_TAX_YEAR_NOT_ENDED
+  formatSelfEmploymentId:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              formatSelfEmploymentId:
+                description: The format of the self-employment ID is not valid.
+                value:
+                  code: FORMAT_SELF_EMPLOYMENT_ID
+  ruleSelfEmploymentId:
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleSelfEmploymentId:
+                description: A self-employment ID can only be supplied for a self-employment business type
+                value:
+                  code: RULE_SELF_EMPLOYMENT_ID
