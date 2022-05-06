@@ -39,7 +39,7 @@ object FinalisedValidation {
   def validateFinalised(finalised: Boolean): List[MtdError] = {
     //400 RULE_NOT_FINALISED Finalised must be set to "true"
 //    if (finalised) NoValidationErrors else List(RuleNotFinalisedError)
-    ???
+    NoValidationErrors // FIXME
   }
 
   def finalisedIncorrectFormat(finalised: String): List[MtdError] = {

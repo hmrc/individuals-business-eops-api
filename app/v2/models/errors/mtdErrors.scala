@@ -18,9 +18,9 @@ package v2.models.errors
 
 import play.api.libs.json.{ Json, OWrites }
 
-case class MtdError(code: String, message: String, paths: Option[Seq[String]] = None)
+case class MtdError(code: String, message: String, paths: Option[Seq[String]] = None, errorId: Option[String] = None)
 
-object CustomMtdError {
+object MtdErrorWithCode {
   def unapply(arg: MtdError): Option[String] = Some(arg.code)
 }
 
@@ -123,9 +123,10 @@ object RuleNonMatchingPeriodError
     )
 
 object RuleBusinessValidationFailure {
+  val code = "RULE_BUSINESS_VALIDATION_FAILURE"
 
-  def apply(message: String, id: String): MtdError =
-    MtdError(code = "RULE_BUSINESS_VALIDATION_FAILURE", message = message)
+  def apply(message: String, errorId: String): MtdError =
+    MtdError(code = code, message = message, errorId = Some(errorId))
 }
 
 //Standard Errors
@@ -145,12 +146,6 @@ object BadRequestError
     extends MtdError(
       code = "INVALID_REQUEST",
       message = "Invalid request"
-    )
-
-object BVRError
-    extends MtdError(
-      code = "BUSINESS_ERROR",
-      message = "Business validation error"
     )
 
 object ServiceUnavailableError

@@ -50,14 +50,16 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri)
-        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123")) // some bearer token))
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123"))
     }
 
     def errorBody(code: String, message: String): String =
       s"""
          |{
+         |  "failures": [{
          |  "code": "$code",
          |  "reason": "$message"
+         |  }]
          |}
     """.stripMargin
   }
@@ -110,7 +112,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
 
       "validation error" when {
         def validationErrorTest(requestNino: String, requestBody: JsValue, expectedStatus: Int, expectedBody: MtdError): Unit = {
-          s"validation fails with ${expectedBody.code} error ${if (expectedBody.equals(TaxYearFormatError)) java.util.UUID.randomUUID else ""}" in new Test {
+          s"validation fails with ${expectedBody.code} error" in new Test {
 
             override val nino: String = requestNino
 
@@ -172,12 +174,11 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
             }
 
             val response: WSResponse = await(request().post(fullValidJson()))
-            response.status shouldBe expectedStatus
             response.json shouldBe Json.toJson(expectedBody)
+            response.status shouldBe expectedStatus
           }
         }
 
-        //scalastyle:off
         val input: Seq[(Int, String, String, Int, MtdError)] = Seq(
           (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, DownstreamError),
           (BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", BAD_REQUEST, NinoFormatError),
@@ -251,8 +252,8 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
             }
 
             val response: WSResponse = await(request().post(fullValidJson()))
-            response.status shouldBe expectedStatus
             response.json shouldBe expectedBody
+            response.status shouldBe expectedStatus
           }
         }
 

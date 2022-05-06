@@ -19,7 +19,7 @@ package v2.services
 import v2.data.SubmitEndOfPeriodStatementData.validRequest
 import v2.models.domain.Nino
 import v2.mocks.connectors.MockSubmitEndOfPeriodStatementConnector
-import v2.models.errors._
+import v2.models.errors.{ IfsValidationRuleFailure, _ }
 import v2.models.outcomes.ResponseWrapper
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
@@ -50,7 +50,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
       "map errors according to spec" when {
 
         def checkServiceErrorForCode(ifsErrorCode: String, singleMtdError: MtdError): Unit =
-          checkServiceError(IfsErrors.single(IfsErrorCode(ifsErrorCode)), ErrorWrapper(correlationId, singleMtdError))
+          checkServiceError(IfsStandardError(List(IfsErrorCode(ifsErrorCode))), ErrorWrapper(correlationId, singleMtdError))
 
         def checkServiceError(ifsError: IfsError, expectedErrorWrapper: ErrorWrapper): Unit =
           s"a $ifsError error is returned from the service" in new Test {
@@ -82,25 +82,30 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
         input.foreach(args => (checkServiceErrorForCode _).tupled(args))
 
         checkServiceError(
-          IfsErrors.single(IfsErrorCode("RULE_BUSINESS_VALIDATION_FAILURE", Some("C55001"), Some("Custom message"))),
-          ErrorWrapper(correlationId, RuleBusinessValidationFailure(message = "Custom message", id = "C55001"))
+          IfsBvrError("BVR_FAILURE_EXISTS", List(IfsValidationRuleFailure("C55001", "Custom message"))),
+          ErrorWrapper(correlationId, RuleBusinessValidationFailure(message = "Custom message", errorId = "C55001"))
         )
 
         checkServiceError(
-          IfsErrors.multiple(
-            Seq(
-              IfsErrorCode("RULE_BUSINESS_VALIDATION_FAILURE", Some("C55001"), Some("Custom message1")),
-              IfsErrorCode("RULE_BUSINESS_VALIDATION_FAILURE", Some("C55002"), Some("Custom message2")),
-            )),
+          IfsBvrError("BVR_FAILURE_EXISTS",
+                      List(
+                        IfsValidationRuleFailure("C55001", "Custom message1"),
+                        IfsValidationRuleFailure("C55002", "Custom message2")
+                      )),
           ErrorWrapper(
             correlationId,
             BadRequestError,
             Some(
               Seq(
-                RuleBusinessValidationFailure(message = "Custom message1", id = "C55001"),
-                RuleBusinessValidationFailure(message = "Custom message2", id = "C55002"),
+                RuleBusinessValidationFailure(message = "Custom message1", errorId = "C55001"),
+                RuleBusinessValidationFailure(message = "Custom message2", errorId = "C55002"),
               ))
           )
+        )
+
+        checkServiceError(
+          IfsBvrError("OTHER", List(IfsValidationRuleFailure("C55001", "Custom message"))),
+          ErrorWrapper(correlationId, DownstreamError)
         )
       }
     }

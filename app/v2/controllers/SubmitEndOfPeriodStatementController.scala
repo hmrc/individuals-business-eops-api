@@ -101,17 +101,34 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     }
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
+    if (hasBvr(errorWrapper)) {
+      Forbidden(Json.toJson(errorWrapper))
+    } else {
+      errorWrapper.error match {
+        case BadRequestError | NinoFormatError | TypeOfBusinessFormatError | BusinessIdFormatError | StartDateFormatError | EndDateFormatError |
+            FinalisedFormatError | MtdErrorWithCode(RuleIncorrectOrEmptyBodyError.code) | RangeEndDateBeforeStartDateError =>
+          BadRequest(Json.toJson(errorWrapper))
+
+        case RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError =>
+          Forbidden(Json.toJson(errorWrapper))
+
+        case NotFoundError   => NotFound(Json.toJson(errorWrapper))
+        case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
+        case _               => unhandledError(errorWrapper)
+      }
+    }
+  }
+
+  private def hasBvr(errorWrapper: ErrorWrapper): Boolean = {
     errorWrapper.error match {
-      case BadRequestError | NinoFormatError | TypeOfBusinessFormatError | BusinessIdFormatError | StartDateFormatError | EndDateFormatError |
-          FinalisedFormatError | CustomMtdError(RuleIncorrectOrEmptyBodyError.code) | RangeEndDateBeforeStartDateError =>
-        BadRequest(Json.toJson(errorWrapper))
+      case MtdErrorWithCode(RuleBusinessValidationFailure.code) => true
+      case MtdErrorWithCode(BadRequestError.code) =>
+        errorWrapper.errors.toSeq.flatten.exists {
+          case MtdErrorWithCode(RuleBusinessValidationFailure.code) => true
+          case _                                                    => false
+        }
 
-      case BVRError | RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError =>
-        Forbidden(Json.toJson(errorWrapper))
-
-      case NotFoundError   => NotFound(Json.toJson(errorWrapper))
-      case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
-      case _               => unhandledError(errorWrapper)
+      case _ => false
     }
   }
 

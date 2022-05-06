@@ -16,21 +16,51 @@
 
 package v2.models.errors
 
-import play.api.libs.json.{ Json, Reads }
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{ JsPath, Json, Reads }
 
-case class IfsErrorCode(code: String, id: Option[String] = None, message: Option[String] = None)
+sealed trait IfsError
+
+object IfsError {
+  // Note that we only deserialize for standard and BVR error formats; OutboundError is created programmatically as required
+  implicit def reads: Reads[IfsError] =
+    implicitly[Reads[IfsStandardError]].map[IfsError](identity) orElse
+      implicitly[Reads[IfsBvrError]].map[IfsError](identity)
+}
+
+case class IfsStandardError(
+    failures: List[IfsErrorCode]
+) extends IfsError
+
+object IfsStandardError {
+  implicit val reads: Reads[IfsStandardError] = Json.reads
+
+  def apply(failures: IfsErrorCode*): IfsStandardError = IfsStandardError(failures.toList)
+}
+
+case class IfsErrorCode(code: String)
 
 object IfsErrorCode {
   implicit val reads: Reads[IfsErrorCode] = Json.reads[IfsErrorCode]
 }
 
-sealed trait IfsError
+case class IfsBvrError(
+    code: String,
+    validationRuleFailures: List[IfsValidationRuleFailure]
+) extends IfsError
 
-case class IfsErrors(errors: List[IfsErrorCode]) extends IfsError
+object IfsBvrError {
+  implicit val reads: Reads[IfsBvrError] = (
+    (JsPath \ "bvrfailureResponseElement" \ "code").read[String] and
+      (JsPath \ "bvrfailureResponseElement" \ "validationRuleFailures").read[List[IfsValidationRuleFailure]]
+  )(IfsBvrError.apply _)
 
-object IfsErrors {
-  def single(error: IfsErrorCode): IfsErrors         = IfsErrors(List(error))
-  def multiple(errors: Seq[IfsErrorCode]): IfsErrors = IfsErrors(errors.toList)
+}
+
+case class IfsValidationRuleFailure(id: String, text: String, `type`: String = "ERR")
+
+object IfsValidationRuleFailure {
+  implicit val reads: Reads[IfsValidationRuleFailure] = Json.reads[IfsValidationRuleFailure]
 }
 
 case class OutboundError(error: MtdError, errors: Option[Seq[MtdError]] = None) extends IfsError

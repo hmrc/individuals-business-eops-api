@@ -23,9 +23,9 @@ import v2.data.SubmitEndOfPeriodStatementData._
 import v2.mocks.MockIdGenerator
 import v2.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v2.mocks.services._
-import v2.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
+import v2.models.audit.{ AuditEvent, AuditResponse, GenericAuditDetail }
 import v2.models.domain.Nino
-import v2.models.errors.{ DownstreamError, NotFoundError, _ }
+import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
 import v2.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
 
@@ -135,8 +135,11 @@ class SubmitEndOfPeriodStatementControllerSpec
       }
 
       "service errors occur" should {
-        def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
-          s"a $mtdError error is returned from the service" in new Test {
+        def serviceErrorForCode(mtdError: MtdError, expectedStatus: Int): Unit =
+          serviceError(ErrorWrapper(correlationId, mtdError), expectedStatus)
+
+        def serviceError(errorWrapper: ErrorWrapper, expectedStatus: Int): Unit = {
+          s"a $errorWrapper is returned from the service" in new Test {
 
             MockSubmitEndOfPeriodStatementParser
               .parseRequest(rawData)
@@ -148,15 +151,15 @@ class SubmitEndOfPeriodStatementControllerSpec
 
             MockSubmitEndOfPeriodStatementService
               .submitEndOfPeriodStatementService(requestData)
-              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
+              .returns(Future.successful(Left(errorWrapper)))
 
             val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
 
             status(result) shouldBe expectedStatus
-            contentAsJson(result) shouldBe Json.toJson(mtdError)
+            contentAsJson(result) shouldBe Json.toJson(errorWrapper)
             header("X-CorrelationId", result) shouldBe Some(correlationId)
 
-            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
+            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(errorWrapper.auditErrors), None)
             MockedAuditService.verifyAuditEvent(event(auditResponse)).once
           }
         }
@@ -176,7 +179,18 @@ class SubmitEndOfPeriodStatementControllerSpec
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 
-        input.foreach(args => (serviceErrors _).tupled(args))
+        input.foreach(args => (serviceErrorForCode _).tupled(args))
+
+        serviceError(
+          ErrorWrapper(correlationId,
+                       BadRequestError,
+                       Some(
+                         Seq(
+                           RuleBusinessValidationFailure("some message", "id1"),
+                           RuleBusinessValidationFailure("some message", "id2")
+                         ))),
+          FORBIDDEN
+        )
       }
     }
   }
