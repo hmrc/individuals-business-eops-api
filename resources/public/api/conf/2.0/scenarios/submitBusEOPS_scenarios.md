@@ -28,12 +28,12 @@
             <td><p>Simulate scenario where the user has tried to make their End of Period Statement declaration too late.</p></td>
         </tr>
         <tr>
-            <td><p>MISMATCHED_START_DATE</p></td>
-            <td><p>Simulate scenario where the period submission start date does not match the accounting period start date.</p></td>
-        </tr>
-        <tr>
             <td><p>NON_MATCHING_PERIOD</p></td>
             <td><p>Simulate scenario where an End of Period Statement without a matching accounting period cannot be submitted.</p></td>
+        </tr>
+        <tr>
+            <td><p>BVR_MISMATCHED_START_DATE</p></td>
+            <td><p>Simulate scenario where the period submission start date does not match the accounting period start date.</p></td>
         </tr>
         <tr>
             <td><p>BVR_CLASS4_OVER_16</p></td>
