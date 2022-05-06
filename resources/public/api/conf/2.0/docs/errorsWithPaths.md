@@ -56,3 +56,10 @@ An example with multiple errors:
           }
       ]
    }`
+
+Where the error `RULE_BUSINESS_VALIDATION_FAILURE` is returned, an additional error ID is returned.
+  `{
+      "code":"RULE_BUSINESS_VALIDATION_FAILURE",
+      "errorId":"C55503",
+      "message":"UK Property - Cannot submit data for consolidated expenses if the cumulative turnover amount exceeds the threshold. Please amend and resubmit"
+   }`
