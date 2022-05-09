@@ -17,15 +17,15 @@
 package v2.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import itData.SubmitEndOfPeriodStatementData._
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{ JsObject, JsValue, Json }
+import play.api.libs.json.{ JsValue, Json }
 import play.api.libs.ws.{ WSRequest, WSResponse }
-import v2.models.errors._
-import v2.stubs.{ AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub, NrsStub }
-import itData.SubmitEndOfPeriodStatementData._
 import play.api.test.Helpers.AUTHORIZATION
 import support.V2IntegrationBaseSpec
+import v2.models.errors._
+import v2.stubs._
 
 class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
 
@@ -124,20 +124,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
 
             val response: WSResponse = await(request().post(requestBody))
             response.status shouldBe expectedStatus
-
-            if (expectedBody.equals(BadRequestError)) {
-              lazy val multipleErrors: Seq[MtdError] = Seq(
-                FinalisedFormatError,
-                StartDateFormatError,
-                EndDateFormatError,
-                TypeOfBusinessFormatError,
-                BusinessIdFormatError,
-              )
-              lazy val multipleErrorsJson = Json.toJson(expectedBody).as[JsObject] + ("errors" -> Json.toJson(multipleErrors))
-              response.json shouldBe multipleErrorsJson
-            } else {
-              response.json shouldBe Json.toJson(expectedBody)
-            }
+            response.json shouldBe Json.toJson(expectedBody)
           }
         }
 
@@ -147,16 +134,13 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
           ("AA123456A", fullValidJson(businessId = "error"), BAD_REQUEST, BusinessIdFormatError),
           ("AA123456A", fullValidJson(startDate = "error"), BAD_REQUEST, StartDateFormatError),
           ("AA123456A", fullValidJson(endDate = "error"), BAD_REQUEST, EndDateFormatError),
-          ("AA123456A", fullValidJson(finalised = "\"error\""), BAD_REQUEST, FinalisedFormatError),
+          ("AA123456A", fullValidJson(finalised = "false"), BAD_REQUEST, FinalisedFormatError),
           ("AA123456A", Json.parse("{}"), BAD_REQUEST, RuleIncorrectOrEmptyBodyError),
           ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RangeEndDateBeforeStartDateError),
-          ("AA123456A", fullValidJson("error", "error", "error", "error", "\"error\""), BAD_REQUEST, BadRequestError)
         )
 
         input.foreach(args => (validationErrorTest _).tupled(args))
       }
-
-      "how should we validate finalised?" in fail("if it's a string/number then RuleIncorrectOrEmptyBodyError surely?")
 
       "ifs service error" when {
         def serviceErrorTest(ifsStatus: Int, ifsCode: String, ifsMessage: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
