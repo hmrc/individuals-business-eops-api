@@ -71,7 +71,6 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
         )
 
         override def setupStubs(): StubMapping = {
-          AuditStub.audit()
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
           NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
@@ -86,7 +85,6 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
       "any valid request is made with a failed NRS call" in new Test {
 
         override def setupStubs(): StubMapping = {
-          AuditStub.audit()
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
           NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, DownstreamError.message)
@@ -107,7 +105,6 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
             override val nino: String = requestNino
 
             override def setupStubs(): StubMapping = {
-              AuditStub.audit()
               AuthStub.authorised()
               MtdIdLookupStub.ninoFound(requestNino)
             }
@@ -135,7 +132,6 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
       "ifs service error" when {
         def fullServiceErrorTest(ifsStatus: Int, downstreamResponse: JsValue, expectedStatus: Int, expectedBody: JsValue): Test = new Test {
           override def setupStubs(): StubMapping = {
-            AuditStub.audit()
             AuthStub.authorised()
             MtdIdLookupStub.ninoFound(nino)
             DownstreamStub.onError(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), ifsStatus, downstreamResponse.toString())

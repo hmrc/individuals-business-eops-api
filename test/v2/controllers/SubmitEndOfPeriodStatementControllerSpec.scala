@@ -23,7 +23,6 @@ import v2.data.SubmitEndOfPeriodStatementData._
 import v2.mocks.MockIdGenerator
 import v2.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v2.mocks.services._
-import v2.models.audit.{ AuditEvent, AuditResponse, GenericAuditDetail }
 import v2.models.domain.Nino
 import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
@@ -39,7 +38,6 @@ class SubmitEndOfPeriodStatementControllerSpec
     with MockSubmitEndOfPeriodStatementParser
     with MockNrsProxyService
     with MockSubmitEndOfPeriodStatementService
-    with MockAuditService
     with MockIdGenerator {
 
   private val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
@@ -47,20 +45,6 @@ class SubmitEndOfPeriodStatementControllerSpec
 
   private val rawData     = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
   private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
-
-  def event(auditResponse: AuditResponse): AuditEvent[GenericAuditDetail] =
-    AuditEvent(
-      auditType = "SubmitEndOfPeriodStatementAuditType",
-      transactionName = "submit-end-of-period-statement-transaction-type",
-      detail = GenericAuditDetail(
-        userType = "Individual",
-        agentReferenceNumber = None,
-        nino,
-        fullValidAuditJson(),
-        correlationId,
-        auditResponse
-      )
-    )
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -71,7 +55,6 @@ class SubmitEndOfPeriodStatementControllerSpec
       requestParser = mockSubmitEndOfPeriodStatementParser,
       nrsProxyService = mockNrsProxyService,
       service = mockSubmitEndOfPeriodStatementService,
-      auditService = mockAuditService,
       cc = cc,
       idGenerator = mockIdGenerator
     )
@@ -154,9 +137,6 @@ class SubmitEndOfPeriodStatementControllerSpec
           status(result) shouldBe expectedStatus
           contentAsJson(result) shouldBe Json.toJson(errorWrapper)
           header("X-CorrelationId", result) shouldBe Some(correlationId)
-
-          val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(errorWrapper.auditErrors), None)
-          MockedAuditService.verifyAuditEvent(event(auditResponse)).once
         }
 
         def simpleServiceError(mtdError: MtdError, expectedStatus: Int): Unit =
