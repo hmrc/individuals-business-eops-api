@@ -52,16 +52,6 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
       buildRequest(uri)
         .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123"))
     }
-
-    def errorBody(code: String, message: String): String =
-      s"""
-         |{
-         |  "failures": [{
-         |  "code": "$code",
-         |  "reason": "$message"
-         |  }]
-         |}
-    """.stripMargin
   }
 
   "Calling the submit eops endpoint" should {
@@ -111,7 +101,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
     "return error according to spec" when {
 
       "validation error" when {
-        def validationErrorTest(requestNino: String, requestBody: JsValue, expectedStatus: Int, expectedBody: MtdError): Unit = {
+        def validationError(requestNino: String, requestBody: JsValue, expectedStatus: Int, expectedBody: MtdError): Unit = {
           s"validation fails with ${expectedBody.code} error" in new Test {
 
             override val nino: String = requestNino
@@ -139,29 +129,34 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
           ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RangeEndDateBeforeStartDateError),
         )
 
-        input.foreach(args => (validationErrorTest _).tupled(args))
+        input.foreach(args => (validationError _).tupled(args))
       }
 
       "ifs service error" when {
-        def serviceErrorTest(ifsStatus: Int, ifsCode: String, ifsMessage: String, expectedStatus: Int, expectedBody: MtdError): Unit = {
-          s"ifs returns an $ifsCode error and status $ifsStatus with message $ifsMessage" in new Test {
-
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              MtdIdLookupStub.ninoFound(nino)
-              DownstreamStub.onError(DownstreamStub.POST,
-                                     ifsUri(),
-                                     Map("incomeSourceId" -> incomeSourceId),
-                                     ifsStatus,
-                                     errorBody(ifsCode, ifsMessage))
-            }
-
-            val response: WSResponse = await(request().post(fullValidJson()))
-            response.json shouldBe Json.toJson(expectedBody)
-            response.status shouldBe expectedStatus
+        def fullServiceErrorTest(ifsStatus: Int, downstreamResponse: JsValue, expectedStatus: Int, expectedBody: JsValue): Test = new Test {
+          override def setupStubs(): StubMapping = {
+            AuditStub.audit()
+            AuthStub.authorised()
+            MtdIdLookupStub.ninoFound(nino)
+            DownstreamStub.onError(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), ifsStatus, downstreamResponse.toString())
           }
+
+          val response: WSResponse = await(request().post(fullValidJson()))
+          response.json shouldBe expectedBody
+          response.status shouldBe expectedStatus
         }
+
+        def serviceErrorTest(ifsStatus: Int, ifsCode: String, ifsMessage: String, expectedStatus: Int, expectedError: MtdError): Unit =
+          s"ifs returns an $ifsCode error and status $ifsStatus with message $ifsMessage" in {
+            val errorBody: JsValue = Json.parse(s"""
+                 |{
+                 |  "failures": [{
+                 |  "code": "$ifsCode",
+                 |  "reason": "$ifsMessage"
+                 |  }]
+                 |}""".stripMargin)
+            fullServiceErrorTest(ifsStatus, errorBody, expectedStatus, Json.toJson(expectedError))
+          }
 
         val input: Seq[(Int, String, String, Int, MtdError)] = Seq(
           (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, DownstreamError),
@@ -222,96 +217,69 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))
-      }
 
-      "bvr service error" when {
-        def serviceErrorTest(ifsStatus: Int, bvrError: JsValue, expectedStatus: Int, expectedBody: JsValue): Unit = {
-          s"ifs returns a bvr error and status $ifsStatus with message - ${bvrError.toString()}" in new Test {
+        "ifs returns a single BVR error" in {
+          val ifsJson = Json.parse("""
+                                     |{
+                                     |    "bvrfailureResponseElement": {
+                                     |        "code": "BVR_FAILURE_EXISTS",
+                                     |        "reason": "Ignored",
+                                     |        "validationRuleFailures": [
+                                     |            {
+                                     |                "id": "ID",
+                                     |                "type": "ERR",
+                                     |                "text": "MESSAGE"
+                                     |            }
+                                     |        ]
+                                     |    }
+                                     |}""".stripMargin)
 
-            override def setupStubs(): StubMapping = {
-              AuditStub.audit()
-              AuthStub.authorised()
-              MtdIdLookupStub.ninoFound(nino)
-              DownstreamStub.onError(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), ifsStatus, bvrError.toString())
-            }
-
-            val response: WSResponse = await(request().post(fullValidJson()))
-            response.json shouldBe expectedBody
-            response.status shouldBe expectedStatus
-          }
-        }
-
-        "the error is a single error" when {
-          val id      = "C55123"
-          val text    = "Custom message"
-          val ifsJson = Json.parse(s"""
-                        |{
-                        |    "bvrfailureResponseElement": {
-                        |        "code": "BVR_FAILURE_EXISTS",
-                        |        "reason": "The remote endpoint has indicated that there are bvr failures",
-                        |        "validationRuleFailures": [
-                        |            {
-                        |                "id": "$id",
-                        |                "type": "ERR",
-                        |                "text": "$text"
-                        |            }
-                        |        ]
-                        |    }
-                        |}
-                        |""".stripMargin)
-
-          val mtdErrorJson = Json.parse(s"""{
+          val mtdErrorJson = Json.parse("""{
                                           |   "code":"RULE_BUSINESS_VALIDATION_FAILURE",
-                                          |   "errorId":"$id",
-                                          |   "message":"$text"
+                                          |   "errorId":"ID",
+                                          |   "message":"MESSAGE"
                                           |}""".stripMargin)
 
-          serviceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
+          fullServiceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
         }
 
-        "the error is a multiple errors" when {
-          val id1     = "C55111"
-          val id2     = "C55222"
-          val text1   = "Custom message1"
-          val text2   = "Custom message2"
-          val ifsJson = Json.parse(s"""
-              |{
+        "ifs returns multiple BVR errors" in {
+          val ifsJson = Json.parse("""{
               |    "bvrfailureResponseElement": {
               |        "code": "BVR_FAILURE_EXISTS",
-              |        "reason": "The remote endpoint has indicated that there are bvr failures",
+              |        "reason": "Ignored",
               |        "validationRuleFailures": [
               |            {
-              |                "id": "$id1",
+              |                "id": "ID_0",
               |                "type": "ERR",
-              |                "text": "$text1"
+              |                "text": "MESSAGE_0"
               |            },{
-              |                "id": "$id2",
+              |                "id": "ID_1",
               |                "type": "ERR",
-              |                "text": "$text2"
+              |                "text": "MESSAGE_1"
               |            }
               |        ]
               |    }
-              |}
-          """.stripMargin)
+              |}""".stripMargin)
 
-          val mtdErrorJson = Json.parse(s"""{
-                                           |   "code":"INVALID_REQUEST",
-                                           |   "message":"Invalid request",
-                                           |   "errors":[
-                                           |      {
-                                           |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
-                                           |         "errorId": "$id1",
-                                           |         "message":"$text1"
-                                           |      },
-                                           |      {
-                                           |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
-                                           |         "errorId": "$id2",
-                                           |         "message":"$text2"
-                                           |      }
-                                           |   ]
-                                           |}""".stripMargin)
+          val mtdErrorJson = Json.parse("""{
+              |   "code":"INVALID_REQUEST",
+              |   "message":"Invalid request",
+              |   "errors":[
+              |      {
+              |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
+              |         "errorId": "ID_0",
+              |         "message":"MESSAGE_0"
+              |      },
+              |      {
+              |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
+              |         "errorId": "ID_1",
+              |         "message":"MESSAGE_1"
+              |      }
+              |   ]
+              |}""".stripMargin)
 
-          serviceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
+          fullServiceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
         }
       }
     }

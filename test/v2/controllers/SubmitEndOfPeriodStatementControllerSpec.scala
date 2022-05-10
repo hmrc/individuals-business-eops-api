@@ -135,34 +135,33 @@ class SubmitEndOfPeriodStatementControllerSpec
       }
 
       "service errors occur" should {
-        def serviceErrorForCode(mtdError: MtdError, expectedStatus: Int): Unit =
-          serviceError(ErrorWrapper(correlationId, mtdError), expectedStatus)
 
-        def serviceError(errorWrapper: ErrorWrapper, expectedStatus: Int): Unit = {
-          s"a $errorWrapper is returned from the service" in new Test {
+        def fullServiceErrorTest(errorWrapper: ErrorWrapper, expectedStatus: Int): Test = new Test {
+          MockSubmitEndOfPeriodStatementParser
+            .parseRequest(rawData)
+            .returns(Right(requestData))
 
-            MockSubmitEndOfPeriodStatementParser
-              .parseRequest(rawData)
-              .returns(Right(requestData))
+          MockNrsProxyService
+            .submit(nino, validRequest)
+            .returns(Future.successful((): Unit))
 
-            MockNrsProxyService
-              .submit(nino, validRequest)
-              .returns(Future.successful((): Unit))
+          MockSubmitEndOfPeriodStatementService
+            .submitEndOfPeriodStatementService(requestData)
+            .returns(Future.successful(Left(errorWrapper)))
 
-            MockSubmitEndOfPeriodStatementService
-              .submitEndOfPeriodStatementService(requestData)
-              .returns(Future.successful(Left(errorWrapper)))
+          val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
 
-            val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
+          status(result) shouldBe expectedStatus
+          contentAsJson(result) shouldBe Json.toJson(errorWrapper)
+          header("X-CorrelationId", result) shouldBe Some(correlationId)
 
-            status(result) shouldBe expectedStatus
-            contentAsJson(result) shouldBe Json.toJson(errorWrapper)
-            header("X-CorrelationId", result) shouldBe Some(correlationId)
-
-            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(errorWrapper.auditErrors), None)
-            MockedAuditService.verifyAuditEvent(event(auditResponse)).once
-          }
+          val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(errorWrapper.auditErrors), None)
+          MockedAuditService.verifyAuditEvent(event(auditResponse)).once
         }
+
+        def simpleServiceError(mtdError: MtdError, expectedStatus: Int): Unit =
+          s"a $mtdError error is returned from the service" in
+            fullServiceErrorTest(ErrorWrapper(correlationId, mtdError), expectedStatus)
 
         val input = Seq(
           (NinoFormatError, BAD_REQUEST),
@@ -179,18 +178,19 @@ class SubmitEndOfPeriodStatementControllerSpec
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 
-        input.foreach(args => (serviceErrorForCode _).tupled(args))
+        input.foreach(args => (simpleServiceError _).tupled(args))
 
-        serviceError(
-          ErrorWrapper(correlationId,
-                       BadRequestError,
-                       Some(
-                         Seq(
-                           RuleBusinessValidationFailure("some message", "id1"),
-                           RuleBusinessValidationFailure("some message", "id2")
-                         ))),
-          FORBIDDEN
-        )
+        "multiple BVR errors occur" in
+          fullServiceErrorTest(
+            ErrorWrapper(correlationId,
+                         BadRequestError,
+                         Some(
+                           Seq(
+                             RuleBusinessValidationFailure("some message", "id1"),
+                             RuleBusinessValidationFailure("some message", "id2")
+                           ))),
+            FORBIDDEN
+          )
       }
     }
   }

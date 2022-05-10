@@ -49,18 +49,17 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
     "unsuccessful" must {
       "map errors according to spec" when {
 
-        def checkServiceErrorForCode(ifsErrorCode: String, singleMtdError: MtdError): Unit =
-          checkServiceError(IfsStandardError(List(IfsErrorCode(ifsErrorCode))), ErrorWrapper(correlationId, singleMtdError))
+        def fullServiceErrorTest(ifsError: IfsError, expectedErrorWrapper: ErrorWrapper): Test = new Test {
+          MockSubmitEndOfPeriodStatementConnector
+            .submitEndOfPeriodStatement(requestData)
+            .returns(Future.successful(Left(ResponseWrapper(correlationId, ifsError))))
 
-        def checkServiceError(ifsError: IfsError, expectedErrorWrapper: ErrorWrapper): Unit =
-          s"a $ifsError error is returned from the service" in new Test {
+          await(service.submit(requestData)) shouldBe Left(expectedErrorWrapper)
+        }
 
-            MockSubmitEndOfPeriodStatementConnector
-              .submitEndOfPeriodStatement(requestData)
-              .returns(Future.successful(Left(ResponseWrapper(correlationId, ifsError))))
-
-            await(service.submit(requestData)) shouldBe Left(expectedErrorWrapper)
-          }
+        def simpleServiceError(ifsErrorCode: String, singleMtdError: MtdError): Unit =
+          s"a $ifsErrorCode error is returned from the service" in
+            fullServiceErrorTest(IfsStandardError(List(IfsErrorCode(ifsErrorCode))), ErrorWrapper(correlationId, singleMtdError))
 
         val input = Seq(
           ("INVALID_IDTYPE", DownstreamError),
@@ -79,34 +78,37 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
           ("SERVICE_UNAVAILABLE", DownstreamError)
         )
 
-        input.foreach(args => (checkServiceErrorForCode _).tupled(args))
+        input.foreach(args => (simpleServiceError _).tupled(args))
 
-        checkServiceError(
-          IfsBvrError("BVR_FAILURE_EXISTS", List(IfsValidationRuleFailure("C55001", "Custom message"))),
-          ErrorWrapper(correlationId, RuleBusinessValidationFailure(message = "Custom message", errorId = "C55001"))
-        )
-
-        checkServiceError(
-          IfsBvrError("BVR_FAILURE_EXISTS",
-                      List(
-                        IfsValidationRuleFailure("C55001", "Custom message1"),
-                        IfsValidationRuleFailure("C55002", "Custom message2")
-                      )),
-          ErrorWrapper(
-            correlationId,
-            BadRequestError,
-            Some(
-              Seq(
-                RuleBusinessValidationFailure(message = "Custom message1", errorId = "C55001"),
-                RuleBusinessValidationFailure(message = "Custom message2", errorId = "C55002"),
-              ))
+        "a single BVR_FAILURE_EXISTS error occurs" in
+          fullServiceErrorTest(
+            IfsBvrError("BVR_FAILURE_EXISTS", List(IfsValidationRuleFailure("C55001", "Custom message"))),
+            ErrorWrapper(correlationId, RuleBusinessValidationFailure(message = "Custom message", errorId = "C55001"))
           )
-        )
 
-        checkServiceError(
-          IfsBvrError("OTHER", List(IfsValidationRuleFailure("C55001", "Custom message"))),
-          ErrorWrapper(correlationId, DownstreamError)
-        )
+        "multiple BVR_FAILURE_EXISTS errors occur" in
+          fullServiceErrorTest(
+            IfsBvrError("BVR_FAILURE_EXISTS",
+                        List(
+                          IfsValidationRuleFailure("C55001", "Custom message1"),
+                          IfsValidationRuleFailure("C55002", "Custom message2")
+                        )),
+            ErrorWrapper(
+              correlationId,
+              BadRequestError,
+              Some(
+                Seq(
+                  RuleBusinessValidationFailure(message = "Custom message1", errorId = "C55001"),
+                  RuleBusinessValidationFailure(message = "Custom message2", errorId = "C55002"),
+                ))
+            )
+          )
+
+        "a BVR failure with unexpected code occurs" in
+          fullServiceErrorTest(
+            IfsBvrError("OTHER", List(IfsValidationRuleFailure("C55001", "Custom message"))),
+            ErrorWrapper(correlationId, DownstreamError)
+          )
       }
     }
   }

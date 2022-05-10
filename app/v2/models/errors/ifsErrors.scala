@@ -16,7 +16,6 @@
 
 package v2.models.errors
 
-import play.api.libs.functional.syntax._
 import play.api.libs.json.{ JsPath, Json, Reads }
 
 sealed trait IfsError
@@ -50,11 +49,8 @@ case class IfsBvrError(
 ) extends IfsError
 
 object IfsBvrError {
-  implicit val reads: Reads[IfsBvrError] = (
-    (JsPath \ "bvrfailureResponseElement" \ "code").read[String] and
-      (JsPath \ "bvrfailureResponseElement" \ "validationRuleFailures").read[List[IfsValidationRuleFailure]]
-  )(IfsBvrError.apply _)
-
+  implicit val reads: Reads[IfsBvrError] =
+    (JsPath \ "bvrfailureResponseElement").read(Json.reads[IfsBvrError])
 }
 
 case class IfsValidationRuleFailure(id: String, text: String, `type`: String = "ERR")
