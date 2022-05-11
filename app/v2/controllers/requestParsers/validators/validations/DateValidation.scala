@@ -18,21 +18,21 @@ package v2.controllers.requestParsers.validators.validations
 
 import java.time.LocalDate
 
-import v2.models.errors.{EndDateFormatError, MtdError, RangeEndDateBeforeStartDateError, StartDateFormatError}
+import v2.models.errors.{ EndDateFormatError, MtdError, RangeEndDateBeforeStartDateError, StartDateFormatError }
 
 object DateValidation {
 
-  def validateStartDate(startDate: Option[LocalDate]): List[MtdError] ={
+  def validateStartDate(startDate: Option[LocalDate]): List[MtdError] = {
     //400 FORMAT_START_DATE The provided Start date is invalid
-    if(startDate.isDefined) NoValidationErrors else List(StartDateFormatError)
+    if (startDate.isDefined) NoValidationErrors else List(StartDateFormatError)
   }
 
-  def validateEndDate(endDate: Option[LocalDate]): List[MtdError] ={
+  def validateEndDate(endDate: Option[LocalDate]): List[MtdError] = {
     //400 FORMAT_END_DATE The provided From date is invalid
-    if(endDate.isDefined) NoValidationErrors else List(EndDateFormatError)
+    if (endDate.isDefined) NoValidationErrors else List(EndDateFormatError)
   }
 
-  def validateDates(startDate: String, endDate: String): List[MtdError] ={
+  def validateDates(startDate: String, endDate: String): List[MtdError] = {
 
     val startLocalDate: Option[LocalDate] = try {
       Some(LocalDate.parse(startDate))
@@ -48,9 +48,7 @@ object DateValidation {
 
     (startLocalDate, endLocalDate) match {
       case (Some(startDate), Some(endDate)) =>
-
-        if(endDate.isBefore(startDate)){
-          //400 RANGE_END_DATE_BEFORE_START_DATE The End date must be after the Start date
+        if (endDate.isBefore(startDate)) {
           List(RangeEndDateBeforeStartDateError)
         } else {
           NoValidationErrors

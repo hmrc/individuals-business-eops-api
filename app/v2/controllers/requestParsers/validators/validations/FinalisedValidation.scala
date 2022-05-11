@@ -16,34 +16,10 @@
 
 package v2.controllers.requestParsers.validators.validations
 
-import play.api.Logger
-import play.api.libs.json.{JsLookupResult, JsValue}
-import v2.models.errors.{FinalisedFormatError, MtdError, RuleNotFinalisedError}
+import v2.models.errors.{ FinalisedFormatError, MtdError }
 
 object FinalisedValidation {
 
-  lazy val log = s"[JsonFormatValidation][validate] - Request body failed validation with errors -"
-  lazy val logger: Logger = Logger(this.getClass)
-
-  def validateFinalised(json: JsLookupResult): List[MtdError] ={
-
-    val jsLookup: Option[JsValue] = json.toOption
-
-    (json.asOpt[Boolean], jsLookup.isDefined) match {
-      case (Some(bool), _) => validateFinalised(bool)
-      case (_, true) => finalisedIncorrectFormat(jsLookup.toString)
-      case _ => NoValidationErrors
-    }
-  }
-
-  def validateFinalised(finalised: Boolean): List[MtdError] ={
-    //400 RULE_NOT_FINALISED Finalised must be set to "true"
-    if(finalised) NoValidationErrors else List(RuleNotFinalisedError)
-  }
-
-  def finalisedIncorrectFormat(finalised: String): List[MtdError] = {
-    logger.warn(s"$log finalised was not of type boolean. finalised: $finalised")
-    //400 FORMAT_FINALISED The provided Finalised value is invalid
-    List(FinalisedFormatError)
-  }
+  def validateFinalised(finalised: Boolean): List[MtdError] =
+    if (finalised) NoValidationErrors else List(FinalisedFormatError)
 }

@@ -19,7 +19,7 @@ package v2.services
 import v2.data.SubmitEndOfPeriodStatementData.validRequest
 import v2.models.domain.Nino
 import v2.mocks.connectors.MockSubmitEndOfPeriodStatementConnector
-import v2.models.errors._
+import v2.models.errors.{ IfsValidationRuleFailure, _ }
 import v2.models.outcomes.ResponseWrapper
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
@@ -38,7 +38,8 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
   "service" when {
     "service call successful" must {
       "return mapped result" in new Test {
-        MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(requestData)
+        MockSubmitEndOfPeriodStatementConnector
+          .submitEndOfPeriodStatement(requestData)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, ()))))
 
         await(service.submit(requestData)) shouldBe Right(ResponseWrapper(correlationId, ()))
@@ -48,14 +49,17 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
     "unsuccessful" must {
       "map errors according to spec" when {
 
-        def serviceError(ifsErrorCode: String, error: MtdError): Unit =
-          s"a $ifsErrorCode error is returned from the service" in new Test {
+        def fullServiceErrorTest(ifsError: IfsError, expectedErrorWrapper: ErrorWrapper): Test = new Test {
+          MockSubmitEndOfPeriodStatementConnector
+            .submitEndOfPeriodStatement(requestData)
+            .returns(Future.successful(Left(ResponseWrapper(correlationId, ifsError))))
 
-            MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(requestData)
-              .returns(Future.successful(Left(ResponseWrapper(correlationId, IfsErrors.single(IfsErrorCode(ifsErrorCode))))))
+          await(service.submit(requestData)) shouldBe Left(expectedErrorWrapper)
+        }
 
-            await(service.submit(requestData)) shouldBe Left(ErrorWrapper(correlationId, error))
-          }
+        def simpleServiceError(ifsErrorCode: String, singleMtdError: MtdError): Unit =
+          s"a $ifsErrorCode error is returned from the service" in
+            fullServiceErrorTest(IfsStandardError(List(IfsErrorCode(ifsErrorCode))), ErrorWrapper(correlationId, singleMtdError))
 
         val input = Seq(
           ("INVALID_IDTYPE", DownstreamError),
@@ -65,27 +69,46 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
           ("INVALID_INCOMESOURCEID", BusinessIdFormatError),
           ("INVALID_INCOMESOURCETYPE", TypeOfBusinessFormatError),
           ("INVALID_CORRELATIONID", DownstreamError),
-          ("CONFLICT", RuleAlreadySubmittedError),
           ("EARLY_SUBMISSION", RuleEarlySubmissionError),
           ("LATE_SUBMISSION", RuleLateSubmissionError),
-          ("C55503", RuleConsolidatedExpensesError),
-          ("C55316", RuleConsolidatedExpensesError),
-          ("C55525", RuleConsolidatedExpensesError),
-          ("C55008", RuleMismatchedStartDateError),
-          ("C55013", RuleMismatchedEndDateError),
-          ("C55014", RuleMismatchedEndDateError),
-          ("C55317", RuleClass4Over16Error),
-          ("C55318", RuleClass4PensionAge),
-          ("C55501", RuleFHLPrivateUseAdjustment),
-          ("C55502", RuleNonFHLPrivateUseAdjustment),
-          ("BVR_UNKNOWN_ID", RuleBusinessValidationFailure),
           ("NON_MATCHING_PERIOD", RuleNonMatchingPeriodError),
           ("NOT_FOUND", NotFoundError),
+          ("CONFLICT", RuleAlreadySubmittedError),
           ("SERVER_ERROR", DownstreamError),
           ("SERVICE_UNAVAILABLE", DownstreamError)
         )
 
-        input.foreach(args => (serviceError _).tupled(args))
+        input.foreach(args => (simpleServiceError _).tupled(args))
+
+        "a single BVR_FAILURE_EXISTS error occurs" in
+          fullServiceErrorTest(
+            IfsBvrError("BVR_FAILURE_EXISTS", List(IfsValidationRuleFailure("C55001", "Custom message"))),
+            ErrorWrapper(correlationId, RuleBusinessValidationFailure(message = "Custom message", errorId = "C55001"))
+          )
+
+        "multiple BVR_FAILURE_EXISTS errors occur" in
+          fullServiceErrorTest(
+            IfsBvrError("BVR_FAILURE_EXISTS",
+                        List(
+                          IfsValidationRuleFailure("C55001", "Custom message1"),
+                          IfsValidationRuleFailure("C55002", "Custom message2")
+                        )),
+            ErrorWrapper(
+              correlationId,
+              BadRequestError,
+              Some(
+                Seq(
+                  RuleBusinessValidationFailure(message = "Custom message1", errorId = "C55001"),
+                  RuleBusinessValidationFailure(message = "Custom message2", errorId = "C55002"),
+                ))
+            )
+          )
+
+        "a BVR failure with unexpected code occurs" in
+          fullServiceErrorTest(
+            IfsBvrError("OTHER", List(IfsValidationRuleFailure("C55001", "Custom message"))),
+            ErrorWrapper(correlationId, DownstreamError)
+          )
       }
     }
   }

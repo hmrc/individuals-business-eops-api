@@ -21,31 +21,23 @@ import v2.models.errors.TypeOfBusinessFormatError
 
 class TypeOfBusinessValidationSpec extends UnitSpec {
 
-  "validate" should {
-
+  "validate" must {
     "return no errors" when {
+      def checkGood(typeOfBusiness: String): Unit =
+        s"type of business is $typeOfBusiness" in {
+          TypeOfBusinessValidation.validate(typeOfBusiness) shouldBe empty
+        }
 
-      "provided with a string of 'self-employment'" in {
-        TypeOfBusinessValidation.typeOfBusinessFormat("self-employment").isEmpty shouldBe true
-      }
-
-      "provided with a string of 'uk-property'" in {
-        TypeOfBusinessValidation.typeOfBusinessFormat("uk-property").isEmpty shouldBe true
-      }
-
-      "provided with a string of 'foreign-property'" in {
-        TypeOfBusinessValidation.typeOfBusinessFormat("foreign-property").isEmpty shouldBe true
-      }
+      Seq("self-employment", "uk-property", "foreign-property").foreach(checkGood)
     }
 
-    "return an error" when {
-
+    "return a validation error" when {
       "provided with an empty string" in {
-        TypeOfBusinessValidation.typeOfBusinessFormat("") shouldBe List(TypeOfBusinessFormatError)
+        TypeOfBusinessValidation.validate("") shouldBe List(TypeOfBusinessFormatError)
       }
 
       "provided with a non-matching string" in {
-        TypeOfBusinessValidation.typeOfBusinessFormat("self-employment-a") shouldBe List(TypeOfBusinessFormatError)
+        TypeOfBusinessValidation.validate("self-employment-a") shouldBe List(TypeOfBusinessFormatError)
       }
     }
   }

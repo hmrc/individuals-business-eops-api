@@ -24,46 +24,41 @@ import v2.models.outcomes.ResponseWrapper
 trait DownstreamResponseMappingSupport {
   self: Logging =>
 
-  final def mapDownstreamErrors[D](errorCodeMap: PartialFunction[String, MtdError])(downstreamResponseWrapper: ResponseWrapper[IfsError])(
-    implicit logContext: EndpointLogContext): ErrorWrapper = {
+  final def mapDownstreamErrors(errorCodeMap: PartialFunction[String, MtdError])(downstreamResponseWrapper: ResponseWrapper[IfsError])(
+      implicit logContext: EndpointLogContext): ErrorWrapper = {
 
     lazy val defaultErrorCodeMapping: String => MtdError = { code =>
-      logger.warn(s"[${logContext.controllerName}] [${logContext.endpointName}] - No mapping found for error code $code")
+      logger.info(s"[${logContext.controllerName}] [${logContext.endpointName}] - No mapping found for error code $code")
       DownstreamError
     }
 
     downstreamResponseWrapper match {
-      case ResponseWrapper(correlationId, IfsErrors(error :: Nil)) =>
+      case ResponseWrapper(correlationId, IfsStandardError(error :: Nil)) =>
         ErrorWrapper(correlationId, errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping), None)
 
-      case ResponseWrapper(correlationId, IfsErrors(errorCodes)) =>
-        val mtdErrors = errorCodes.map(error => errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping)).distinct
+      case ResponseWrapper(correlationId, IfsStandardError(errorCodes)) =>
+        val mtdErrors = errorCodes.map(error => errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping))
 
         if (mtdErrors.contains(DownstreamError)) {
-          logger.warn(
+          logger.info(
             s"[${logContext.controllerName}] [${logContext.endpointName}] [CorrelationId - $correlationId]" +
               s" - downstream returned ${errorCodes.map(_.code).mkString(",")}. Revert to ISE")
+
           ErrorWrapper(correlationId, DownstreamError, None)
         } else {
-          val allowedErrorList =
-            List(
-              RuleConsolidatedExpensesError,
-              RuleMismatchedStartDateError,
-              RuleMismatchedEndDateError,
-              RuleClass4Over16Error,
-              RuleClass4PensionAge,
-              RuleFHLPrivateUseAdjustment,
-              RuleNonFHLPrivateUseAdjustment,
-              RuleBusinessValidationFailure
-            )
-          allowedErrorList.exists(mtdErrors.contains(_)) match {
-            case true => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
-            case false => ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
-          }
+          ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
         }
 
       case ResponseWrapper(correlationId, OutboundError(error, errors)) =>
         ErrorWrapper(correlationId, error, errors)
+
+      case ResponseWrapper(correlationId, e: IfsBvrError) =>
+        logger.info(
+          s"[${logContext.controllerName}] [${logContext.endpointName}] [CorrelationId - $correlationId]" +
+            s" - downstream returned unhandled BVR error ${e.code} " +
+            s"with IDs ${e.validationRuleFailures.map(_.id).mkString(",")}. Revert to ISE")
+
+        ErrorWrapper(correlationId, DownstreamError, None)
     }
   }
 }

@@ -32,4 +32,6 @@ object TypeOfBusiness {
   case object `foreign-property` extends TypeOfBusiness
 
   implicit val format: Format[TypeOfBusiness] = Enums.format[TypeOfBusiness]
+
+  val parser: PartialFunction[String, TypeOfBusiness] = Enums.parser[TypeOfBusiness]
 }

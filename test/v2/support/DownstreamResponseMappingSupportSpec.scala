@@ -24,7 +24,7 @@ import v2.models.outcomes.ResponseWrapper
 
 class DownstreamResponseMappingSupportSpec extends UnitSpec {
 
-  implicit val logContext: EndpointLogContext = EndpointLogContext("ctrl", "ep")
+  implicit val logContext: EndpointLogContext                = EndpointLogContext("ctrl", "ep")
   val mapping: DownstreamResponseMappingSupport with Logging = new DownstreamResponseMappingSupport with Logging {}
 
   val correlationId = "someCorrelationId"
@@ -33,67 +33,71 @@ class DownstreamResponseMappingSupportSpec extends UnitSpec {
 
   object Error2 extends MtdError("msg", "code2")
 
-  object ErrorBvrMain extends MtdError("msg", "bvrMain")
-
-  object ErrorBvr extends MtdError("msg", "bvr")
-
-  val errorCodeMap : PartialFunction[String, MtdError] = {
+  val errorCodeMap: PartialFunction[String, MtdError] = {
     case "ERR1" => Error1
     case "ERR2" => Error2
-    case "DS" => DownstreamError
+    case "DS"   => DownstreamError
   }
 
-  "mapping Downstream errors" when {
-    "single error" when {
+  "mapping errors from downstream" when {
+    "standard error with single error code" when {
       "the error code is in the map provided" must {
         "use the mapping and wrap" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsErrors.single(IfsErrorCode("ERR1")))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("ERR1")))) shouldBe
             ErrorWrapper(correlationId, Error1)
         }
       }
 
       "the error code is not in the map provided" must {
         "default to DownstreamError and wrap" in {
-          mapping.mapDownstreamErrors (errorCodeMap)(ResponseWrapper(correlationId, IfsErrors.single(IfsErrorCode("UNKNOWN")))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("UNKNOWN")))) shouldBe
             ErrorWrapper(correlationId, DownstreamError)
         }
       }
     }
 
-    "multiple errors" when {
-      "the error codes is in the map provided" must {
+    "standard error with multiple errors codes" when {
+      "all error codes are in the map provided" must {
         "use the mapping and wrap with main error type of BadRequest" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("ERR2"))))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("ERR1"), IfsErrorCode("ERR2")))) shouldBe
             ErrorWrapper(correlationId, BadRequestError, Some(Seq(Error1, Error2)))
         }
       }
 
-      "the error code is not in the map provided" must {
+      "an error code is not in the map provided" must {
         "default main error to DownstreamError ignore other errors" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("UNKNOWN"))))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("ERR1"), IfsErrorCode("UNKNOWN")))) shouldBe
             ErrorWrapper(correlationId, DownstreamError)
         }
       }
 
       "one of the mapped errors is DownstreamError" must {
         "wrap the errors with main error type of DownstreamError" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("DS"))))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("ERR1"), IfsErrorCode("DS")))) shouldBe
             ErrorWrapper(correlationId, DownstreamError)
         }
       }
     }
 
-    "the error code is an OutboundError" must {
-      "return the error as is (in an ErrorWrapper)" in {
-        mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, OutboundError(ErrorBvrMain))) shouldBe
-          ErrorWrapper(correlationId, ErrorBvrMain)
+    "the error is an OutboundError with a single MTD error" must {
+      "return the MTD error in an ErrorWrapper" in {
+        mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, OutboundError(Error1))) shouldBe
+          ErrorWrapper(correlationId, Error1)
       }
     }
 
-    "the error code is an OutboundError with multiple errors" must {
-      "return the error as is (in an ErrorWrapper)" in {
-        mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, OutboundError(ErrorBvrMain, Some(Seq(ErrorBvr))))) shouldBe
-          ErrorWrapper(correlationId, ErrorBvrMain, Some(Seq(ErrorBvr)))
+    "the error is an OutboundError with a main and secondary errors" must {
+      "return the MTD errors in the same structure in an ErrorWrapper" in {
+        mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, OutboundError(Error1, Some(Seq(Error2))))) shouldBe
+          ErrorWrapper(correlationId, Error1, Some(Seq(Error2)))
+      }
+    }
+
+    "bvr errors are returned" must {
+      "map to a DownstreamError" in {
+        mapping.mapDownstreamErrors(errorCodeMap)(
+          ResponseWrapper(correlationId, IfsBvrError("ERR1", List(IfsValidationRuleFailure("ID 1", "message 1"))))) shouldBe
+          ErrorWrapper(correlationId, DownstreamError)
       }
     }
   }

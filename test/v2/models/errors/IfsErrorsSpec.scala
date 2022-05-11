@@ -16,27 +16,66 @@
 
 package v2.models.errors
 
+import play.api.libs.json.{ JsError, JsValue, Json }
 import support.UnitSpec
 
 class IfsErrorsSpec extends UnitSpec {
 
-  "IfsErrorCode.toMtd" should {
-    "convert the error to an MtdError" in {
-      IfsErrorCode("test").toMtd shouldBe MtdError("test", "")
-    }
-  }
-
   "IfsErrors" should {
+    "be able to read a JSON standard error format" in {
+      val downstreamErrorsJson: JsValue = Json.parse(
+        """
+          |{
+          |   "failures": [
+          |       {
+          |           "code": "CODE 1",
+          |           "reason": "MESSAGE 1"
+          |       },
+          |       {
+          |           "code": "CODE 2",
+          |           "reason": "MESSAGE 2"
+          |       }
+          |   ]
+          |}""".stripMargin
+      )
 
-    val error  = IfsErrorCode("error")
-    val errors = Seq(IfsErrorCode("ERROR 1"), IfsErrorCode("ERROR 2"))
-
-    "read in a singleError" in {
-      IfsErrors.single(error) shouldBe IfsErrors(List(IfsErrorCode("error")))
+      downstreamErrorsJson.as[IfsError] shouldBe IfsStandardError(List(IfsErrorCode("CODE 1"), IfsErrorCode("CODE 2")))
     }
 
-    "read in multiple errors" in {
-      IfsErrors.multiple(errors) shouldBe IfsErrors(List(IfsErrorCode("ERROR 1"), IfsErrorCode("ERROR 2")))
+    "be able to read a JSON bvr error format" in {
+      val downstreamErrorsJson: JsValue = Json.parse(
+        s"""
+           |{
+           |   "bvrfailureResponseElement":{
+           |      "code":"CODE",
+           |      "reason":"Ignored top-level reason",
+           |      "validationRuleFailures":[
+           |         {
+           |            "id": "ID 0",
+           |            "type":"ERR",
+           |            "text":"MESSAGE 0"
+           |         },
+           |         {
+           |            "id": "ID 1",
+           |            "type":"INFO",
+           |            "text":"MESSAGE 1"
+           |         }
+           |      ]
+           |   }
+           |}""".stripMargin
+      )
+
+      downstreamErrorsJson.as[IfsError] shouldBe IfsBvrError("CODE",
+                                                             List(
+                                                               IfsValidationRuleFailure("ID 0", "MESSAGE 0", "ERR"),
+                                                               IfsValidationRuleFailure("ID 1", "MESSAGE 1", "INFO"),
+                                                             ))
+    }
+
+    "fail if unrecognised error format is received" in {
+      val downstreamErrorsJson: JsValue = Json.obj("something" -> "something")
+
+      downstreamErrorsJson.validate[IfsError] shouldBe a[JsError]
     }
   }
 }

@@ -17,49 +17,34 @@
 package v2.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, Result}
+import play.api.mvc.{ AnyContentAsJson, Result }
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.data.SubmitEndOfPeriodStatementData._
 import v2.mocks.MockIdGenerator
 import v2.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v2.mocks.services._
-import v2.models.audit.{AuditError, AuditEvent, AuditResponse, GenericAuditDetail}
 import v2.models.domain.Nino
-import v2.models.errors.{DownstreamError, NotFoundError, _}
+import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
-import v2.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
+import v2.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
-  with MockEnrolmentsAuthService
-  with MockMtdIdLookupService
-  with MockSubmitEndOfPeriodStatementParser
-  with MockNrsProxyService
-  with MockSubmitEndOfPeriodStatementService
-  with MockAuditService
-  with MockIdGenerator {
+class SubmitEndOfPeriodStatementControllerSpec
+    extends ControllerBaseSpec
+    with MockEnrolmentsAuthService
+    with MockMtdIdLookupService
+    with MockSubmitEndOfPeriodStatementParser
+    with MockNrsProxyService
+    with MockSubmitEndOfPeriodStatementService
+    with MockIdGenerator {
 
   private val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
-  private val nino = "AA123456A"
+  private val nino          = "AA123456A"
 
-  private val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
+  private val rawData     = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
   private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
-
-  def event(auditResponse: AuditResponse): AuditEvent[GenericAuditDetail] =
-    AuditEvent(
-      auditType = "SubmitEndOfPeriodStatementAuditType",
-      transactionName = "submit-end-of-period-statement-transaction-type",
-      detail = GenericAuditDetail(
-        userType = "Individual",
-        agentReferenceNumber = None,
-        nino,
-        fullValidAuditJson(),
-        correlationId,
-        auditResponse
-      )
-    )
 
   trait Test {
     val hc: HeaderCarrier = HeaderCarrier()
@@ -70,7 +55,6 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
       requestParser = mockSubmitEndOfPeriodStatementParser,
       nrsProxyService = mockNrsProxyService,
       service = mockSubmitEndOfPeriodStatementService,
-      auditService = mockAuditService,
       cc = cc,
       idGenerator = mockIdGenerator
     )
@@ -127,58 +111,66 @@ class SubmitEndOfPeriodStatementControllerSpec extends ControllerBaseSpec
           (EndDateFormatError, BAD_REQUEST),
           (FinalisedFormatError, BAD_REQUEST),
           (RuleIncorrectOrEmptyBodyError, BAD_REQUEST),
-          (RangeEndDateBeforeStartDateError, BAD_REQUEST),
-          (RuleNotFinalisedError, BAD_REQUEST)
+          (RangeEndDateBeforeStartDateError, BAD_REQUEST)
         )
 
         input.foreach(args => (errorsFromParserTester _).tupled(args))
       }
 
       "service errors occur" should {
-        def serviceErrors(mtdError: MtdError, expectedStatus: Int): Unit = {
-          s"a $mtdError error is returned from the service" in new Test {
 
-            MockSubmitEndOfPeriodStatementParser
-              .parseRequest(rawData)
-              .returns(Right(requestData))
+        def fullServiceErrorTest(errorWrapper: ErrorWrapper, expectedStatus: Int): Test = new Test {
+          MockSubmitEndOfPeriodStatementParser
+            .parseRequest(rawData)
+            .returns(Right(requestData))
 
-            MockNrsProxyService
-              .submit(nino, validRequest)
-              .returns(Future.successful((): Unit))
+          MockNrsProxyService
+            .submit(nino, validRequest)
+            .returns(Future.successful((): Unit))
 
-            MockSubmitEndOfPeriodStatementService
-              .submitEndOfPeriodStatementService(requestData)
-              .returns(Future.successful(Left(ErrorWrapper(correlationId, mtdError))))
+          MockSubmitEndOfPeriodStatementService
+            .submitEndOfPeriodStatementService(requestData)
+            .returns(Future.successful(Left(errorWrapper)))
 
-            val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
+          val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
 
-            status(result) shouldBe expectedStatus
-            contentAsJson(result) shouldBe Json.toJson(mtdError)
-            header("X-CorrelationId", result) shouldBe Some(correlationId)
-
-            val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
-            MockedAuditService.verifyAuditEvent(event(auditResponse)).once
-          }
+          status(result) shouldBe expectedStatus
+          contentAsJson(result) shouldBe Json.toJson(errorWrapper)
+          header("X-CorrelationId", result) shouldBe Some(correlationId)
         }
 
+        def simpleServiceError(mtdError: MtdError, expectedStatus: Int): Unit =
+          s"a $mtdError error is returned from the service" in
+            fullServiceErrorTest(ErrorWrapper(correlationId, mtdError), expectedStatus)
+
         val input = Seq(
-          (RuleAlreadySubmittedError, FORBIDDEN),
+          (NinoFormatError, BAD_REQUEST),
+          (StartDateFormatError, BAD_REQUEST),
+          (EndDateFormatError, BAD_REQUEST),
+          (BusinessIdFormatError, BAD_REQUEST),
+          (TypeOfBusinessFormatError, BAD_REQUEST),
           (RuleEarlySubmissionError, FORBIDDEN),
           (RuleLateSubmissionError, FORBIDDEN),
+          (RuleBusinessValidationFailure("some message", "C54321"), FORBIDDEN),
           (RuleNonMatchingPeriodError, FORBIDDEN),
-          (RuleConsolidatedExpensesError, FORBIDDEN),
-          (RuleMismatchedStartDateError, FORBIDDEN),
-          (RuleMismatchedEndDateError, FORBIDDEN),
-          (RuleClass4Over16Error, FORBIDDEN),
-          (RuleClass4PensionAge, FORBIDDEN),
-          (RuleFHLPrivateUseAdjustment, FORBIDDEN),
-          (RuleNonFHLPrivateUseAdjustment, FORBIDDEN),
-          (RuleBusinessValidationFailure, FORBIDDEN),
           (NotFoundError, NOT_FOUND),
+          (RuleAlreadySubmittedError, FORBIDDEN),
           (DownstreamError, INTERNAL_SERVER_ERROR)
         )
 
-        input.foreach(args => (serviceErrors _).tupled(args))
+        input.foreach(args => (simpleServiceError _).tupled(args))
+
+        "multiple BVR errors occur" in
+          fullServiceErrorTest(
+            ErrorWrapper(correlationId,
+                         BadRequestError,
+                         Some(
+                           Seq(
+                             RuleBusinessValidationFailure("some message", "id1"),
+                             RuleBusinessValidationFailure("some message", "id2")
+                           ))),
+            FORBIDDEN
+          )
       }
     }
   }
