@@ -123,7 +123,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
           ("AA123456A", fullValidJson(endDate = "error"), BAD_REQUEST, EndDateFormatError),
           ("AA123456A", fullValidJson(finalised = "false"), BAD_REQUEST, FinalisedFormatError),
           ("AA123456A", Json.parse("{}"), BAD_REQUEST, RuleIncorrectOrEmptyBodyError),
-          ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RangeEndDateBeforeStartDateError),
+          ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RuleEndDateBeforeStartDateError),
         )
 
         input.foreach(args => (validationError _).tupled(args))

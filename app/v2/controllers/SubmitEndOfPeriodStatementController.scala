@@ -85,7 +85,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     } else {
       errorWrapper.error match {
         case BadRequestError | NinoFormatError | TypeOfBusinessFormatError | BusinessIdFormatError | StartDateFormatError | EndDateFormatError |
-            FinalisedFormatError | MtdErrorWithCode(RuleIncorrectOrEmptyBodyError.code) | RangeEndDateBeforeStartDateError =>
+            FinalisedFormatError | MtdErrorWithCode(RuleIncorrectOrEmptyBodyError.code) | RuleEndDateBeforeStartDateError =>
           BadRequest(Json.toJson(errorWrapper))
 
         case RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError =>

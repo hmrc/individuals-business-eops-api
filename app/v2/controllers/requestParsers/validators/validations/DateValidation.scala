@@ -18,7 +18,7 @@ package v2.controllers.requestParsers.validators.validations
 
 import java.time.LocalDate
 
-import v2.models.errors.{ EndDateFormatError, MtdError, RangeEndDateBeforeStartDateError, StartDateFormatError }
+import v2.models.errors.{ EndDateFormatError, MtdError, RuleEndDateBeforeStartDateError, StartDateFormatError }
 
 object DateValidation {
 
@@ -49,7 +49,7 @@ object DateValidation {
     (startLocalDate, endLocalDate) match {
       case (Some(startDate), Some(endDate)) =>
         if (endDate.isBefore(startDate)) {
-          List(RangeEndDateBeforeStartDateError)
+          List(RuleEndDateBeforeStartDateError)
         } else {
           NoValidationErrors
         }

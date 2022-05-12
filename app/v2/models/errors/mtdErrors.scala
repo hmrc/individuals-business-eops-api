@@ -64,13 +64,13 @@ object EndDateFormatError
 object FinalisedFormatError
     extends MtdError(
       code = "FORMAT_FINALISED",
-      message = "The format of the supplied Finalised field is not valid"
+      message = "Finalised must be set to `true`"
     )
 
-object RangeEndDateBeforeStartDateError
+object RuleEndDateBeforeStartDateError
     extends MtdError(
       code = "RULE_END_DATE_BEFORE_START_DATE",
-      message = "The End date is before the Start date"
+      message = "The End date must be after the Start date"
     )
 
 object NinoFormatError
