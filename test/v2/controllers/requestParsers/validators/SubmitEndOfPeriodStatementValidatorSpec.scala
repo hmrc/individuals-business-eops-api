@@ -91,7 +91,7 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
                                                 startDate = "2020-10-10",
                                                 endDate = "2020-10-09"
                                               )))) shouldBe List(
-          RangeEndDateBeforeStartDateError
+          RuleEndDateBeforeStartDateError
         )
       }
 

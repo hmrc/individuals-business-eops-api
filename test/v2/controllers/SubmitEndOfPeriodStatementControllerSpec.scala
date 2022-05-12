@@ -111,7 +111,7 @@ class SubmitEndOfPeriodStatementControllerSpec
           (EndDateFormatError, BAD_REQUEST),
           (FinalisedFormatError, BAD_REQUEST),
           (RuleIncorrectOrEmptyBodyError, BAD_REQUEST),
-          (RangeEndDateBeforeStartDateError, BAD_REQUEST)
+          (RuleEndDateBeforeStartDateError, BAD_REQUEST)
         )
 
         input.foreach(args => (errorsFromParserTester _).tupled(args))
