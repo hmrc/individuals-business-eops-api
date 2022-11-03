@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package v1.models.errors
-
 import play.api.libs.json.Json
 import support.UnitSpec
 import v1.models.audit.AuditError
-import v2.models.errors.TypeOfBusinessFormatError
 
 class ErrorWrapperSpec extends UnitSpec {
   val correlationId = "X-123"
-
   "Rendering a error response with one error" should {
     val error = ErrorWrapper(correlationId, NinoFormatError, Some(Seq.empty))
-
     val json = Json.parse(
       """
         |{
@@ -35,15 +30,12 @@ class ErrorWrapperSpec extends UnitSpec {
         |}
       """.stripMargin
     )
-
     "generate the correct JSON" in {
       Json.toJson(error) shouldBe json
     }
   }
-
   "Rendering a error response with one error and an empty sequence of errors" should {
     val error = ErrorWrapper(correlationId, NinoFormatError, Some(Seq.empty))
-
     val json = Json.parse(
       """
         |{
@@ -52,22 +44,19 @@ class ErrorWrapperSpec extends UnitSpec {
         |}
       """.stripMargin
     )
-
     "generate the correct JSON" in {
       Json.toJson(error) shouldBe json
     }
   }
-
   "Rendering a error response with two errors" should {
     val error = ErrorWrapper(correlationId, BadRequestError,
-      Some (
+      Some(
         Seq(
           NinoFormatError,
           TaxYearFormatError
         )
       )
     )
-
     val json = Json.parse(
       """
         |{
@@ -86,37 +75,14 @@ class ErrorWrapperSpec extends UnitSpec {
         |}
       """.stripMargin
     )
-
     "generate the correct JSON" in {
       Json.toJson(error) shouldBe json
     }
   }
   "Rendering a error response" should {
     val error = ErrorWrapper(correlationId, NinoFormatError, None)
-
     "convert an error to an audit error with that error code" in {
       error.auditErrors shouldBe Seq(AuditError("FORMAT_NINO"))
-    }
-  }
-
-  "When ErrorWrapper has several errors, containsAnyOf" should {
-    val errorWrapper = ErrorWrapper("correlationId", BadRequestError, Some(List(NinoFormatError, TaxYearFormatError)))
-
-    "return false" when {
-      "given no matching errors" in {
-        val result = errorWrapper.containsAnyOf(EndDateFormatError, BusinessIdFormatError)
-        result shouldBe false
-      }
-      "given a matching error in 'errors' but not the single 'error' which should be a BadRequestError" in {
-        val result = errorWrapper.containsAnyOf(NinoFormatError, TaxYearFormatError, TypeOfBusinessFormatError)
-        result shouldBe false
-      }
-    }
-    "return true" when {
-      "given the 'single' BadRequestError" in {
-        val result = errorWrapper.containsAnyOf(NinoFormatError, BadRequestError, TaxYearFormatError, TypeOfBusinessFormatError)
-        result shouldBe true
-      }
     }
   }
 }
