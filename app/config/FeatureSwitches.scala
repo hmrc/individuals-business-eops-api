@@ -31,11 +31,13 @@ case class FeatureSwitches(featureSwitchConfig: Configuration) {
 
     val enabled = for {
       validVersion <- maybeVersion
-      enabled <- featureSwitchConfig.getOptional[Boolean](s"version-$validVersion.enabled")
+      enabled      <- featureSwitchConfig.getOptional[Boolean](s"version-$validVersion.enabled")
     } yield enabled
 
     enabled.getOrElse(false)
   }
+
+  val isTaxYearSpecificApiEnabled: Boolean = isEnabled("tys-api.enabled")
 
   private def isEnabled(key: String): Boolean = featureSwitchConfig.getOptional[Boolean](key).getOrElse(true)
 
