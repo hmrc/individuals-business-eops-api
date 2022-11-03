@@ -98,4 +98,26 @@ class ErrorWrapperSpec extends UnitSpec {
       error.auditErrors shouldBe Seq(AuditError("FORMAT_NINO"))
     }
   }
+
+  "When ErrorWrapper has several errors, containsAnyOf" should {
+    val errorWrapper = ErrorWrapper("correlationId", BadRequestError, Some(List(NinoFormatError, TaxYearFormatError)))
+
+    "return false" when {
+      "given no matching errors" in {
+        val result = errorWrapper.containsAnyOf(EndDateFormatError, BusinessIdFormatError)
+        result shouldBe false
+      }
+      "given a matching error in 'errors' but not the single 'error' which should be a BadRequestError" in {
+        val result = errorWrapper.containsAnyOf(NinoFormatError, TaxYearFormatError, TypeOfBusinessFormatError)
+        result shouldBe false
+      }
+    }
+    "return true" when {
+      "given the 'single' BadRequestError" in {
+        val result = errorWrapper.containsAnyOf(NinoFormatError, BadRequestError, TaxYearFormatError, TypeOfBusinessFormatError)
+        result shouldBe true
+      }
+    }
+  }
+
 }
