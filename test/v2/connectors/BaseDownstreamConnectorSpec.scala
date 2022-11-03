@@ -91,7 +91,7 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
       MockedHttpClient.post(absoluteUrl, config, body, requiredHeadersPost, excludedHeaders)
         .returns(Future.successful(outcome))
 
-      await(connector.post(body, IfsUri[Result](url))) shouldBe outcome
+      await(connector.post(body, DownstreamUri[Result](url))) shouldBe outcome
     }
   }
 }

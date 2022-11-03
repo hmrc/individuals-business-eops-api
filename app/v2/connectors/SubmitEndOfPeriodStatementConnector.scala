@@ -20,8 +20,10 @@ import config.AppConfig
 
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import v2.connectors.DownstreamUri.IfsUri
 import v2.models.downstream.EmptyJsonBody
 import v2.models.request.SubmitEndOfPeriodStatementRequest
+import v2.connectors.httpparsers.StandardDownstreamHttpParser._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,18 +36,18 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient,
     ec: ExecutionContext,
     correlationId: String): Future[DownstreamOutcome[Unit]] = {
 
-    import v2.connectors.httpparsers.StandardDownstreamHttpParser._
-
     val nino                      = request.nino.nino
     val incomeSourceType          = request.submitEndOfPeriod.typeOfBusiness
     val accountingPeriodStartDate = request.submitEndOfPeriod.accountingPeriod.startDate
     val accountingPeriodEndDate   = request.submitEndOfPeriod.accountingPeriod.endDate
     val incomeSourceId            = request.submitEndOfPeriod.businessId
 
+    val url = s"income-tax/income-sources/nino/" +
+      s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId"
+
     post(
       body = EmptyJsonBody,
-      uri = IfsUri[Unit]("income-tax/income-sources/nino/" +
-          s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
+      uri = IfsUri[Unit](url)
     )
   }
 }
