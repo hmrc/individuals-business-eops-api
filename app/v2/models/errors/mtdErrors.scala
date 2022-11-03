@@ -89,7 +89,7 @@ object TaxYearFormatError
 object RuleTaxYearNotSupportedError
     extends MtdError(
       code = "RULE_TAX_YEAR_NOT_SUPPORTED",
-      message = "Tax year not supported, because it precedes the earliest allowable tax year"
+      message = "The tax year specified does not lie within the supported range"
     )
 
 object RuleIncorrectOrEmptyBodyError
