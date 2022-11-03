@@ -20,6 +20,7 @@ import config.ConfidenceLevelConfig
 import definition.APIStatus.{ALPHA, BETA}
 import definition.Versions.{VERSION_1, VERSION_2}
 import mocks.MockAppConfig
+import play.api.Configuration
 import support.UnitSpec
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import v1.mocks.MockHttpClient
@@ -42,7 +43,7 @@ class ApiDefinitionFactorySpec extends UnitSpec {
       }
 
       def testDefinitionWithConfidence(confidenceLevelConfig: ConfidenceLevelConfig): Unit = new Test {
-        MockAppConfig.featureSwitch returns None anyNumberOfTimes()
+        MockAppConfig.featureSwitches returns Configuration.empty anyNumberOfTimes()
         MockAppConfig.apiStatus("1.0") returns "BETA"
         MockAppConfig.apiStatus("2.0") returns "ALPHA"
         MockAppConfig.endpointsEnabled("1.0") returns true anyNumberOfTimes()
