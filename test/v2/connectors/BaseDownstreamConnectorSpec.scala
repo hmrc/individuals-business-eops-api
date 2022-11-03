@@ -18,7 +18,9 @@ package v2.connectors
 
 import config.AppConfig
 import mocks.MockAppConfig
+import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import v2.connectors.DownstreamUri.IfsUri
 import v2.mocks.MockHttpClient
 import v2.models.outcomes.ResponseWrapper
 
@@ -30,15 +32,15 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
   case class Result(value: Int)
 
   // WLOG
-  val body = "body"
-  val outcome = Right(ResponseWrapper(correlationId, Result(2)))
-
-  val url = "some/url?param=value"
+  val body        = "body"
+  val outcome     = Right(ResponseWrapper(correlationId, Result(2)))
+  val url         = "some/url?param=value"
   val absoluteUrl = s"$baseUrl/$url"
 
   implicit val httpReads: HttpReads[DownstreamOutcome[Result]] = mock[HttpReads[DownstreamOutcome[Result]]]
 
-  class Test(ifsEnvironmentHeaders: Option[Seq[String]]) extends MockHttpClient with MockAppConfig {
+  class IfsTest(ifsEnvironmentHeaders: Option[Seq[String]]) extends MockHttpClient with MockAppConfig {
+
     val connector: BaseDownstreamConnector = new BaseDownstreamConnector {
       val http: HttpClient = mockHttpClient
       val appConfig: AppConfig = mockAppConfig
@@ -48,6 +50,7 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     MockAppConfig.ifsToken returns "ifs-token"
     MockAppConfig.ifsEnvironment returns "ifs-environment"
     MockAppConfig.ifsEnvironmentHeaders returns ifsEnvironmentHeaders
+    MockAppConfig.featureSwitches returns Configuration("tys-api.enabled" -> false)
   }
 
   "BaseDownstreamConnector" when {
@@ -64,7 +67,7 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     )
 
     "making a HTTP request to a downstream service (i.e IFS)" must {
-      testHttpMethods(dummyHeaderCarrierConfig, requiredHeaders, excludedHeaders, Some(allowedIfsHeaders))
+      ifsTestHttpMethods(dummyHeaderCarrierConfig, requiredHeaders, excludedHeaders, Some(allowedIfsHeaders))
 
       "exclude all `otherHeaders` when no external service header allow-list is found" should {
         val requiredHeaders: Seq[(String, String)] = Seq(
@@ -74,24 +77,70 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
           "CorrelationId" -> correlationId,
         )
 
-        testHttpMethods(dummyHeaderCarrierConfig, requiredHeaders, otherHeaders, None)
+        ifsTestHttpMethods(dummyHeaderCarrierConfig, requiredHeaders, otherHeaders, None)
       }
     }
   }
 
-  def testHttpMethods(config: HeaderCarrier.Config,
-                      requiredHeaders: Seq[(String, String)],
-                      excludedHeaders: Seq[(String, String)],
-                      ifsEnvironmentHeaders: Option[Seq[String]]): Unit = {
+  def ifsTestHttpMethods(config: HeaderCarrier.Config,
+                         requiredHeaders: Seq[(String, String)],
+                         excludedHeaders: Seq[(String, String)],
+                         ifsEnvironmentHeaders: Option[Seq[String]]): Unit = {
 
-    "POST" in new Test(ifsEnvironmentHeaders) {
-      implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
-      val requiredHeadersPost: Seq[(String, String)] = requiredHeaders ++ Seq("Content-Type" -> "application/json")
+    "complete the request successfully with the required headers" when {
 
-      MockedHttpClient.post(absoluteUrl, config, body, requiredHeadersPost, excludedHeaders)
-        .returns(Future.successful(outcome))
+      "POST" in new IfsTest(ifsEnvironmentHeaders) {
 
-      await(connector.post(body, DownstreamUri[Result](url))) shouldBe outcome
+        implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
+        val requiredHeadersPost: Seq[(String, String)] = requiredHeaders ++ Seq("Content-Type" -> "application/json")
+
+        MockedHttpClient
+          .post(absoluteUrl, config, body, requiredHeadersPost, excludedHeaders)
+          .returns(Future.successful(outcome))
+
+        await(connector.post(body, IfsUri[Result](url))) shouldBe outcome
+      }
+    }
+
+    "complete the request successfully with the required headers" when {
+
+      "GET" in new IfsTest(ifsEnvironmentHeaders) {
+
+        MockedHttpClient
+          .get(absoluteUrl, config, requiredHeaders, excludedHeaders)
+          .returns(Future.successful(outcome))
+
+        await(connector.get(IfsUri[Result](url))) shouldBe outcome
+      }
+
+      "GET with query params" in new IfsTest(ifsEnvironmentHeaders) {
+        val params = Seq("param1" -> "value")
+
+        MockedHttpClient
+          .parameterGet(absoluteUrl, params, config, requiredHeaders, excludedHeaders)
+          .returns(Future.successful(outcome))
+
+        await(connector.get(IfsUri[Result](url), params)) shouldBe outcome
+      }
+
+      "PUT" in new IfsTest(ifsEnvironmentHeaders) {
+        implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
+        val requiredHeadersPut: Seq[(String, String)] = requiredHeaders ++ Seq("Content-Type" -> "application/json")
+
+        MockedHttpClient
+          .put(absoluteUrl, config, body, requiredHeadersPut, excludedHeaders)
+          .returns(Future.successful(outcome))
+
+        await(connector.put(body, IfsUri[Result](url))) shouldBe outcome
+      }
+
+      "DELETE" in new IfsTest(ifsEnvironmentHeaders) {
+        MockedHttpClient
+          .delete(absoluteUrl, config, requiredHeaders, excludedHeaders)
+          .returns(Future.successful(outcome))
+
+        await(connector.delete(IfsUri[Result](url))) shouldBe outcome
+      }
     }
   }
 }
