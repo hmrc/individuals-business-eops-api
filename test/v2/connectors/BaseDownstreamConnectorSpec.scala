@@ -42,23 +42,23 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
   class IfsTest(ifsEnvironmentHeaders: Option[Seq[String]]) extends MockHttpClient with MockAppConfig {
 
     val connector: BaseDownstreamConnector = new BaseDownstreamConnector {
-      val http: HttpClient = mockHttpClient
+      val http: HttpClient     = mockHttpClient
       val appConfig: AppConfig = mockAppConfig
     }
 
-    MockAppConfig.ifsBaseUrl returns baseUrl
-    MockAppConfig.ifsToken returns "ifs-token"
-    MockAppConfig.ifsEnvironment returns "ifs-environment"
+    MockAppConfig.ifsBaseUrl            returns baseUrl
+    MockAppConfig.ifsToken              returns "ifs-token"
+    MockAppConfig.ifsEnvironment        returns "ifs-environment"
     MockAppConfig.ifsEnvironmentHeaders returns ifsEnvironmentHeaders
-    MockAppConfig.featureSwitches returns Configuration("tys-api.enabled" -> false)
+    MockAppConfig.featureSwitches       returns Configuration("tys-api.enabled" -> false)
   }
 
   "BaseDownstreamConnector" when {
     val requiredHeaders: Seq[(String, String)] = Seq(
-      "Environment" -> "ifs-environment",
-      "Authorization" -> "Bearer ifs-token",
-      "User-Agent" -> "individuals-business-eops-api",
-      "CorrelationId" -> correlationId,
+      "Environment"       -> "ifs-environment",
+      "Authorization"     -> "Bearer ifs-token",
+      "User-Agent"        -> "individuals-business-eops-api",
+      "CorrelationId"     -> correlationId,
       "Gov-Test-Scenario" -> "DEFAULT"
     )
 
@@ -71,10 +71,10 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
 
       "exclude all `otherHeaders` when no external service header allow-list is found" should {
         val requiredHeaders: Seq[(String, String)] = Seq(
-          "Environment" -> "ifs-environment",
+          "Environment"   -> "ifs-environment",
           "Authorization" -> "Bearer ifs-token",
-          "User-Agent" -> "individuals-business-eops-api",
-          "CorrelationId" -> correlationId,
+          "User-Agent"    -> "individuals-business-eops-api",
+          "CorrelationId" -> correlationId
         )
 
         ifsTestHttpMethods(dummyHeaderCarrierConfig, requiredHeaders, otherHeaders, None)
