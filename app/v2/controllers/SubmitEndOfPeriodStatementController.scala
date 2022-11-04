@@ -100,12 +100,12 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
           ) =>
           BadRequest(Json.toJson(errorWrapper))
 
-        case RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError =>
-          Forbidden(Json.toJson(errorWrapper))
+        case RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError
+            => Forbidden(Json.toJson(errorWrapper))
 
-        case NotFoundError => NotFound(Json.toJson(errorWrapper))
+        case NotFoundError   => NotFound(Json.toJson(errorWrapper))
         case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
-        case _ => unhandledError(errorWrapper)
+        case _               => unhandledError(errorWrapper)
 
       }
     }
