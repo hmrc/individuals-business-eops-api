@@ -102,10 +102,10 @@ trait ConnectorSpec extends UnitSpec
 
     protected def willGet[T](url: String, parameters: Seq[(String, String)]): CallHandler[Future[T]] = {
       MockedHttpClient
-        .parameterGet(
+        .get(
           url = url,
-          parameters = parameters,
           config = dummyHeaderCarrierConfig,
+          parameters = parameters,
           requiredHeaders = requiredHeaders,
           excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
         )
