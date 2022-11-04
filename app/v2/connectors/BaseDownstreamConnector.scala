@@ -114,7 +114,7 @@ trait BaseDownstreamConnector extends Logging {
         // Contract headers
         Seq(
           "Authorization" -> s"Bearer ${downstreamConfig.token}",
-          "Environment" -> downstreamConfig.env,
+          "Environment"   -> downstreamConfig.env,
           "CorrelationId" -> correlationId
         ) ++
         additionalHeaders ++
