@@ -16,4 +16,12 @@
 
 package v2.connectors
 
-case class IfsUri[Resp](value: String)
+sealed trait DownstreamUri[Resp] {
+  val value: String
+}
+
+object DownstreamUri {
+  case class DesUri[Resp](value: String)                extends DownstreamUri[Resp]
+  case class IfsUri[Resp](value: String)                extends DownstreamUri[Resp]
+  case class TaxYearSpecificIfsUri[Resp](value: String) extends DownstreamUri[Resp]
+}

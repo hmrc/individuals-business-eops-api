@@ -66,14 +66,14 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
 
   class Test(implicit acceptHeader: Option[String]) {
     val httpConfiguration: HttpConfiguration = HttpConfiguration("context")
-    private val errorHandler      = mock[HttpErrorHandler]
-    private val filters           = mock[HttpFilters]
+    private val errorHandler                 = mock[HttpErrorHandler]
+    private val filters                      = mock[HttpFilters]
     (filters.filters _).stubs().returns(Seq.empty)
 
-    MockAppConfig.featureSwitch.returns(Some(Configuration(ConfigFactory.parseString("""
+    MockAppConfig.featureSwitches.returns(Configuration(ConfigFactory.parseString("""
                                                                            |version-1.enabled = true
                                                                            |version-2.enabled = true
-                                                                         """.stripMargin))))
+                                                                         """.stripMargin)))
 
     val requestHandler: VersionRoutingRequestHandler =
       new VersionRoutingRequestHandler(routingMap, errorHandler, httpConfiguration, mockAppConfig, filters, action)
