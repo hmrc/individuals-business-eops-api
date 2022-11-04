@@ -26,7 +26,7 @@ case class FeatureSwitches(featureSwitchConfig: Configuration) {
     val maybeVersion: Option[String] =
       version match {
         case versionRegex(v) => Some(v)
-        case _ => None
+        case _               => None
       }
 
     val enabled = for {

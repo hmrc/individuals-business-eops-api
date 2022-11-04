@@ -35,12 +35,12 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
                                              filters: HttpFilters,
                                              action: DefaultActionBuilder)
   extends DefaultHttpRequestHandler(
-    webCommands = new DefaultWebCommands,
+    webCommands   = new DefaultWebCommands,
     optDevContext = None,
-    router = versionRoutingMap.defaultRouter,
-    errorHandler = errorHandler,
+    router        = versionRoutingMap.defaultRouter,
+    errorHandler  = errorHandler,
     configuration = httpConfiguration,
-    filters = filters.filters
+    filters       = filters.filters
   ) {
 
   private val featureSwitches          = FeatureSwitches(config.featureSwitches)
@@ -57,10 +57,10 @@ class VersionRoutingRequestHandler @Inject()(versionRoutingMap: VersionRoutingMa
       case Some(version) =>
         versionRoutingMap.versionRouter(version) match {
           case Some(versionRouter) if featureSwitches.isVersionEnabled(version) => routeWith(versionRouter)(request)
-          case Some(_)                                                        => Some(unsupportedVersionAction)
-          case None                                                           => Some(unsupportedVersionAction)
+          case Some(_)                                                          => Some(unsupportedVersionAction)
+          case None                                                             => Some(unsupportedVersionAction)
         }
-      case None => Some(invalidAcceptHeaderError)
+      case None         => Some(invalidAcceptHeaderError)
     }
     documentHandler orElse apiHandler
   }
