@@ -19,16 +19,16 @@ package v2.controllers
 import cats.data.EitherT
 import cats.implicits._
 import play.api.http.MimeTypes
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
-import utils.{IdGenerator, Logging}
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents, Result }
+import utils.{ IdGenerator, Logging }
 import v2.controllers.requestParsers.SubmitEndOfPeriodStatementParser
-import v2.models.errors.{NotFoundError, _}
+import v2.models.errors.{ NotFoundError, _ }
 import v2.models.request.SubmitEndOfPeriodStatementRawData
 import v2.services._
 
 import javax.inject._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class SubmitEndOfPeriodStatementController @Inject()(val authService: EnrolmentsAuthService,
@@ -47,7 +47,6 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
 
   def handleRequest(nino: String): Action[JsValue] =
     authorisedAction(nino).async(parse.json) { implicit request =>
-
       implicit val correlationId: String = idGenerator.generateCorrelationId
       logger.info(
         s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
@@ -56,7 +55,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
       val result =
         for {
-          parsedRequest   <- EitherT.fromEither[Future](requestParser.parseRequest(rawData))
+          parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawData))
           serviceResponse <- {
             nrsProxyService.submit(nino, parsedRequest.submitEndOfPeriod)
             EitherT(service.submit(parsedRequest))
@@ -87,25 +86,25 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     } else {
       errorWrapper.error match {
         case _
-          if errorWrapper.containsAnyOf(
-            BadRequestError,
-            NinoFormatError,
-            TypeOfBusinessFormatError,
-            BusinessIdFormatError,
-            StartDateFormatError,
-            EndDateFormatError,
-            FinalisedFormatError,
-            RuleIncorrectOrEmptyBodyError,
-            RuleEndDateBeforeStartDateError
-          ) =>
+            if errorWrapper.containsAnyOf(
+              BadRequestError,
+              NinoFormatError,
+              TypeOfBusinessFormatError,
+              BusinessIdFormatError,
+              StartDateFormatError,
+              EndDateFormatError,
+              FinalisedFormatError,
+              RuleIncorrectOrEmptyBodyError,
+              RuleEndDateBeforeStartDateError
+            ) =>
           BadRequest(Json.toJson(errorWrapper))
 
-        case RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError
-            => Forbidden(Json.toJson(errorWrapper))
+        case RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError =>
+          Forbidden(Json.toJson(errorWrapper))
 
-        case NotFoundError   => NotFound(Json.toJson(errorWrapper))
-        case DownstreamError => InternalServerError(Json.toJson(errorWrapper))
-        case _               => unhandledError(errorWrapper)
+        case NotFoundError => NotFound(Json.toJson(errorWrapper))
+        case InternalError => InternalServerError(Json.toJson(errorWrapper))
+        case _             => unhandledError(errorWrapper)
 
       }
     }

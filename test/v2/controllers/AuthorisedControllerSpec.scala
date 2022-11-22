@@ -17,13 +17,13 @@
 package v2.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{ Action, AnyContent }
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService}
+import v2.mocks.services.{ MockEnrolmentsAuthService, MockMtdIdLookupService }
 import v2.models.errors._
-import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
+import v2.services.{ EnrolmentsAuthService, MtdIdLookupService }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -77,7 +77,7 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
 
         MockedEnrolmentsAuthService
           .authorised(predicate)
-          .returns(Future.successful(Left(DownstreamError)))
+          .returns(Future.successful(Left(InternalError)))
 
         private val result = target.action(nino)(fakeGetRequest)
         status(result) shouldBe INTERNAL_SERVER_ERROR
@@ -127,7 +127,7 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
 
       MockedMtdIdLookupService
         .lookup(nino)
-        .returns(Future.successful(Left(DownstreamError)))
+        .returns(Future.successful(Left(InternalError)))
 
       private val result = target.action(nino)(fakeGetRequest)
       status(result) shouldBe INTERNAL_SERVER_ERROR

@@ -47,16 +47,16 @@ trait HttpParser extends Logging {
 
   def retrieveCorrelationId(response: HttpResponse): String = response.header("CorrelationId").getOrElse("")
 
-  def parseErrors(response: HttpResponse): IfsError = {
-    lazy val unableToParseJsonError: IfsError = {
+  def parseErrors(response: HttpResponse): DownstreamError = {
+    lazy val unableToParseJsonError: DownstreamError = {
       logger.warn(s"unable to parse errors from response: ${response.body}")
-      OutboundError(DownstreamError)
+      OutboundError(InternalError)
     }
 
     response
-      .validateJson[IfsError]
+      .validateJson[DownstreamError]
       .flatMap {
-        case e: IfsBvrError =>
+        case e: DownstreamBvrError =>
           val filtered = e.validationRuleFailures.filter(_.`type` == "ERR")
           if (filtered.isEmpty) {
             None
@@ -64,7 +64,7 @@ trait HttpParser extends Logging {
             Some(e.copy(validationRuleFailures = filtered))
           }
 
-        case e: IfsError => Some(e)
+        case e: DownstreamError => Some(e)
       }
       .getOrElse(unableToParseJsonError)
   }

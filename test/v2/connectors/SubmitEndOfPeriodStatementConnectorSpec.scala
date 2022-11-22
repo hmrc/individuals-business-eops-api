@@ -16,11 +16,9 @@
 
 package v2.connectors
 
-import mocks.MockAppConfig
-import uk.gov.hmrc.http.HeaderCarrier
+import org.scalamock.handlers.CallHandler
 import v2.data.SubmitEndOfPeriodStatementData._
-import v2.models.domain.Nino
-import v2.mocks._
+import v2.models.domain.{ Nino, TaxYear }
 import v2.models.downstream.EmptyJsonBody
 import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
@@ -30,88 +28,121 @@ import scala.concurrent.Future
 
 class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
-  val nino: String = "AA123456A"
+  val nino: String          = "AA123456A"
+  private val preTysTaxYear = TaxYear.fromMtd("2022-23")
+  private val tysTaxYear    = TaxYear.fromMtd("2023-24")
 
-  class Test extends MockHttpClient with MockAppConfig {
+  trait Test {
+    _: ConnectorTest =>
+    def taxYear: TaxYear
+
     val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(
       http = mockHttpClient,
       appConfig = mockAppConfig
     )
 
-    MockAppConfig.ifsBaseUrl returns baseUrl
-    MockAppConfig.ifsToken returns "ifs-token"
-    MockAppConfig.ifsEnvironment returns "ifs-environment"
-    MockAppConfig.ifsEnvironmentHeaders returns Some(allowedIfsHeaders)
+    val request: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(
+      nino = Nino(nino),
+      validRequest
+    )
+
+    //how do the headers work for these methods??
+    protected def stubHttpResponse(outcome: DownstreamOutcome[Unit]): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
+      willPost(
+        url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
+          s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+        body = EmptyJsonBody,
+      ).returns(Future.successful(outcome))
+    }
+
+    protected def stubTysHttpResponse(outcome: DownstreamOutcome[Unit]): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
+      willPost(
+        url = s"$baseUrl/income-tax/income-sources/${taxYear.asTysDownstream}/" +
+          s"$nino/$incomeSourceId/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration",
+        body = EmptyJsonBody,
+      ).returns(Future.successful(outcome))
+    }
   }
 
   "Submit end of period statement" when {
 
-    implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
-    val requiredIfsHeadersPost: Seq[(String, String)] = requiredIfsHeaders ++ Seq("Content-Type" -> "application/json")
+    val outcome = Right(ResponseWrapper(correlationId, ()))
 
     "a valid request is supplied" should {
-      "return a successful response with the correct correlationId" in new Test {
-        val expected = Right(ResponseWrapper(correlationId, ()))
+      "return a successful response with the correct correlationId" in new IfsTest with Test {
+        def taxYear: TaxYear = preTysTaxYear
 
-        MockedHttpClient
-          .post(
-            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
-            config = dummyHeaderCarrierConfig,
-            body = EmptyJsonBody,
-            requiredHeaders = requiredIfsHeadersPost,
-            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(expected))
+        stubHttpResponse(outcome)
 
-        await(connector.submitPeriodStatement(
-          SubmitEndOfPeriodStatementRequest(
-            nino = Nino(nino),
-            validRequest)
-        )) shouldBe expected
+        val result = await(connector.submitPeriodStatement(request))
+
+        result shouldBe outcome
+      }
+    }
+
+    "a valid request is supplied called for a Tax Year Specific tax year" should {
+      "return a successful response with the correct correlationId" in new TysIfsTest with Test {
+        def taxYear: TaxYear = tysTaxYear
+
+        stubTysHttpResponse(outcome)
+
+        val result = await(connector.submitPeriodStatement(request))
+
+        result shouldBe outcome
       }
     }
 
     "a request returning a single error" should {
-      "return an unsuccessful response with the correct correlationId and a single error" in new Test {
-        val expected = Left(ResponseWrapper(correlationId, NinoFormatError))
 
-        MockedHttpClient
-          .post(
-            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
-            config = dummyHeaderCarrierConfig,
-            body = EmptyJsonBody,
-            requiredHeaders = requiredIfsHeadersPost,
-            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(expected))
+      val downstreamErrorResponse: DownstreamStandardError =
+        DownstreamStandardError(List(DownstreamErrorCode("FORMAT_NINO")))
+      val outcome = Left(ResponseWrapper(correlationId, downstreamErrorResponse))
 
-        await(connector.submitPeriodStatement(
-          SubmitEndOfPeriodStatementRequest(
-            nino = Nino(nino),
-            validRequest)
-        )) shouldBe expected
+      "return an unsuccessful response with the correct correlationId and a single error" in new IfsTest with Test {
+        def taxYear: TaxYear = preTysTaxYear
+
+        stubHttpResponse(outcome)
+
+        val result = await(connector.submitPeriodStatement(request))
+
+        result shouldBe outcome
+      }
+
+      "return an unsuccessful response with the correct correlationId and a single error given a TYS tax year request" in new TysIfsTest with Test {
+        def taxYear: TaxYear = tysTaxYear
+
+        stubTysHttpResponse(outcome)
+
+        val result = await(connector.submitPeriodStatement(request))
+
+        result shouldBe outcome
       }
     }
 
     "a request returning multiple errors" should {
-      "return an unsuccessful response with the correct correlationId and multiple errors" in new Test {
-        val expected = Left(ResponseWrapper(correlationId, Seq(NinoFormatError, DownstreamError)))
 
-        MockedHttpClient
-          .post(
-            url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
-            config = dummyHeaderCarrierConfig,
-            body = EmptyJsonBody,
-            requiredHeaders = requiredIfsHeadersPost,
-            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(expected))
+      val downstreamErrorResponse: DownstreamStandardError =
+        DownstreamStandardError(List(DownstreamErrorCode("FORMAT_NINO"), DownstreamErrorCode("INTERNAL_SERVER_ERROR")))
+      val outcome = Left(ResponseWrapper(correlationId, downstreamErrorResponse))
 
-        await(connector.submitPeriodStatement(
-          SubmitEndOfPeriodStatementRequest(
-            nino = Nino(nino),
-            validRequest)
-        )) shouldBe expected
+      "return an unsuccessful response with the correct correlationId and multiple errors" in new IfsTest with Test {
+        def taxYear: TaxYear = preTysTaxYear
+
+        stubHttpResponse(outcome)
+
+        val result = await(connector.submitPeriodStatement(request))
+
+        result shouldBe outcome
+      }
+
+      "return an unsuccessful response with the correct correlationId and multiple errors given a TYS tax year request" in new TysIfsTest with Test {
+        def taxYear: TaxYear = tysTaxYear
+
+        stubTysHttpResponse(outcome)
+
+        val result = await(connector.submitPeriodStatement(request))
+
+        result shouldBe outcome
       }
     }
   }

@@ -87,7 +87,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
-          NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, DownstreamError.message)
+          NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, InternalError.message)
         }
 
         val response: WSResponse = await(request().post(fullValidJson()))
@@ -155,7 +155,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
           }
 
         val input: Seq[(Int, String, String, Int, MtdError)] = Seq(
-          (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, DownstreamError),
+          (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, InternalError),
           (BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", BAD_REQUEST, NinoFormatError),
           (BAD_REQUEST,
            "INVALID_ACCOUNTINGPERIODSTARTDATE",
@@ -181,7 +181,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
            "INVALID_CORRELATIONID",
            "Submission has not passed validation. Invalid header CorrelationId.",
            INTERNAL_SERVER_ERROR,
-           DownstreamError),
+           InternalError),
           (FORBIDDEN,
            "EARLY_SUBMISSION",
            "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
@@ -208,8 +208,8 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
            "SERVER_ERROR",
            "IF is currently experiencing problems that require live service intervention.",
            INTERNAL_SERVER_ERROR,
-           DownstreamError),
-          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, DownstreamError),
+           InternalError),
+          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, InternalError),
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))

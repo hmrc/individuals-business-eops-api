@@ -42,9 +42,9 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
     EitherT(connector.submitPeriodStatement(request)).leftMap(errorOrBvrMap).value
   }
 
-  def errorOrBvrMap(downstreamResponseWrapper: ResponseWrapper[IfsError])(implicit logContext: EndpointLogContext): ErrorWrapper = {
+  def errorOrBvrMap(downstreamResponseWrapper: ResponseWrapper[DownstreamError])(implicit logContext: EndpointLogContext): ErrorWrapper = {
     downstreamResponseWrapper match {
-      case ResponseWrapper(correlationId, IfsBvrError("BVR_FAILURE_EXISTS", items)) =>
+      case ResponseWrapper(correlationId, DownstreamBvrError("BVR_FAILURE_EXISTS", items)) =>
         items match {
           case item :: Nil =>
             ErrorWrapper(correlationId, error = RuleBusinessValidationFailure(errorId = item.id, message = item.text), errors = None)
@@ -59,19 +59,19 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
   }
 
   private val downstreamErrorMap: Map[String, MtdError] = Map(
-    "INVALID_IDTYPE"                    -> DownstreamError,
+    "INVALID_IDTYPE"                    -> InternalError,
     "INVALID_IDVALUE"                   -> NinoFormatError,
     "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
     "INVALID_ACCOUNTINGPERIODENDDATE"   -> EndDateFormatError,
     "INVALID_INCOMESOURCEID"            -> BusinessIdFormatError,
     "INVALID_INCOMESOURCETYPE"          -> TypeOfBusinessFormatError,
-    "INVALID_CORRELATIONID"             -> DownstreamError,
+    "INVALID_CORRELATIONID"             -> InternalError,
     "EARLY_SUBMISSION"                  -> RuleEarlySubmissionError,
     "LATE_SUBMISSION"                   -> RuleLateSubmissionError,
     "NON_MATCHING_PERIOD"               -> RuleNonMatchingPeriodError,
     "NOT_FOUND"                         -> NotFoundError,
     "CONFLICT"                          -> RuleAlreadySubmittedError,
-    "SERVER_ERROR"                      -> DownstreamError,
-    "SERVICE_UNAVAILABLE"               -> DownstreamError
+    "SERVER_ERROR"                      -> InternalError,
+    "SERVICE_UNAVAILABLE"               -> InternalError
   )
 }
