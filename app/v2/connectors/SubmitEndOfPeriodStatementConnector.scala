@@ -17,10 +17,10 @@
 package v2.connectors
 
 import config.AppConfig
+import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient }
 import v2.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
 import v2.connectors.httpparsers.StandardDownstreamHttpParser._
-import v2.models.downstream.EmptyJsonBody
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
 import javax.inject.{ Inject, Singleton }
@@ -52,7 +52,7 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
       }
 
     post(
-      body = EmptyJsonBody,
+      body = JsObject.empty,
       uri = downstreamUri
     )
   }
