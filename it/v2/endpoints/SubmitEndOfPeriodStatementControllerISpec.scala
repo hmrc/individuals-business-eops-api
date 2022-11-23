@@ -28,7 +28,7 @@ import v2.models.domain.TaxYear
 import v2.models.errors._
 import v2.stubs._
 
-class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
+class SubmitEndOfPeriodStatementControllerISpec extends V2IntegrationBaseSpec {
 
   private trait Test {
 
@@ -296,6 +296,11 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
            FORBIDDEN,
            RuleNonMatchingPeriodError),
           (UNPROCESSABLE_ENTITY,
+           "BVR_FAILURE",
+           "The remote endpoint has indicated there are business validation rule failures.",
+           FORBIDDEN,
+           RuleBusinessValidationFailureTys),
+          (UNPROCESSABLE_ENTITY,
            "TAX_YEAR_NOT_SUPPORTED",
            "The remote endpoint has indicated that this tax year is not supported.",
            BAD_REQUEST,
@@ -304,26 +309,11 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
 
         (errors ++ extraTysErrors).foreach(args => (serviceErrorTest _).tupled(args))
 
-        "ifs returns a single BVR error" in {
+        "downstream returns a single BVR error" in {
           val ifsJson = Json.parse("""
                                      |{
                                      |    "bvrfailureResponseElement": {
                                      |        "code": "BVR_FAILURE_EXISTS",
-                                     |        "reason": "Ignored",
-                                     |        "validationRuleFailures": [
-                                     |            {
-                                     |                "id": "ID",
-                                     |                "type": "ERR",
-                                     |                "text": "MESSAGE"
-                                     |            }
-                                     |        ]
-                                     |    }
-                                     |}""".stripMargin)
-
-          val tysIfsJson = Json.parse("""
-                                     |{
-                                     |    "bvrfailureResponseElement": {
-                                     |        "code": "BVR_FAILURE",
                                      |        "reason": "Ignored",
                                      |        "validationRuleFailures": [
                                      |            {
@@ -342,10 +332,9 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
                                           |}""".stripMargin)
 
           fullServiceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
-          fullServiceErrorTest(UNPROCESSABLE_ENTITY, tysIfsJson, FORBIDDEN, mtdErrorJson)
         }
 
-        "ifs returns multiple BVR errors" in {
+        "downstream returns multiple BVR errors" in {
           val ifsJson = Json.parse("""{
               |    "bvrfailureResponseElement": {
               |        "code": "BVR_FAILURE_EXISTS",
@@ -363,24 +352,6 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
               |        ]
               |    }
               |}""".stripMargin)
-
-          val tysIfsJson = Json.parse("""{
-                                     |    "bvrfailureResponseElement": {
-                                     |        "code": "BVR_FAILURE",
-                                     |        "reason": "Ignored",
-                                     |        "validationRuleFailures": [
-                                     |            {
-                                     |                "id": "ID_0",
-                                     |                "type": "ERR",
-                                     |                "text": "MESSAGE_0"
-                                     |            },{
-                                     |                "id": "ID_1",
-                                     |                "type": "ERR",
-                                     |                "text": "MESSAGE_1"
-                                     |            }
-                                     |        ]
-                                     |    }
-                                     |}""".stripMargin)
 
           val mtdErrorJson = Json.parse("""{
               |   "code":"INVALID_REQUEST",
@@ -400,7 +371,6 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
               |}""".stripMargin)
 
           fullServiceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
-          fullServiceErrorTest(UNPROCESSABLE_ENTITY, tysIfsJson, FORBIDDEN, mtdErrorJson)
         }
       }
     }

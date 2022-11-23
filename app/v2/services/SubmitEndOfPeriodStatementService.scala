@@ -44,7 +44,7 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
 
   def errorOrBvrMap(downstreamResponseWrapper: ResponseWrapper[DownstreamError])(implicit logContext: EndpointLogContext): ErrorWrapper = {
     downstreamResponseWrapper match {
-      case ResponseWrapper(correlationId, DownstreamBvrError("BVR_FAILURE_EXISTS" | "BVR_FAILURE", items)) =>
+      case ResponseWrapper(correlationId, DownstreamBvrError("BVR_FAILURE_EXISTS", items)) =>
         items match {
           case item :: Nil =>
             ErrorWrapper(correlationId, error = RuleBusinessValidationFailure(errorId = item.id, message = item.text), errors = None)
@@ -86,6 +86,7 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
       "INVALID_PAYLOAD"            -> InternalError,
       "INVALID_QUERY_PARAMETERS"   -> InternalError,
       "PERIOD_MISMATCH"            -> RuleNonMatchingPeriodError,
+      "BVR_FAILURE"                -> RuleBusinessValidationFailureTys,
       "TAX_YEAR_NOT_SUPPORTED"     -> RuleTaxYearNotSupportedError,
     )
 

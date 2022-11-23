@@ -129,6 +129,12 @@ object RuleBusinessValidationFailure {
     MtdError(code = code, message = message, errorId = Some(errorId))
 }
 
+object RuleBusinessValidationFailureTys
+    extends MtdError(
+      code = "RULE_BUSINESS_VALIDATION_FAILURE",
+      message = "There are business validation rule failures."
+    )
+
 //Standard Errors
 object NotFoundError
     extends MtdError(

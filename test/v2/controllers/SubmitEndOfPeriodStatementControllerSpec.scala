@@ -156,6 +156,7 @@ class SubmitEndOfPeriodStatementControllerSpec
           (NotFoundError, NOT_FOUND),
           (RuleAlreadySubmittedError, FORBIDDEN),
           (InternalError, INTERNAL_SERVER_ERROR),
+          (RuleBusinessValidationFailureTys, FORBIDDEN),
           (RuleTaxYearNotSupportedError, BAD_REQUEST)
         )
 
