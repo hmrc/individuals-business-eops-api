@@ -44,7 +44,7 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
 
   def errorOrBvrMap(downstreamResponseWrapper: ResponseWrapper[DownstreamError])(implicit logContext: EndpointLogContext): ErrorWrapper = {
     downstreamResponseWrapper match {
-      case ResponseWrapper(correlationId, DownstreamBvrError("BVR_FAILURE_EXISTS", items)) =>
+      case ResponseWrapper(correlationId, DownstreamBvrError("BVR_FAILURE_EXISTS" | "BVR_FAILURE", items)) =>
         items match {
           case item :: Nil =>
             ErrorWrapper(correlationId, error = RuleBusinessValidationFailure(errorId = item.id, message = item.text), errors = None)
@@ -58,20 +58,37 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
     }
   }
 
-  private val downstreamErrorMap: Map[String, MtdError] = Map(
-    "INVALID_IDTYPE"                    -> InternalError,
-    "INVALID_IDVALUE"                   -> NinoFormatError,
-    "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
-    "INVALID_ACCOUNTINGPERIODENDDATE"   -> EndDateFormatError,
-    "INVALID_INCOMESOURCEID"            -> BusinessIdFormatError,
-    "INVALID_INCOMESOURCETYPE"          -> TypeOfBusinessFormatError,
-    "INVALID_CORRELATIONID"             -> InternalError,
-    "EARLY_SUBMISSION"                  -> RuleEarlySubmissionError,
-    "LATE_SUBMISSION"                   -> RuleLateSubmissionError,
-    "NON_MATCHING_PERIOD"               -> RuleNonMatchingPeriodError,
-    "NOT_FOUND"                         -> NotFoundError,
-    "CONFLICT"                          -> RuleAlreadySubmittedError,
-    "SERVER_ERROR"                      -> InternalError,
-    "SERVICE_UNAVAILABLE"               -> InternalError
-  )
+  private val downstreamErrorMap: Map[String, MtdError] = {
+    val errors = Map(
+      "INVALID_IDTYPE"                    -> InternalError,
+      "INVALID_IDVALUE"                   -> NinoFormatError,
+      "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
+      "INVALID_ACCOUNTINGPERIODENDDATE"   -> EndDateFormatError,
+      "INVALID_INCOMESOURCEID"            -> BusinessIdFormatError,
+      "INVALID_INCOMESOURCETYPE"          -> TypeOfBusinessFormatError,
+      "INVALID_CORRELATIONID"             -> InternalError,
+      "EARLY_SUBMISSION"                  -> RuleEarlySubmissionError,
+      "LATE_SUBMISSION"                   -> RuleLateSubmissionError,
+      "NON_MATCHING_PERIOD"               -> RuleNonMatchingPeriodError,
+      "NOT_FOUND"                         -> NotFoundError,
+      "CONFLICT"                          -> RuleAlreadySubmittedError,
+      "SERVER_ERROR"                      -> InternalError,
+      "SERVICE_UNAVAILABLE"               -> InternalError
+    )
+
+    val extraTysErrors = Map(
+      "INVALID_TAX_YEAR"           -> InternalError,
+      "INVALID_TAXABLE_ENTITY_ID"  -> NinoFormatError,
+      "INVALID_START_DATE"         -> StartDateFormatError,
+      "INVALID_END_DATE"           -> EndDateFormatError,
+      "INVALID_INCOME_SOURCE_ID"   -> BusinessIdFormatError,
+      "INVALID_INCOME_SOURCE_TYPE" -> TypeOfBusinessFormatError,
+      "INVALID_PAYLOAD"            -> InternalError,
+      "INVALID_QUERY_PARAMETERS"   -> InternalError,
+      "PERIOD_MISMATCH"            -> RuleNonMatchingPeriodError,
+      "TAX_YEAR_NOT_SUPPORTED"     -> RuleTaxYearNotSupportedError,
+    )
+
+    errors ++ extraTysErrors
+  }
 }

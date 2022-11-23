@@ -46,7 +46,11 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       validRequest
     )
 
-    //how do the headers work for these methods??
+    val tysRequest: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(
+      nino = Nino(nino),
+      validTysRequest
+    )
+
     protected def stubHttpResponse(outcome: DownstreamOutcome[Unit]): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
       willPost(
         url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
@@ -58,7 +62,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
     protected def stubTysHttpResponse(outcome: DownstreamOutcome[Unit]): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
       willPost(
         url = s"$baseUrl/income-tax/income-sources/${taxYear.asTysDownstream}/" +
-          s"$nino/$incomeSourceId/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration",
+          s"$nino/$incomeSourceId/$incomeSourceType/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration",
         body = EmptyJsonBody,
       ).returns(Future.successful(outcome))
     }
@@ -80,13 +84,13 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       }
     }
 
-    "a valid request is supplied called for a Tax Year Specific tax year" should {
+    "a valid request is supplied for a Tax Year Specific tax year" should {
       "return a successful response with the correct correlationId" in new TysIfsTest with Test {
         def taxYear: TaxYear = tysTaxYear
 
         stubTysHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(request))
+        val result = await(connector.submitPeriodStatement(tysRequest))
 
         result shouldBe outcome
       }
@@ -113,7 +117,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         stubTysHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(request))
+        val result = await(connector.submitPeriodStatement(tysRequest))
 
         result shouldBe outcome
       }
@@ -140,7 +144,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         stubTysHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(request))
+        val result = await(connector.submitPeriodStatement(tysRequest))
 
         result shouldBe outcome
       }

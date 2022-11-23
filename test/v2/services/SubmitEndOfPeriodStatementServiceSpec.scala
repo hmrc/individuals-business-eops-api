@@ -49,19 +49,19 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
     "unsuccessful" must {
       "map errors according to spec" when {
 
-        def fullServiceErrorTest(ifsError: DownstreamError, expectedErrorWrapper: ErrorWrapper): Test = new Test {
+        def fullServiceErrorTest(downstreamError: DownstreamError, expectedErrorWrapper: ErrorWrapper): Test = new Test {
           MockSubmitEndOfPeriodStatementConnector
             .submitEndOfPeriodStatement(requestData)
-            .returns(Future.successful(Left(ResponseWrapper(correlationId, ifsError))))
+            .returns(Future.successful(Left(ResponseWrapper(correlationId, downstreamError))))
 
           await(service.submit(requestData)) shouldBe Left(expectedErrorWrapper)
         }
 
-        def simpleServiceError(ifsErrorCode: String, singleMtdError: MtdError): Unit =
-          s"a $ifsErrorCode error is returned from the service" in
-            fullServiceErrorTest(DownstreamStandardError(List(DownstreamErrorCode(ifsErrorCode))), ErrorWrapper(correlationId, singleMtdError))
+        def simpleServiceError(downstreamErrorCode: String, singleMtdError: MtdError): Unit =
+          s"a $downstreamErrorCode error is returned from the service" in
+            fullServiceErrorTest(DownstreamStandardError(List(DownstreamErrorCode(downstreamErrorCode))), ErrorWrapper(correlationId, singleMtdError))
 
-        val input = Seq(
+        val errors = Seq(
           ("INVALID_IDTYPE", InternalError),
           ("INVALID_IDVALUE", NinoFormatError),
           ("INVALID_ACCOUNTINGPERIODSTARTDATE", StartDateFormatError),
@@ -78,31 +78,54 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
           ("SERVICE_UNAVAILABLE", InternalError)
         )
 
-        input.foreach(args => (simpleServiceError _).tupled(args))
+        val extraTysErrors = Seq(
+          ("INVALID_TAX_YEAR", InternalError),
+          ("INVALID_TAXABLE_ENTITY_ID", NinoFormatError),
+          ("INVALID_START_DATE", StartDateFormatError),
+          ("INVALID_END_DATE", EndDateFormatError),
+          ("INVALID_INCOME_SOURCE_ID", BusinessIdFormatError),
+          ("INVALID_INCOME_SOURCE_TYPE", TypeOfBusinessFormatError),
+          ("INVALID_PAYLOAD", InternalError),
+          ("INVALID_QUERY_PARAMETERS", InternalError),
+          ("PERIOD_MISMATCH", RuleNonMatchingPeriodError),
+          ("TAX_YEAR_NOT_SUPPORTED", RuleTaxYearNotSupportedError),
+        )
 
-        "a single BVR_FAILURE_EXISTS error occurs" in
-          fullServiceErrorTest(
-            DownstreamBvrError("BVR_FAILURE_EXISTS", List(DownstreamValidationRuleFailure("C55001", "Custom message"))),
-            ErrorWrapper(correlationId, RuleBusinessValidationFailure(message = "Custom message", errorId = "C55001"))
-          )
+        (errors ++ extraTysErrors).foreach(args => (simpleServiceError _).tupled(args))
 
-        "multiple BVR_FAILURE_EXISTS errors occur" in
-          fullServiceErrorTest(
-            DownstreamBvrError("BVR_FAILURE_EXISTS",
-                               List(
-                                 DownstreamValidationRuleFailure("C55001", "Custom message1"),
-                                 DownstreamValidationRuleFailure("C55002", "Custom message2")
-                               )),
-            ErrorWrapper(
-              correlationId,
-              BadRequestError,
-              Some(
-                Seq(
-                  RuleBusinessValidationFailure(message = "Custom message1", errorId = "C55001"),
-                  RuleBusinessValidationFailure(message = "Custom message2", errorId = "C55002"),
-                ))
+        val bvrErrorCodes = Seq(
+          "BVR_FAILURE_EXISTS",
+          "BVR_FAILURE"
+        )
+
+        def singleBvrErrorTest(bvrErrorCode: String): Unit =
+          s"a single $bvrErrorCode error occurs" in
+            fullServiceErrorTest(
+              DownstreamBvrError(bvrErrorCode, List(DownstreamValidationRuleFailure("C55001", "Custom message"))),
+              ErrorWrapper(correlationId, RuleBusinessValidationFailure(message = "Custom message", errorId = "C55001"))
             )
-          )
+
+        def multipleBvrErrorTest(bvrErrorCode: String): Unit =
+          s"multiple $bvrErrorCode errors occur" in
+            fullServiceErrorTest(
+              DownstreamBvrError(bvrErrorCode,
+                                 List(
+                                   DownstreamValidationRuleFailure("C55001", "Custom message1"),
+                                   DownstreamValidationRuleFailure("C55002", "Custom message2")
+                                 )),
+              ErrorWrapper(
+                correlationId,
+                BadRequestError,
+                Some(
+                  Seq(
+                    RuleBusinessValidationFailure(message = "Custom message1", errorId = "C55001"),
+                    RuleBusinessValidationFailure(message = "Custom message2", errorId = "C55002"),
+                  ))
+              )
+            )
+
+        bvrErrorCodes.foreach(singleBvrErrorTest)
+        bvrErrorCodes.foreach(multipleBvrErrorTest)
 
         "a BVR failure with unexpected code occurs" in
           fullServiceErrorTest(

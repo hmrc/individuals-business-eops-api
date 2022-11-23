@@ -16,17 +16,20 @@
 
 package v2.data
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import v2.models.downstream.TypeOfBusiness
 import v2.models.downstream.TypeOfBusiness.`foreign-property`
-import v2.models.request.{AccountingPeriod, SubmitEndOfPeriod}
+import v2.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
 
 object SubmitEndOfPeriodStatementData {
 
-  val incomeSourceType: TypeOfBusiness = `foreign-property`
+  val incomeSourceType: TypeOfBusiness  = `foreign-property`
+  val incomeSourceId: String            = "XAIS12345678910"
   val accountingPeriodStartDate: String = "2021-04-06"
-  val accountingPeriodEndDate: String = "2022-04-05"
-  val incomeSourceId: String = "XAIS12345678910"
+  val accountingPeriodEndDate: String   = "2022-04-05"
+
+  val accountingPeriodStartDateTys: String = "2023-04-06"
+  val accountingPeriodEndDateTys: String   = "2024-04-05"
 
   val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(
     typeOfBusiness = `foreign-property`,
@@ -38,12 +41,21 @@ object SubmitEndOfPeriodStatementData {
     finalised = true
   )
 
+  val validTysRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(
+    typeOfBusiness = `foreign-property`,
+    businessId = "XAIS12345678910",
+    accountingPeriod = AccountingPeriod(
+      startDate = "2023-04-06",
+      endDate = "2024-04-05"
+    ),
+    finalised = true
+  )
+
   def fullValidJson(typeOfBusiness: String = "self-employment",
                     businessId: String = "XAIS12345678910",
                     startDate: String = "2021-04-06",
                     endDate: String = "2022-04-05",
-                    finalised: String = "true"
-                   ): JsValue = Json.parse(
+                    finalised: String = "true"): JsValue = Json.parse(
     s"""
        |{
        |  "typeOfBusiness":"$typeOfBusiness",
@@ -75,8 +87,7 @@ object SubmitEndOfPeriodStatementData {
                          businessId: String = "XAIS12345678910",
                          startDate: String = "2021-04-06",
                          endDate: String = "2022-04-05",
-                         finalised: String = "true"
-                        ): JsValue = Json.parse(
+                         finalised: String = "true"): JsValue = Json.parse(
     s"""
        |{
        |  "typeOfBusiness":"$typeOfBusiness",

@@ -95,7 +95,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
               EndDateFormatError,
               FinalisedFormatError,
               RuleIncorrectOrEmptyBodyError,
-              RuleEndDateBeforeStartDateError
+              RuleEndDateBeforeStartDateError,
+              RuleTaxYearNotSupportedError
             ) =>
           BadRequest(Json.toJson(errorWrapper))
 

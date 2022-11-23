@@ -155,7 +155,8 @@ class SubmitEndOfPeriodStatementControllerSpec
           (RuleNonMatchingPeriodError, FORBIDDEN),
           (NotFoundError, NOT_FOUND),
           (RuleAlreadySubmittedError, FORBIDDEN),
-          (InternalError, INTERNAL_SERVER_ERROR)
+          (InternalError, INTERNAL_SERVER_ERROR),
+          (RuleTaxYearNotSupportedError, BAD_REQUEST)
         )
 
         input.foreach(args => (simpleServiceError _).tupled(args))
