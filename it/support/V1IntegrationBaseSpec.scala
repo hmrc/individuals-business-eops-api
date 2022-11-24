@@ -18,19 +18,10 @@ package support
 
 trait V1IntegrationBaseSpec extends IntegrationBaseSpec {
 
-  override def servicesConfig: Map[String, Any] = Map(
-    "microservice.services.des.host" -> mockHost,
-    "microservice.services.des.port" -> mockPort,
-    "microservice.services.ifs.host" -> mockHost,
-    "microservice.services.ifs.port" -> mockPort,
-    "microservice.services.mtd-id-lookup.host" -> mockHost,
-    "microservice.services.mtd-id-lookup.port" -> mockPort,
-    "microservice.services.auth.host" -> mockHost,
-    "microservice.services.auth.port" -> mockPort,
-    "microservice.services.mtd-api-nrs-proxy.host" -> mockHost,
-    "microservice.services.mtd-api-nrs-proxy.port" -> mockPort,
-    "auditing.consumer.baseUri.port" -> mockPort,
-    "feature-switch.version-1.enabled" -> "true",
-    "feature-switch.version-2.enabled" -> "false"
-  )
+  override def servicesConfig: Map[String, Any] =
+    super.servicesConfig ++
+      Map(
+        "feature-switch.version-1.enabled" -> "true",
+        "feature-switch.version-2.enabled" -> "false"
+      )
 }

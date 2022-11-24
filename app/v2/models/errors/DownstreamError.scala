@@ -27,9 +27,7 @@ object DownstreamError {
       implicitly[Reads[DownstreamBvrError]].map[DownstreamError](identity)
 }
 
-case class DownstreamStandardError(
-    failures: List[DownstreamErrorCode]
-) extends DownstreamError
+case class DownstreamStandardError(failures: List[DownstreamErrorCode]) extends DownstreamError
 
 object DownstreamStandardError {
   implicit val reads: Reads[DownstreamStandardError] = Json.reads
