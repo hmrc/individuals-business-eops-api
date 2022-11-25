@@ -34,7 +34,7 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
 
     "return a 204 status code" when {
 
-      "any valid request is made with a successful NRS call" in new TysIfsTest {
+      "any valid request is made with a successful NRS call in a Tax Year Specific tax year" in new TysIfsTest {
         val nrsSuccess: JsValue = Json.parse(
           s"""
              |{
@@ -57,30 +57,7 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
         response.header("X-CorrelationId").nonEmpty shouldBe true
       }
 
-      "any valid request is made with a successful NRS call in a Tax Year Specific tax year" in new TysIfsTest {
-        val nrsSuccess: JsValue = Json.parse(
-          s"""
-             |{
-             |  "nrSubmissionId":"2dd537bc-4244-4ebf-bac9-96321be13cdc",
-             |  "cadesTSignature":"30820b4f06092a864886f70111111111c0445c464",
-             |  "timestamp":""
-             |}
-         """.stripMargin
-        )
-
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          MtdIdLookupStub.ninoFound(nino)
-          NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, Map("incomeSourceId" -> incomeSourceId), NO_CONTENT)
-        }
-
-        val response: WSResponse = await(request().post(validMtdRequestJson))
-        response.status shouldBe NO_CONTENT
-        response.header("X-CorrelationId").nonEmpty shouldBe true
-      }
-
-      "any valid request is made with a failed NRS call" in new TysIfsTest {
+      "any valid request is made with a failed NRS call in a Tax Year Specific tax year" in new TysIfsTest {
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
@@ -158,7 +135,10 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
           (NOT_FOUND, "NOT_FOUND", NOT_FOUND, NotFoundError),
           (CONFLICT, "CONFLICT", FORBIDDEN, RuleAlreadySubmittedError),
           (UNPROCESSABLE_ENTITY, "EARLY_SUBMISSION", FORBIDDEN, RuleEarlySubmissionError),
-          (UNPROCESSABLE_ENTITY, "LATE_SUBMISSION", FORBIDDEN, RuleLateSubmissionError)
+          (UNPROCESSABLE_ENTITY, "LATE_SUBMISSION", FORBIDDEN, RuleLateSubmissionError),
+          (BAD_REQUEST, "INVALID_CORRELATIONID", INTERNAL_SERVER_ERROR, InternalError),
+          (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, InternalError),
+          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, InternalError)
         )
 
         val extraTysErrors: Seq[(Int, String, Int, MtdError)] = List(
