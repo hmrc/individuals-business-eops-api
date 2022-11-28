@@ -36,22 +36,22 @@ class DownstreamResponseMappingSupportSpec extends UnitSpec {
   val errorCodeMap: PartialFunction[String, MtdError] = {
     case "ERR1" => Error1
     case "ERR2" => Error2
-    case "DS"   => DownstreamError
+    case "DS"   => InternalError
   }
 
   "mapping errors from downstream" when {
     "standard error with single error code" when {
       "the error code is in the map provided" must {
         "use the mapping and wrap" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("ERR1")))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, DownstreamStandardError(DownstreamErrorCode("ERR1")))) shouldBe
             ErrorWrapper(correlationId, Error1)
         }
       }
 
       "the error code is not in the map provided" must {
         "default to DownstreamError and wrap" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("UNKNOWN")))) shouldBe
-            ErrorWrapper(correlationId, DownstreamError)
+          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, DownstreamStandardError(DownstreamErrorCode("UNKNOWN")))) shouldBe
+            ErrorWrapper(correlationId, InternalError)
         }
       }
     }
@@ -59,22 +59,25 @@ class DownstreamResponseMappingSupportSpec extends UnitSpec {
     "standard error with multiple errors codes" when {
       "all error codes are in the map provided" must {
         "use the mapping and wrap with main error type of BadRequest" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("ERR1"), IfsErrorCode("ERR2")))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(
+            ResponseWrapper(correlationId, DownstreamStandardError(DownstreamErrorCode("ERR1"), DownstreamErrorCode("ERR2")))) shouldBe
             ErrorWrapper(correlationId, BadRequestError, Some(Seq(Error1, Error2)))
         }
       }
 
       "an error code is not in the map provided" must {
         "default main error to DownstreamError ignore other errors" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("ERR1"), IfsErrorCode("UNKNOWN")))) shouldBe
-            ErrorWrapper(correlationId, DownstreamError)
+          mapping.mapDownstreamErrors(errorCodeMap)(
+            ResponseWrapper(correlationId, DownstreamStandardError(DownstreamErrorCode("ERR1"), DownstreamErrorCode("UNKNOWN")))) shouldBe
+            ErrorWrapper(correlationId, InternalError)
         }
       }
 
       "one of the mapped errors is DownstreamError" must {
         "wrap the errors with main error type of DownstreamError" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsStandardError(IfsErrorCode("ERR1"), IfsErrorCode("DS")))) shouldBe
-            ErrorWrapper(correlationId, DownstreamError)
+          mapping.mapDownstreamErrors(errorCodeMap)(
+            ResponseWrapper(correlationId, DownstreamStandardError(DownstreamErrorCode("ERR1"), DownstreamErrorCode("DS")))) shouldBe
+            ErrorWrapper(correlationId, InternalError)
         }
       }
     }
@@ -96,8 +99,8 @@ class DownstreamResponseMappingSupportSpec extends UnitSpec {
     "bvr errors are returned" must {
       "map to a DownstreamError" in {
         mapping.mapDownstreamErrors(errorCodeMap)(
-          ResponseWrapper(correlationId, IfsBvrError("ERR1", List(IfsValidationRuleFailure("ID 1", "message 1"))))) shouldBe
-          ErrorWrapper(correlationId, DownstreamError)
+          ResponseWrapper(correlationId, DownstreamBvrError("ERR1", List(DownstreamValidationRuleFailure("ID 1", "message 1"))))) shouldBe
+          ErrorWrapper(correlationId, InternalError)
       }
     }
   }

@@ -29,31 +29,6 @@ import v2.stubs._
 
 class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
 
-  private trait Test {
-
-    val nino: String = "AA123456A"
-
-    val incomeSourceId: String = "XAIS12345678910"
-
-    def uri: String = s"/$nino"
-
-    def ifsUri(nino: String = nino,
-               incomeSourceType: String = "self-employment",
-               accountingPeriodStartDate: String = "2021-04-06",
-               accountingPeriodEndDate: String = "2022-04-05"): String = {
-      s"/income-tax/income-sources/nino/" +
-        s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration"
-    }
-
-    def setupStubs(): StubMapping
-
-    def request(): WSRequest = {
-      setupStubs()
-      buildRequest(uri)
-        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123"))
-    }
-  }
-
   "Calling the submit eops endpoint" should {
 
     "return a 204 status code" when {
@@ -87,7 +62,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
-          NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, DownstreamError.message)
+          NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, InternalError.message)
         }
 
         val response: WSResponse = await(request().post(fullValidJson()))
@@ -145,17 +120,17 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
         def serviceErrorTest(ifsStatus: Int, ifsCode: String, ifsMessage: String, expectedStatus: Int, expectedError: MtdError): Unit =
           s"ifs returns an $ifsCode error and status $ifsStatus with message $ifsMessage" in {
             val errorBody: JsValue = Json.parse(s"""
-                 |{
-                 |  "failures": [{
-                 |  "code": "$ifsCode",
-                 |  "reason": "$ifsMessage"
-                 |  }]
-                 |}""".stripMargin)
+                                                   |{
+                                                   |  "failures": [{
+                                                   |  "code": "$ifsCode",
+                                                   |  "reason": "$ifsMessage"
+                                                   |  }]
+                                                   |}""".stripMargin)
             fullServiceErrorTest(ifsStatus, errorBody, expectedStatus, Json.toJson(expectedError))
           }
 
         val input: Seq[(Int, String, String, Int, MtdError)] = Seq(
-          (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, DownstreamError),
+          (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, InternalError),
           (BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", BAD_REQUEST, NinoFormatError),
           (BAD_REQUEST,
            "INVALID_ACCOUNTINGPERIODSTARTDATE",
@@ -181,7 +156,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
            "INVALID_CORRELATIONID",
            "Submission has not passed validation. Invalid header CorrelationId.",
            INTERNAL_SERVER_ERROR,
-           DownstreamError),
+           InternalError),
           (FORBIDDEN,
            "EARLY_SUBMISSION",
            "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
@@ -208,8 +183,8 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
            "SERVER_ERROR",
            "IF is currently experiencing problems that require live service intervention.",
            INTERNAL_SERVER_ERROR,
-           DownstreamError),
-          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, DownstreamError),
+           InternalError),
+          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, InternalError),
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))
@@ -241,43 +216,68 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
 
         "ifs returns multiple BVR errors" in {
           val ifsJson = Json.parse("""{
-              |    "bvrfailureResponseElement": {
-              |        "code": "BVR_FAILURE_EXISTS",
-              |        "reason": "Ignored",
-              |        "validationRuleFailures": [
-              |            {
-              |                "id": "ID_0",
-              |                "type": "ERR",
-              |                "text": "MESSAGE_0"
-              |            },{
-              |                "id": "ID_1",
-              |                "type": "ERR",
-              |                "text": "MESSAGE_1"
-              |            }
-              |        ]
-              |    }
-              |}""".stripMargin)
+                                     |    "bvrfailureResponseElement": {
+                                     |        "code": "BVR_FAILURE_EXISTS",
+                                     |        "reason": "Ignored",
+                                     |        "validationRuleFailures": [
+                                     |            {
+                                     |                "id": "ID_0",
+                                     |                "type": "ERR",
+                                     |                "text": "MESSAGE_0"
+                                     |            },{
+                                     |                "id": "ID_1",
+                                     |                "type": "ERR",
+                                     |                "text": "MESSAGE_1"
+                                     |            }
+                                     |        ]
+                                     |    }
+                                     |}""".stripMargin)
 
           val mtdErrorJson = Json.parse("""{
-              |   "code":"INVALID_REQUEST",
-              |   "message":"Invalid request",
-              |   "errors":[
-              |      {
-              |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
-              |         "errorId": "ID_0",
-              |         "message":"MESSAGE_0"
-              |      },
-              |      {
-              |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
-              |         "errorId": "ID_1",
-              |         "message":"MESSAGE_1"
-              |      }
-              |   ]
-              |}""".stripMargin)
+                                          |   "code":"INVALID_REQUEST",
+                                          |   "message":"Invalid request",
+                                          |   "errors":[
+                                          |      {
+                                          |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
+                                          |         "errorId": "ID_0",
+                                          |         "message":"MESSAGE_0"
+                                          |      },
+                                          |      {
+                                          |         "code":"RULE_BUSINESS_VALIDATION_FAILURE",
+                                          |         "errorId": "ID_1",
+                                          |         "message":"MESSAGE_1"
+                                          |      }
+                                          |   ]
+                                          |}""".stripMargin)
 
           fullServiceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
         }
       }
+    }
+  }
+
+  private trait Test {
+
+    val nino: String = "AA123456A"
+
+    val incomeSourceId: String = "XAIS12345678910"
+
+    def uri: String = s"/$nino"
+
+    def ifsUri(nino: String = nino,
+               incomeSourceType: String = "self-employment",
+               accountingPeriodStartDate: String = "2021-04-06",
+               accountingPeriodEndDate: String = "2022-04-05"): String = {
+      s"/income-tax/income-sources/nino/" +
+        s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration"
+    }
+
+    def setupStubs(): StubMapping
+
+    def request(): WSRequest = {
+      setupStubs()
+      buildRequest(uri)
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123"))
     }
   }
 }

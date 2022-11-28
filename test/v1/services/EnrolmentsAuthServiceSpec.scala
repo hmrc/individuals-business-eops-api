@@ -19,16 +19,16 @@ package v1.services
 import config.ConfidenceLevelConfig
 import mocks.MockAppConfig
 import org.scalamock.handlers.CallHandler
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
+import uk.gov.hmrc.auth.core.AffinityGroup.{ Agent, Individual, Organisation }
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.authorise.{AlternatePredicate, CompositePredicate, EmptyPredicate, Predicate}
+import uk.gov.hmrc.auth.core.authorise.{ AlternatePredicate, CompositePredicate, EmptyPredicate, Predicate }
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
+import uk.gov.hmrc.auth.core.retrieve.{ Retrieval, ~ }
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.models.auth.UserDetails
-import v1.models.errors.{DownstreamError, UnauthorisedError}
+import v1.models.errors.{ DownstreamError, UnauthorisedError }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
 
@@ -38,8 +38,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
     val authRetrievals: Retrieval[Option[AffinityGroup] ~ Enrolments] = affinityGroup and authorisedEnrolments
 
     object MockedAuthConnector {
+
       def authorised[A](predicate: Predicate, retrievals: Retrieval[A]): CallHandler[Future[A]] = {
-        (mockAuthConnector.authorise[A](_: Predicate, _: Retrieval[A])(_: HeaderCarrier, _: ExecutionContext))
+        (mockAuthConnector
+          .authorise[A](_: Predicate, _: Retrieval[A])(_: HeaderCarrier, _: ExecutionContext))
           .expects(predicate, retrievals, *, *)
       }
     }
@@ -124,9 +126,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
         MockAppConfig.confidenceLevelCheckEnabled.returns(ConfidenceLevelConfig(definitionEnabled = true, authValidationEnabled = true))
 
         val retrievalsResult = new ~(Some(AffinityGroup.Individual), Enrolments(Set.empty))
-        val expected = Right(UserDetails("", "Individual", None))
+        val expected         = Right(UserDetails("", "Individual", None))
 
-        MockedAuthConnector.authorised(extraPredicatesAnd(EmptyPredicate), authRetrievals)
+        MockedAuthConnector
+          .authorised(extraPredicatesAnd(EmptyPredicate), authRetrievals)
           .returns(Future.successful(retrievalsResult))
 
         private val result = await(target.authorised(EmptyPredicate))
@@ -141,9 +144,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
         MockAppConfig.confidenceLevelCheckEnabled.returns(ConfidenceLevelConfig(definitionEnabled = true, authValidationEnabled = false))
 
         val retrievalsResult = new ~(Some(Individual), Enrolments(Set.empty))
-        val expected = Right(UserDetails("", "Individual", None))
+        val expected         = Right(UserDetails("", "Individual", None))
 
-        MockedAuthConnector.authorised(EmptyPredicate, authRetrievals)
+        MockedAuthConnector
+          .authorised(EmptyPredicate, authRetrievals)
           .returns(Future.successful(retrievalsResult))
 
         private val result = await(target.authorised(EmptyPredicate))
@@ -158,9 +162,10 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
         MockAppConfig.confidenceLevelCheckEnabled.returns(ConfidenceLevelConfig(definitionEnabled = true, authValidationEnabled = false))
 
         val retrievalsResult = new ~(Some(Organisation), Enrolments(Set.empty))
-        val expected = Right(UserDetails("", "Organisation", None))
+        val expected         = Right(UserDetails("", "Organisation", None))
 
-        MockedAuthConnector.authorised(EmptyPredicate, authRetrievals)
+        MockedAuthConnector
+          .authorised(EmptyPredicate, authRetrievals)
           .returns(Future.successful(retrievalsResult))
 
         private val result = await(target.authorised(EmptyPredicate))
@@ -189,7 +194,8 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
 
         val expected = Left(DownstreamError)
 
-        MockedAuthConnector.authorised(EmptyPredicate, authRetrievals)
+        MockedAuthConnector
+          .authorised(EmptyPredicate, authRetrievals)
           .returns(Future.successful(retrievalsResult))
 
         private val result = await(target.authorised(EmptyPredicate))
@@ -205,7 +211,8 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
 
         val expected = Left(UnauthorisedError)
 
-        MockedAuthConnector.authorised(EmptyPredicate, authRetrievals)
+        MockedAuthConnector
+          .authorised(EmptyPredicate, authRetrievals)
           .returns(Future.failed(MissingBearerToken()))
 
         private val result = await(target.authorised(EmptyPredicate))
@@ -221,7 +228,8 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
 
         val expected = Left(UnauthorisedError)
 
-        MockedAuthConnector.authorised(EmptyPredicate, authRetrievals)
+        MockedAuthConnector
+          .authorised(EmptyPredicate, authRetrievals)
           .returns(Future.failed(InsufficientEnrolments()))
 
         private val result = await(target.authorised(EmptyPredicate))
@@ -232,17 +240,18 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
 
     "calling getAgentReferenceFromEnrolments" should {
       "return a valid AgentReferenceNumber" when {
-        "a valid agent Enrolment is supplied" in new Test{
+        "a valid agent Enrolment is supplied" in new Test {
           val expectedArn = "123567890"
-          val actualArn: Option[String] = target.getAgentReferenceFromEnrolments(Enrolments(
-            Set(
-              Enrolment(
-                "HMRC-AS-AGENT",
-                Seq(EnrolmentIdentifier("AgentReferenceNumber", expectedArn)),
-                "Active"
+          val actualArn: Option[String] = target.getAgentReferenceFromEnrolments(
+            Enrolments(
+              Set(
+                Enrolment(
+                  "HMRC-AS-AGENT",
+                  Seq(EnrolmentIdentifier("AgentReferenceNumber", expectedArn)),
+                  "Active"
+                )
               )
-            )
-          ))
+            ))
 
           actualArn shouldBe Some(expectedArn)
         }

@@ -19,15 +19,15 @@ package v1.endpoints
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.libs.ws.{WSRequest, WSResponse}
+import play.api.libs.json.{ JsObject, JsValue, Json }
+import play.api.libs.ws.{ WSRequest, WSResponse }
 import v1.models.errors._
-import v1.stubs.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub, NrsStub}
+import v1.stubs.{ AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub, NrsStub }
 import itData.SubmitEndOfPeriodStatementData._
 import play.api.test.Helpers.AUTHORIZATION
 import support.V1IntegrationBaseSpec
 
-class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
+class SubmitEndOfPeriodStatementControllerISpec extends V1IntegrationBaseSpec {
 
   private trait Test {
 
@@ -40,8 +40,7 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
     def ifsUri(nino: String = nino,
                incomeSourceType: String = "self-employment",
                accountingPeriodStartDate: String = "2021-04-06",
-               accountingPeriodEndDate: String = "2022-04-05"
-              ): String = {
+               accountingPeriodEndDate: String = "2022-04-05"): String = {
       s"/income-tax/income-sources/nino/" +
         s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration"
     }
@@ -51,9 +50,7 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri)
-        .withHttpHeaders(
-          (ACCEPT, "application/vnd.hmrc.1.0+json"),
-          (AUTHORIZATION, "Bearer 123")) // some bearer token))
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"), (AUTHORIZATION, "Bearer 123")) // some bearer token))
     }
 
     def errorBody(code: String, message: String): String =
@@ -112,11 +109,8 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
     "return error according to spec" when {
 
       "validation error" when {
-        def validationErrorTest(requestNino: String, requestBody: JsValue,
-                                expectedStatus: Int, expectedBody: MtdError): Unit = {
-          s"validation fails with ${expectedBody.code} error ${
-            if(expectedBody.equals(TaxYearFormatError)) java.util.UUID.randomUUID else ""
-          }" in new Test {
+        def validationErrorTest(requestNino: String, requestBody: JsValue, expectedStatus: Int, expectedBody: MtdError): Unit = {
+          s"validation fails with ${expectedBody.code} error ${if (expectedBody.equals(TaxYearFormatError)) java.util.UUID.randomUUID else ""}" in new Test {
 
             override val nino: String = requestNino
 
@@ -129,7 +123,7 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
             val response: WSResponse = await(request().post(requestBody))
             response.status shouldBe expectedStatus
 
-            if(expectedBody.equals(BadRequestError)){
+            if (expectedBody.equals(BadRequestError)) {
               lazy val multipleErrors: Seq[MtdError] = Seq(
                 FinalisedFormatError,
                 StartDateFormatError,
@@ -153,9 +147,9 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
           ("AA123456A", fullValidJson(endDate = "error"), BAD_REQUEST, EndDateFormatError),
           ("AA123456A", fullValidJson(finalised = "\"error\""), BAD_REQUEST, FinalisedFormatError),
           ("AA123456A", Json.parse("{}"), BAD_REQUEST, RuleIncorrectOrEmptyBodyError),
-          ("AA123456A", fullValidJson(endDate ="2021-04-05"), BAD_REQUEST, RangeEndDateBeforeStartDateError),
+          ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RangeEndDateBeforeStartDateError),
           ("AA123456A", fullValidJson(finalised = "false"), BAD_REQUEST, RuleNotFinalisedError),
-          ("AA123456A", fullValidJson("error","error","error","error","\"error\""), BAD_REQUEST, BadRequestError)
+          ("AA123456A", fullValidJson("error", "error", "error", "error", "\"error\""), BAD_REQUEST, BadRequestError)
         )
 
         input.foreach(args => (validationErrorTest _).tupled(args))
@@ -169,7 +163,11 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
               AuditStub.audit()
               AuthStub.authorised()
               MtdIdLookupStub.ninoFound(nino)
-              DownstreamStub.onError(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), ifsStatus, errorBody(ifsCode, ifsMessage))
+              DownstreamStub.onError(DownstreamStub.POST,
+                                     ifsUri(),
+                                     Map("incomeSourceId" -> incomeSourceId),
+                                     ifsStatus,
+                                     errorBody(ifsCode, ifsMessage))
             }
 
             val response: WSResponse = await(request().post(fullValidJson()))
@@ -179,21 +177,61 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
         }
 
         //scalastyle:off
-        val input : Seq[(Int, String, String, Int, MtdError)]= Seq(
+        val input: Seq[(Int, String, String, Int, MtdError)] = Seq(
           (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, DownstreamError),
           (BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", BAD_REQUEST, NinoFormatError),
-          (BAD_REQUEST, "INVALID_ACCOUNTINGPERIODSTARTDATE", "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.", BAD_REQUEST, StartDateFormatError),
-          (BAD_REQUEST, "INVALID_ACCOUNTINGPERIODENDDATE", "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.", BAD_REQUEST, EndDateFormatError),
-          (BAD_REQUEST, "INVALID_INCOMESOURCEID", "Submission has not passed validation. Invalid parameter incomeSourceId.", BAD_REQUEST, BusinessIdFormatError),
-          (BAD_REQUEST, "INVALID_INCOMESOURCETYPE", "Submission has not passed validation. Invalid parameter incomeSourceType.", BAD_REQUEST, TypeOfBusinessFormatError),
-          (BAD_REQUEST, "INVALID_CORRELATIONID", "Submission has not passed validation. Invalid header CorrelationId.", INTERNAL_SERVER_ERROR, DownstreamError),
-          (FORBIDDEN, "EARLY_SUBMISSION", "The remote endpoint has indicated that an early submission has been made before accounting period end date.", FORBIDDEN, RuleEarlySubmissionError),
-          (FORBIDDEN, "LATE_SUBMISSION", "The remote endpoint has indicated that the period to finalise has passed.", FORBIDDEN, RuleLateSubmissionError),
-          (FORBIDDEN, "NON_MATCHING_PERIOD", "The remote endpoint has indicated that submission cannot be made with no matching accounting period.", FORBIDDEN, RuleNonMatchingPeriodError),
+          (BAD_REQUEST,
+           "INVALID_ACCOUNTINGPERIODSTARTDATE",
+           "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.",
+           BAD_REQUEST,
+           StartDateFormatError),
+          (BAD_REQUEST,
+           "INVALID_ACCOUNTINGPERIODENDDATE",
+           "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.",
+           BAD_REQUEST,
+           EndDateFormatError),
+          (BAD_REQUEST,
+           "INVALID_INCOMESOURCEID",
+           "Submission has not passed validation. Invalid parameter incomeSourceId.",
+           BAD_REQUEST,
+           BusinessIdFormatError),
+          (BAD_REQUEST,
+           "INVALID_INCOMESOURCETYPE",
+           "Submission has not passed validation. Invalid parameter incomeSourceType.",
+           BAD_REQUEST,
+           TypeOfBusinessFormatError),
+          (BAD_REQUEST,
+           "INVALID_CORRELATIONID",
+           "Submission has not passed validation. Invalid header CorrelationId.",
+           INTERNAL_SERVER_ERROR,
+           DownstreamError),
+          (FORBIDDEN,
+           "EARLY_SUBMISSION",
+           "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
+           FORBIDDEN,
+           RuleEarlySubmissionError),
+          (FORBIDDEN,
+           "LATE_SUBMISSION",
+           "The remote endpoint has indicated that the period to finalise has passed.",
+           FORBIDDEN,
+           RuleLateSubmissionError),
+          (FORBIDDEN,
+           "NON_MATCHING_PERIOD",
+           "The remote endpoint has indicated that submission cannot be made with no matching accounting period.",
+           FORBIDDEN,
+           RuleNonMatchingPeriodError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found.", NOT_FOUND, NotFoundError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists.", NOT_FOUND, NotFoundError),
-          (CONFLICT, "CONFLICT", "The remote endpoint has indicated that the taxation period has already been finalised.", FORBIDDEN, RuleAlreadySubmittedError),
-          (INTERNAL_SERVER_ERROR, "SERVER_ERROR", "IF is currently experiencing problems that require live service intervention.", INTERNAL_SERVER_ERROR, DownstreamError),
+          (CONFLICT,
+           "CONFLICT",
+           "The remote endpoint has indicated that the taxation period has already been finalised.",
+           FORBIDDEN,
+           RuleAlreadySubmittedError),
+          (INTERNAL_SERVER_ERROR,
+           "SERVER_ERROR",
+           "IF is currently experiencing problems that require live service intervention.",
+           INTERNAL_SERVER_ERROR,
+           DownstreamError),
           (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, DownstreamError),
         )
 
@@ -214,7 +252,7 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
             val response: WSResponse = await(request().post(fullValidJson()))
             response.status shouldBe expectedStatus
 
-            if(expectedBody.equals(BVRError)){
+            if (expectedBody.equals(BVRError)) {
               lazy val multipleErrors: Seq[MtdError] = Seq(
                 RuleConsolidatedExpensesError,
                 RuleMismatchedStartDateError,
@@ -232,8 +270,7 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
           }
         }
 
-        def bvr(code: String, text: String = "text") = Json.parse(
-          s"""
+        def bvr(code: String, text: String = "text") = Json.parse(s"""
             |{
             |    "bvrfailureResponseElement": {
             |        "code": "BVR_FAILURE_EXISTS",
@@ -303,7 +340,7 @@ class SubmitEndOfPeriodStatementISpec extends V1IntegrationBaseSpec {
           """.stripMargin
         )
 
-        val input : Seq[(Int, JsValue, Int, MtdError)]= Seq(
+        val input: Seq[(Int, JsValue, Int, MtdError)] = Seq(
           (FORBIDDEN, bvr("C55503"), FORBIDDEN, RuleConsolidatedExpensesError),
           (FORBIDDEN, bvr("C55316"), FORBIDDEN, RuleConsolidatedExpensesError),
           (FORBIDDEN, bvr("C55525"), FORBIDDEN, RuleConsolidatedExpensesError),

@@ -129,6 +129,12 @@ object RuleBusinessValidationFailure {
     MtdError(code = code, message = message, errorId = Some(errorId))
 }
 
+object RuleBusinessValidationFailureTys
+    extends MtdError(
+      code = "RULE_BUSINESS_VALIDATION_FAILURE",
+      message = "There are business validation rule failures."
+    )
+
 //Standard Errors
 object NotFoundError
     extends MtdError(
@@ -136,7 +142,7 @@ object NotFoundError
       message = "Matching resource not found"
     )
 
-object DownstreamError
+object InternalError
     extends MtdError(
       code = "INTERNAL_SERVER_ERROR",
       message = "An internal server error occurred"

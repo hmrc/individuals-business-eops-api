@@ -19,7 +19,7 @@ package v2.models.errors
 import play.api.libs.json.{ JsError, JsValue, Json }
 import support.UnitSpec
 
-class IfsErrorsSpec extends UnitSpec {
+class DownstreamErrorsSpec extends UnitSpec {
 
   "IfsErrors" should {
     "be able to read a JSON standard error format" in {
@@ -39,7 +39,7 @@ class IfsErrorsSpec extends UnitSpec {
           |}""".stripMargin
       )
 
-      downstreamErrorsJson.as[IfsError] shouldBe IfsStandardError(List(IfsErrorCode("CODE 1"), IfsErrorCode("CODE 2")))
+      downstreamErrorsJson.as[DownstreamError] shouldBe DownstreamStandardError(List(DownstreamErrorCode("CODE 1"), DownstreamErrorCode("CODE 2")))
     }
 
     "be able to read a JSON bvr error format" in {
@@ -65,17 +65,17 @@ class IfsErrorsSpec extends UnitSpec {
            |}""".stripMargin
       )
 
-      downstreamErrorsJson.as[IfsError] shouldBe IfsBvrError("CODE",
-                                                             List(
-                                                               IfsValidationRuleFailure("ID 0", "MESSAGE 0", "ERR"),
-                                                               IfsValidationRuleFailure("ID 1", "MESSAGE 1", "INFO"),
-                                                             ))
+      downstreamErrorsJson.as[DownstreamError] shouldBe DownstreamBvrError("CODE",
+                                                                           List(
+                                                                             DownstreamValidationRuleFailure("ID 0", "MESSAGE 0", "ERR"),
+                                                                             DownstreamValidationRuleFailure("ID 1", "MESSAGE 1", "INFO"),
+                                                                           ))
     }
 
     "fail if unrecognised error format is received" in {
       val downstreamErrorsJson: JsValue = Json.obj("something" -> "something")
 
-      downstreamErrorsJson.validate[IfsError] shouldBe a[JsError]
+      downstreamErrorsJson.validate[DownstreamError] shouldBe a[JsError]
     }
   }
 }

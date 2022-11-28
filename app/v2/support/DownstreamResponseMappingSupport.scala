@@ -24,27 +24,27 @@ import v2.models.outcomes.ResponseWrapper
 trait DownstreamResponseMappingSupport {
   self: Logging =>
 
-  final def mapDownstreamErrors(errorCodeMap: PartialFunction[String, MtdError])(downstreamResponseWrapper: ResponseWrapper[IfsError])(
+  final def mapDownstreamErrors(errorCodeMap: PartialFunction[String, MtdError])(downstreamResponseWrapper: ResponseWrapper[DownstreamError])(
       implicit logContext: EndpointLogContext): ErrorWrapper = {
 
     lazy val defaultErrorCodeMapping: String => MtdError = { code =>
       logger.info(s"[${logContext.controllerName}] [${logContext.endpointName}] - No mapping found for error code $code")
-      DownstreamError
+      InternalError
     }
 
     downstreamResponseWrapper match {
-      case ResponseWrapper(correlationId, IfsStandardError(error :: Nil)) =>
+      case ResponseWrapper(correlationId, DownstreamStandardError(error :: Nil)) =>
         ErrorWrapper(correlationId, errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping), None)
 
-      case ResponseWrapper(correlationId, IfsStandardError(errorCodes)) =>
+      case ResponseWrapper(correlationId, DownstreamStandardError(errorCodes)) =>
         val mtdErrors = errorCodes.map(error => errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping))
 
-        if (mtdErrors.contains(DownstreamError)) {
+        if (mtdErrors.contains(InternalError)) {
           logger.info(
             s"[${logContext.controllerName}] [${logContext.endpointName}] [CorrelationId - $correlationId]" +
               s" - downstream returned ${errorCodes.map(_.code).mkString(",")}. Revert to ISE")
 
-          ErrorWrapper(correlationId, DownstreamError, None)
+          ErrorWrapper(correlationId, InternalError, None)
         } else {
           ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
         }
@@ -52,13 +52,13 @@ trait DownstreamResponseMappingSupport {
       case ResponseWrapper(correlationId, OutboundError(error, errors)) =>
         ErrorWrapper(correlationId, error, errors)
 
-      case ResponseWrapper(correlationId, e: IfsBvrError) =>
+      case ResponseWrapper(correlationId, e: DownstreamBvrError) =>
         logger.info(
           s"[${logContext.controllerName}] [${logContext.endpointName}] [CorrelationId - $correlationId]" +
             s" - downstream returned unhandled BVR error ${e.code} " +
             s"with IDs ${e.validationRuleFailures.map(_.id).mkString(",")}. Revert to ISE")
 
-        ErrorWrapper(correlationId, DownstreamError, None)
+        ErrorWrapper(correlationId, InternalError, None)
     }
   }
 }

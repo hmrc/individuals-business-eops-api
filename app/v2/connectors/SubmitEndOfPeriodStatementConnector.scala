@@ -17,37 +17,43 @@
 package v2.connectors
 
 import config.AppConfig
-
-import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import v2.connectors.DownstreamUri.IfsUri
-import v2.models.downstream.EmptyJsonBody
-import v2.models.request.SubmitEndOfPeriodStatementRequest
+import play.api.libs.json.JsObject
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient }
+import v2.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
 import v2.connectors.httpparsers.StandardDownstreamHttpParser._
+import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient,
-                                                    val appConfig: AppConfig) extends BaseDownstreamConnector {
+class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector {
 
-  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext,
-    correlationId: String): Future[DownstreamOutcome[Unit]] = {
+  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(implicit hc: HeaderCarrier,
+                                                                        ec: ExecutionContext,
+                                                                        correlationId: String): Future[DownstreamOutcome[Unit]] = {
 
+    import request._
     val nino                      = request.nino.nino
-    val incomeSourceType          = request.submitEndOfPeriod.typeOfBusiness
-    val accountingPeriodStartDate = request.submitEndOfPeriod.accountingPeriod.startDate
-    val accountingPeriodEndDate   = request.submitEndOfPeriod.accountingPeriod.endDate
-    val incomeSourceId            = request.submitEndOfPeriod.businessId
+    val incomeSourceType          = submitEndOfPeriod.typeOfBusiness
+    val accountingPeriodStartDate = submitEndOfPeriod.accountingPeriod.startDate
+    val accountingPeriodEndDate   = submitEndOfPeriod.accountingPeriod.endDate
+    val incomeSourceId            = submitEndOfPeriod.businessId
 
-    val url = s"income-tax/income-sources/nino/" +
-      s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId"
+    val downstreamUri =
+      if (taxYear.useTaxYearSpecificApi) {
+        TaxYearSpecificIfsUri[Unit](
+          s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
+            s"$nino/$incomeSourceId/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
+      } else {
+        IfsUri[Unit](
+          s"income-tax/income-sources/nino/" +
+            s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
+      }
 
     post(
-      body = EmptyJsonBody,
-      uri = IfsUri[Unit](url)
+      body = JsObject.empty,
+      uri = downstreamUri
     )
   }
 }
