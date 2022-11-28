@@ -87,7 +87,7 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
       "INVALID_QUERY_PARAMETERS"   -> InternalError,
       "PERIOD_MISMATCH"            -> RuleNonMatchingPeriodError,
       "BVR_FAILURE"                -> RuleBusinessValidationFailureTys,
-      "TAX_YEAR_NOT_SUPPORTED"     -> RuleTaxYearNotSupportedError,
+      "TAX_YEAR_NOT_SUPPORTED"     -> RuleTaxYearNotSupportedError
     )
 
     errors ++ extraTysErrors
