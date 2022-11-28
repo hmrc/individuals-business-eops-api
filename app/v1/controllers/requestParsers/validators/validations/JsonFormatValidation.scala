@@ -20,6 +20,8 @@ import play.api.Logger
 import play.api.libs.json._
 import v1.models.errors.{MtdError, RuleIncorrectOrEmptyBodyError}
 
+//case class tryingThis(value: Seq[(JsPath, Seq[JsonValidationError])])
+
 object JsonFormatValidation {
 
   //TODO Look into what this is for
