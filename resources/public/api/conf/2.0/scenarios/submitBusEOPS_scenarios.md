@@ -68,6 +68,10 @@
             <td><p>Simulate scenario for UK Property where multiple business validation rule errors are returned.</p></td>
         </tr>
         <tr>
+            <td><p>BUSINESS_VALIDATION_FAILURE</p></td>
+            <td><p>Simulate a generic BVR failure message.</p></td>
+        </tr>
+        <tr>
             <td><p>TAX_YEAR_NOT_SUPPORTED</p></td>
             <td><p>Simulates the scenario where the tax year is not supported.</p></td>
         </tr>
