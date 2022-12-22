@@ -133,9 +133,9 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
 
         val errors: Seq[(Int, String, Int, MtdError)] = List(
           (NOT_FOUND, "NOT_FOUND", NOT_FOUND, NotFoundError),
-          (CONFLICT, "CONFLICT", FORBIDDEN, RuleAlreadySubmittedError),
-          (UNPROCESSABLE_ENTITY, "EARLY_SUBMISSION", FORBIDDEN, RuleEarlySubmissionError),
-          (UNPROCESSABLE_ENTITY, "LATE_SUBMISSION", FORBIDDEN, RuleLateSubmissionError),
+          (CONFLICT, "CONFLICT", BAD_REQUEST, RuleAlreadySubmittedError),
+          (UNPROCESSABLE_ENTITY, "EARLY_SUBMISSION", BAD_REQUEST, RuleEarlySubmissionError),
+          (UNPROCESSABLE_ENTITY, "LATE_SUBMISSION", BAD_REQUEST, RuleLateSubmissionError),
           (BAD_REQUEST, "INVALID_CORRELATIONID", INTERNAL_SERVER_ERROR, InternalError),
           (INTERNAL_SERVER_ERROR, "SERVER_ERROR", INTERNAL_SERVER_ERROR, InternalError),
           (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", INTERNAL_SERVER_ERROR, InternalError)
@@ -150,8 +150,8 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
           (BAD_REQUEST, "INVALID_INCOME_SOURCE_TYPE", BAD_REQUEST, TypeOfBusinessFormatError),
           (BAD_REQUEST, "INVALID_PAYLOAD", INTERNAL_SERVER_ERROR, InternalError),
           (BAD_REQUEST, "INVALID_QUERY_PARAMETERS", INTERNAL_SERVER_ERROR, InternalError),
-          (UNPROCESSABLE_ENTITY, "PERIOD_MISMATCH", FORBIDDEN, RuleNonMatchingPeriodError),
-          (UNPROCESSABLE_ENTITY, "BVR_FAILURE", FORBIDDEN, RuleBusinessValidationFailureTys),
+          (UNPROCESSABLE_ENTITY, "PERIOD_MISMATCH", BAD_REQUEST, RuleNonMatchingPeriodError),
+          (UNPROCESSABLE_ENTITY, "BVR_FAILURE", BAD_REQUEST, RuleBusinessValidationFailureTys),
           (UNPROCESSABLE_ENTITY, "TAX_YEAR_NOT_SUPPORTED", BAD_REQUEST, RuleTaxYearNotSupportedError)
         )
 

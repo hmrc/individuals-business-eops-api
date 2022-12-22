@@ -115,7 +115,7 @@ traits:
                   code: RULE_END_DATE_BEFORE_START_DATE
   ruleAlreadySubmitted:
     responses:
-      403:
+      400:
         body:
           application/json:
             type: types.errorResponse
@@ -126,7 +126,7 @@ traits:
                   code: RULE_ALREADY_SUBMITTED
   ruleEarlySubmission:
     responses:
-      403:
+      400:
         body:
           application/json:
             type: types.errorResponse
@@ -137,7 +137,7 @@ traits:
                   code: RULE_EARLY_SUBMISSION
   ruleLateSubmission:
     responses:
-      403:
+      400:
         body:
           application/json:
             type: types.errorResponse
@@ -148,7 +148,7 @@ traits:
                   code: RULE_LATE_SUBMISSION
   ruleNonMatchingPeriod:
     responses:
-      403:
+      400:
         body:
           application/json:
             type: types.errorResponse
@@ -159,7 +159,7 @@ traits:
                   code: RULE_NON_MATCHING_PERIOD
   ruleMismatchedStartDate:
     responses:
-      403:
+      400:
         body:
           application/json:
             type: types.errorResponse
@@ -170,7 +170,7 @@ traits:
                   code: RULE_MISMATCHED_START_DATE
   ruleBusinessValidationFailure:
     responses:
-      403:
+      400:
         body:
           application/json:
             type: types.errorResponse
@@ -224,16 +224,16 @@ traits:
                 value:
                   code: RULE_TAX_YEAR_RANGE_EXCEEDED
   ruleTaxYearNotEnded:
-      responses:
-        400:
-          body:
-            application/json:
-              type: types.errorResponse
-              examples:
-                ruleTaxYearNotEnded:
-                  description: A brought forward loss is entered before the end of the tax year in which it was generated.
-                  value:
-                    code: RULE_TAX_YEAR_NOT_ENDED
+    responses:
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              ruleTaxYearNotEnded:
+                description: A brought forward loss is entered before the end of the tax year in which it was generated.
+                value:
+                  code: RULE_TAX_YEAR_NOT_ENDED
   formatSelfEmploymentId:
     responses:
       400:

@@ -149,14 +149,14 @@ class SubmitEndOfPeriodStatementControllerSpec
           (EndDateFormatError, BAD_REQUEST),
           (BusinessIdFormatError, BAD_REQUEST),
           (TypeOfBusinessFormatError, BAD_REQUEST),
-          (RuleEarlySubmissionError, FORBIDDEN),
-          (RuleLateSubmissionError, FORBIDDEN),
-          (RuleBusinessValidationFailure("some message", "C54321"), FORBIDDEN),
-          (RuleNonMatchingPeriodError, FORBIDDEN),
+          (RuleEarlySubmissionError, BAD_REQUEST),
+          (RuleLateSubmissionError, BAD_REQUEST),
+          (RuleBusinessValidationFailure("some message", "C54321"), BAD_REQUEST),
+          (RuleNonMatchingPeriodError, BAD_REQUEST),
           (NotFoundError, NOT_FOUND),
-          (RuleAlreadySubmittedError, FORBIDDEN),
+          (RuleAlreadySubmittedError, BAD_REQUEST),
           (InternalError, INTERNAL_SERVER_ERROR),
-          (RuleBusinessValidationFailureTys, FORBIDDEN),
+          (RuleBusinessValidationFailureTys, BAD_REQUEST),
           (RuleTaxYearNotSupportedError, BAD_REQUEST)
         )
 
@@ -171,7 +171,7 @@ class SubmitEndOfPeriodStatementControllerSpec
                              RuleBusinessValidationFailure("some message", "id1"),
                              RuleBusinessValidationFailure("some message", "id2")
                            ))),
-            FORBIDDEN
+            BAD_REQUEST
           )
       }
     }

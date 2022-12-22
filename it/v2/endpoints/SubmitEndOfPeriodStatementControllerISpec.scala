@@ -157,27 +157,27 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
            "Submission has not passed validation. Invalid header CorrelationId.",
            INTERNAL_SERVER_ERROR,
            InternalError),
-          (FORBIDDEN,
+          (BAD_REQUEST,
            "EARLY_SUBMISSION",
            "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
-           FORBIDDEN,
+           BAD_REQUEST,
            RuleEarlySubmissionError),
-          (FORBIDDEN,
+          (BAD_REQUEST,
            "LATE_SUBMISSION",
            "The remote endpoint has indicated that the period to finalise has passed.",
-           FORBIDDEN,
+           BAD_REQUEST,
            RuleLateSubmissionError),
-          (FORBIDDEN,
+          (BAD_REQUEST,
            "NON_MATCHING_PERIOD",
            "The remote endpoint has indicated that submission cannot be made with no matching accounting period.",
-           FORBIDDEN,
+           BAD_REQUEST,
            RuleNonMatchingPeriodError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found.", NOT_FOUND, NotFoundError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists.", NOT_FOUND, NotFoundError),
           (CONFLICT,
            "CONFLICT",
            "The remote endpoint has indicated that the taxation period has already been finalised.",
-           FORBIDDEN,
+           BAD_REQUEST,
            RuleAlreadySubmittedError),
           (INTERNAL_SERVER_ERROR,
            "SERVER_ERROR",
@@ -211,7 +211,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
                                           |   "message":"MESSAGE"
                                           |}""".stripMargin)
 
-          fullServiceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
+          fullServiceErrorTest(FORBIDDEN, ifsJson, BAD_REQUEST, mtdErrorJson)
         }
 
         "ifs returns multiple BVR errors" in {
@@ -250,7 +250,7 @@ class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
                                           |   ]
                                           |}""".stripMargin)
 
-          fullServiceErrorTest(FORBIDDEN, ifsJson, FORBIDDEN, mtdErrorJson)
+          fullServiceErrorTest(FORBIDDEN, ifsJson, BAD_REQUEST, mtdErrorJson)
         }
       }
     }

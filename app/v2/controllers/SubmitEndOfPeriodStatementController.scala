@@ -82,7 +82,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
 
     if (hasBvr(errorWrapper)) {
-      Forbidden(Json.toJson(errorWrapper))
+      BadRequest(Json.toJson(errorWrapper))
     } else {
       errorWrapper.error match {
         case _
@@ -96,18 +96,18 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
               FinalisedFormatError,
               RuleIncorrectOrEmptyBodyError,
               RuleEndDateBeforeStartDateError,
-              RuleTaxYearNotSupportedError
+              RuleTaxYearNotSupportedError,
+              RuleAlreadySubmittedError,
+              RuleEarlySubmissionError,
+              RuleLateSubmissionError,
+              RuleNonMatchingPeriodError,
+              RuleBusinessValidationFailureTys
             ) =>
           BadRequest(Json.toJson(errorWrapper))
-
-        case RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError |
-            RuleBusinessValidationFailureTys =>
-          Forbidden(Json.toJson(errorWrapper))
 
         case NotFoundError => NotFound(Json.toJson(errorWrapper))
         case InternalError => InternalServerError(Json.toJson(errorWrapper))
         case _             => unhandledError(errorWrapper)
-
       }
     }
   }
