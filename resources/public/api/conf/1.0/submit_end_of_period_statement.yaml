@@ -83,16 +83,16 @@ post:
     - User-Restricted:
         - write:self-assessment
 
-requestBody:
-  content:
-    application/json:
-      schema:
-        $ref: './schemas/submitBusEOPS_req.json'
-      examples:
-        example-request:
-          description: Submit End of Period Statement for a Business Request
-          value:
-            $ref: './examples/submitBusEOPS_req.json'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: './schemas/submitBusEOPS_req.json'
+        examples:
+          example-request:
+            description: Submit End of Period Statement for a Business Request
+            value:
+              $ref: './examples/submitBusEOPS_req.json'
 
   responses:
     "204":
