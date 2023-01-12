@@ -22,9 +22,9 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws,
-    "uk.gov.hmrc"   %% "bootstrap-backend-play-28" % "5.24.0",
-    "org.typelevel" %% "cats-core"                 % "2.7.0",
-    "com.chuusai"   %% "shapeless"                 % "2.4.0-M1",
+    "uk.gov.hmrc"                  %% "bootstrap-backend-play-28" % "5.24.0",
+    "org.typelevel"                %% "cats-core"                 % "2.7.0",
+    "com.chuusai"                  %% "shapeless"                 % "2.4.0-M1",
     "com.fasterxml.jackson.module" %% "jackson-module-scala"  % "2.13.2"
   )
 
@@ -35,6 +35,7 @@ object AppDependencies {
     "org.scalamock"          %% "scalamock"          % "5.2.0"             % scope,
     "com.typesafe.play"      %% "play-test"          % PlayVersion.current % scope,
     "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0"             % scope,
-    "com.github.tomakehurst" % "wiremock-jre8"       % "2.33.2"            % scope
+    "com.github.tomakehurst" % "wiremock-jre8"       % "2.33.2"            % scope,
+    "io.swagger.parser.v3"   % "swagger-parser-v3"   % "2.0.24"            % scope
   )
 }
