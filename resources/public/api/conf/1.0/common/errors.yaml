@@ -8,54 +8,63 @@ components:
         The format of the supplied NINO field is not valid.
       value:
         code: FORMAT_NINO
+        message: The format of the supplied NINO field is not valid.
 
     formatTypeOfBusiness:
       description: |
         The format of the supplied Type of Business field is not valid.
       value:
         code: FORMAT_TYPE_OF_BUSINESS
+        message: The format of the supplied Type of Business field is not valid.
 
     formatBusinessId:
       description: |
         The format of the supplied Business ID field is not valid.
       value:
         code: FORMAT_BUSINESS_ID
+        message: The format of the supplied Business ID field is not valid.
 
     formatStartDate:
       description: |
         The Accounting Period Start date is not a valid ISO format date.
       value:
         code: FORMAT_START_DATE
+        message: The Accounting Period Start date is not a valid ISO format date.
 
     formatEndDate:
       description: |
         The Accounting Period End date is not a valid ISO format date.
       value:
         code: FORMAT_END_DATE
+        message: The Accounting Period End date is not a valid ISO format date.
 
     formatFinalised:
       description: |
         The format of the supplied Finalised field is not valid.
       value:
         code: FORMAT_FINALISED
+        message: The format of the supplied Finalised field is not valid.
 
     ruleIncorrectOrEmptyBodySubmitted:
       description: |
         The user's submission is missing one or more expected fields.
       value:
         code: RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED
+        message: The user's submission is missing one or more expected fields.
 
     ruleEndDateBeforeStartDate:
       description: |
         The End date is before the Start date.
       value:
         code: RANGE_END_DATE_BEFORE_START_DATE
+        message: The End date is before the Start date.
 
     ruleNotFinalised:
       description: |
         The user has not declared the submission for this business is complete.
       value:
         code: RULE_NOT_FINALISED
+        message: The user has not declared the submission for this business is complete.
 
     # 403
 
@@ -64,78 +73,92 @@ components:
         The client or agent is not authorised. This is because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.
       value:
         code: CLIENT_OR_AGENT_NOT_AUTHORISED
+        message: |
+          The client or agent is not authorised. This is because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.
 
     ruleAlreadySubmitted:
       description: |
         The user has previously submitted an End of Period Statement for this business' accounting period.
       value:
         code: RULE_ALREADY_SUBMITTED
+        message: The user has previously submitted an End of Period Statement for this business' accounting period.
 
     ruleEarlySubmission:
       description: |
         The user has tried to make their End of Period Statement declaration before the accounting period has ended.
       value:
         code: RULE_EARLY_SUBMISSION
+        message: The user has tried to make their End of Period Statement declaration before the accounting period has ended.
 
     ruleLateSubmission:
       description: |
         The user has tried to make their End of Period Statement declaration too late.
       value:
         code: RULE_LATE_SUBMISSION
+        message: The user has tried to make their End of Period Statement declaration too late.
 
     ruleNonMatchingPeriod:
       description: |
         An End of Period Statement without a matching accounting period cannot be submitted.
       value:
         code: RULE_NON_MATCHING_PERIOD
+        message: An End of Period Statement without a matching accounting period cannot be submitted.
 
     ruleConsolidatedExpenses:
       description: |
         Consolidated expenses are not allowed if the cumulative turnover amount exceeds the threshold.
       value:
         code: RULE_CONSOLIDATED_EXPENSES
+        message: Consolidated expenses are not allowed if the cumulative turnover amount exceeds the threshold.
 
     ruleMismatchedStartDate:
       description: |
         The period submission start date does not match the accounting period start date.
       value:
         code: RULE_MISMATCHED_START_DATE
+        message: The period submission start date does not match the accounting period start date.
 
     ruleMismatchedEndDate:
       description: |
         The period submission end date does not match the accounting period end date.
       value:
         code: RULE_MISMATCHED_END_DATE
+        message: The period submission end date does not match the accounting period end date.
 
     ruleClass4Over16:
       description: |
         The user has requested a National Insurance Class 4 exemption but the individual’s age is greater than or equal to 16 years old on the 6th April of the current tax year.
       value:
         code: RULE_CLASS4_OVER_16
+        message: The user has requested a National Insurance Class 4 exemption but the individual’s age is greater than or equal to 16 years old on the 6th April of the current tax year.
 
     ruleClass4PensionAge:
       description: |
         The user has requested a National Insurance Class 4 exemption but the individual's age is less than their State Pension age on the 6th April of the current tax year.
       value:
         code: RULE_CLASS4_PENSION_AGE
+        message: The user has requested a National Insurance Class 4 exemption but the individual's age is less than their State Pension age on the 6th April of the current tax year.
 
     ruleFHLPrivateUseAdjustment:
       description: |
         For UK Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
       value:
         code: RULE_FHL_PRIVATE_USE_ADJUSTMENT
+        message: For UK Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
 
     ruleNonFHLPrivateUseAdjustment:
       description: |
         For UK non-Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
       value:
         code: RULE_NON_FHL_PRIVATE_USE_ADJUSTMENT
+        message: For UK non-Furnished Holiday Lettings, the private use adjustment exceeds the total allowable expenses.
 
     ruleBusinessValidationFailure:
       description: |
         There are business validation rule failures, please trigger and retrieve an in-year tax calculation and refer to any warnings and errors in the messages section.
       value:
         code: RULE_BUSINESS_VALIDATION_FAILURE
+        message: There are business validation rule failures, please trigger and retrieve an in-year tax calculation and refer to any warnings and errors in the messages section.
 
     # 404
 
@@ -144,3 +167,4 @@ components:
         The matching resource is not found.
       value:
         code: MATCHING_RESOURCE_NOT_FOUND
+        message: The matching resource is not found.
