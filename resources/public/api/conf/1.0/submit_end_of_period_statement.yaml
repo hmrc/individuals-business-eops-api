@@ -124,7 +124,7 @@ post:
             RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED:
               $ref: './common/errors.yaml#/components/examples/ruleIncorrectOrEmptyBodySubmitted'
             RANGE_END_DATE_BEFORE_START_DATE:
-              $ref: './common/errors.yaml#/components/examples/ruleEndDateBeforeStartDate'
+              $ref: './common/errors.yaml#/components/examples/rangeEndDateBeforeStartDate'
             RULE_NOT_FINALISED:
               $ref: './common/errors.yaml#/components/examples/ruleNotFinalised'
 
