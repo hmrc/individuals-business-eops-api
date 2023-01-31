@@ -118,8 +118,24 @@ object ServiceUnavailableError
       httpStatus = INTERNAL_SERVER_ERROR
     )
 
+object InvalidHttpMethodError
+    extends MtdError(
+      code = "INVALID_HTTP_METHOD",
+      message = "Invalid HTTP method",
+      httpStatus = METHOD_NOT_ALLOWED
+    )
+
 //Authorisation Errors
-object UnauthorisedError
+object ClientNotAuthenticatedError
+    extends MtdError(
+      code = "CLIENT_OR_AGENT_NOT_AUTHORISED",
+      message = "The client and/or agent is not authorised",
+      httpStatus = UNAUTHORIZED
+    )
+
+/** Authentication OK but not allowed access to the requested resource
+  */
+object ClientNotAuthorisedError
     extends MtdError(
       code = "CLIENT_OR_AGENT_NOT_AUTHORISED",
       message = "The client and/or agent is not authorised",

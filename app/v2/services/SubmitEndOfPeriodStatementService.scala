@@ -17,7 +17,6 @@
 package v2.services
 
 import cats.data.EitherT
-import v1.services.BaseService
 import v2.connectors.SubmitEndOfPeriodStatementConnector
 import v2.controllers.{EndpointLogContext, RequestContext}
 import v2.models.errors._
