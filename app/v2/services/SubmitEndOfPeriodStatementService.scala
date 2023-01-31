@@ -17,27 +17,20 @@
 package v2.services
 
 import cats.data.EitherT
-import uk.gov.hmrc.http.HeaderCarrier
-import utils.Logging
+import v1.services.BaseService
 import v2.connectors.SubmitEndOfPeriodStatementConnector
-import v2.controllers.EndpointLogContext
+import v2.controllers.{EndpointLogContext, RequestContext}
 import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
 import v2.models.request.SubmitEndOfPeriodStatementRequest
-import v2.support.DownstreamResponseMappingSupport
 
-import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector)
-    extends DownstreamResponseMappingSupport
-    with Logging {
+class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector) extends BaseService {
 
-  def submit(request: SubmitEndOfPeriodStatementRequest)(implicit hc: HeaderCarrier,
-                                                         ec: ExecutionContext,
-                                                         logContext: EndpointLogContext,
-                                                         correlationId: String): Future[ServiceOutcome[Unit]] = {
+  def submit(request: SubmitEndOfPeriodStatementRequest)(implicit ctx: RequestContext, ec: ExecutionContext): Future[ServiceOutcome[Unit]] = {
 
     EitherT(connector.submitPeriodStatement(request)).leftMap(errorOrBvrMap).value
   }
