@@ -18,7 +18,6 @@ package v2.controllers
 
 import play.api.mvc.{AnyContentAsJson, Result}
 import v2.data.SubmitEndOfPeriodStatementData._
-import v2.mocks.MockIdGenerator
 import v2.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v2.mocks.services._
 import v2.models.domain.Nino
@@ -32,17 +31,15 @@ import scala.concurrent.Future
 class SubmitEndOfPeriodStatementControllerSpec
     extends ControllerBaseSpec
     with ControllerTestRunner
-    with MockEnrolmentsAuthService
-    with MockMtdIdLookupService
     with MockSubmitEndOfPeriodStatementParser
     with MockNrsProxyService
-    with MockSubmitEndOfPeriodStatementService
-    with MockIdGenerator {
+    with MockSubmitEndOfPeriodStatementService {
 
   private val rawData     = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(fullValidJson()))
   private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
 
   trait Test extends ControllerTest {
+
     val controller = new SubmitEndOfPeriodStatementController(
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,

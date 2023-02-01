@@ -25,7 +25,7 @@ class MtdErrorSpec extends UnitSpec {
 
     "written to JSON" should {
       "produce the expected JsObject" in {
-        Json.toJson(NinoFormatError) shouldBe Json.parse(
+        NinoFormatError.asJson shouldBe Json.parse(
           """
             |{
             |   "code": "FORMAT_NINO",
@@ -38,7 +38,7 @@ class MtdErrorSpec extends UnitSpec {
 
     "written to JSON with and errorId" should {
       "produce the expected JsObject" in {
-        Json.toJson(RuleBusinessValidationFailure("Some message","someId")) shouldBe Json.parse(
+        RuleBusinessValidationFailure("Some message","someId").asJson shouldBe Json.parse(
           """
             |{
             |   "code": "RULE_BUSINESS_VALIDATION_FAILURE",
