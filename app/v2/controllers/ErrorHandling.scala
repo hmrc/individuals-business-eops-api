@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package v2.models.errors
+package v2.controllers
 
 import play.api.libs.json.Json
-import support.UnitSpec
+import play.api.mvc.Result
+import play.api.mvc.Results.Status
+import v2.models.errors.ErrorWrapper
 
-class ErrorSpec extends UnitSpec{
+case class ErrorHandling(errorHandler: PartialFunction[ErrorWrapper, Result])
 
-  "writes" should {
-    "generate the correct JSON" in {
-      Json.toJson(MtdError("CODE", "some message")) shouldBe Json.parse(
-        """
-          |{
-          |   "code": "CODE",
-          |   "message": "some message"
-          |}
-        """.stripMargin
-      )
-    }
+object ErrorHandling {
+
+  val Default: ErrorHandling = ErrorHandling { case errorWrapper: ErrorWrapper =>
+    Status(errorWrapper.error.httpStatus)(Json.toJson(errorWrapper))
   }
+
 }

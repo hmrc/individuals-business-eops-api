@@ -17,35 +17,32 @@
 package v2.services
 
 import config.AppConfig
-import play.api.Logger
-import uk.gov.hmrc.auth.core.AffinityGroup.{ Agent, Individual, Organisation }
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.Logging
 import v2.models.auth.UserDetails
-import v2.models.errors.{ InternalError, UnauthorisedError }
+import v2.models.errors.{ClientNotAuthorisedError, InternalError}
 import v2.models.outcomes.AuthOutcome
 
-import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EnrolmentsAuthService @Inject()(val connector: AuthConnector, val appConfig: AppConfig) {
-
-  val logger: Logger = Logger(getClass)
+class EnrolmentsAuthService @Inject() (val connector: AuthConnector, val appConfig: AppConfig) extends Logging {
 
   private val authFunction: AuthorisedFunctions = new AuthorisedFunctions {
     override def authConnector: AuthConnector = connector
   }
 
-  def getAgentReferenceFromEnrolments(enrolments: Enrolments): Option[String] =
-    enrolments
-      .getEnrolment("HMRC-AS-AGENT")
-      .flatMap(_.getIdentifier("AgentReferenceNumber"))
-      .map(_.value)
+  def getAgentReferenceFromEnrolments(enrolments: Enrolments): Option[String] = enrolments
+    .getEnrolment("HMRC-AS-AGENT")
+    .flatMap(_.getIdentifier("AgentReferenceNumber"))
+    .map(_.value)
 
   def buildPredicate(predicate: Predicate): Predicate =
     if (appConfig.confidenceLevelConfig.authValidationEnabled) {
@@ -73,10 +70,10 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector, val appConfi
         }
       case _ ~ _ =>
         logger.warn(s"[EnrolmentsAuthService][authorised] Invalid AffinityGroup.")
-        Future.successful(Left(UnauthorisedError))
+        Future.successful(Left(ClientNotAuthorisedError))
     } recoverWith {
-      case _: MissingBearerToken     => Future.successful(Left(UnauthorisedError))
-      case _: AuthorisationException => Future.successful(Left(UnauthorisedError))
+      case _: MissingBearerToken     => Future.successful(Left(ClientNotAuthorisedError))
+      case _: AuthorisationException => Future.successful(Left(ClientNotAuthorisedError))
       case error =>
         logger.warn(s"[EnrolmentsAuthService][authorised] An unexpected error occurred: $error")
         Future.successful(Left(InternalError))
@@ -91,4 +88,5 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector, val appConfi
           Future.successful(getAgentReferenceFromEnrolments(enrolments))
         case _ => Future.successful(None)
       }
+
 }

@@ -16,19 +16,15 @@
 
 package v2.controllers
 
-import cats.data.EitherT
-import cats.implicits._
-import play.api.http.MimeTypes
-import play.api.libs.json.{ JsValue, Json }
-import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents, Result }
-import utils.{ IdGenerator, Logging }
+import play.api.libs.json.JsValue
+import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents}
+import utils.IdGenerator
 import v2.controllers.requestParsers.SubmitEndOfPeriodStatementParser
-import v2.models.errors.{ NotFoundError, _ }
 import v2.models.request.SubmitEndOfPeriodStatementRawData
 import v2.services._
 
 import javax.inject._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class SubmitEndOfPeriodStatementController @Inject()(val authService: EnrolmentsAuthService,
@@ -38,90 +34,25 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
                                                      service: SubmitEndOfPeriodStatementService,
                                                      requestParser: SubmitEndOfPeriodStatementParser,
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
-    extends AuthorisedController(cc)
-    with BaseController
-    with Logging {
+    extends AuthorisedController(cc) {
 
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController", endpointName = "Submit end of period statement")
 
   def handleRequest(nino: String): Action[JsValue] =
     authorisedAction(nino).async(parse.json) { implicit request =>
-      implicit val correlationId: String = idGenerator.generateCorrelationId
-      logger.info(
-        s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
-          s"with CorrelationId: $correlationId")
+      implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
 
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
-      val result =
-        for {
-          parsedRequest <- EitherT.fromEither[Future](requestParser.parseRequest(rawData))
-          serviceResponse <- {
+
+      val requestHandler =
+        RequestHandler
+          .withParser(requestParser)
+          .withService { parsedRequest =>
             nrsProxyService.submit(nino, parsedRequest.submitEndOfPeriod)
-            EitherT(service.submit(parsedRequest))
+            service.submit(parsedRequest)
           }
-        } yield {
-          logger.info(
-            s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
-              s"Success response received with CorrelationId: ${serviceResponse.correlationId}")
 
-          NoContent
-            .withApiHeaders(serviceResponse.correlationId)
-            .as(MimeTypes.JSON)
-        }
-
-      result.leftMap { errorWrapper =>
-        val resCorrelationId = errorWrapper.correlationId
-        logger.warn(
-          s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
-            s"Error response received with CorrelationId: $resCorrelationId")
-        errorResult(errorWrapper).withApiHeaders(resCorrelationId)
-      }.merge
+      requestHandler.handleRequest(rawData)
     }
-
-  private def errorResult(errorWrapper: ErrorWrapper): Result = {
-
-    if (hasBvr(errorWrapper)) {
-      BadRequest(Json.toJson(errorWrapper))
-    } else {
-      errorWrapper.error match {
-        case _
-            if errorWrapper.containsAnyOf(
-              BadRequestError,
-              NinoFormatError,
-              TypeOfBusinessFormatError,
-              BusinessIdFormatError,
-              StartDateFormatError,
-              EndDateFormatError,
-              FinalisedFormatError,
-              RuleIncorrectOrEmptyBodyError,
-              RuleEndDateBeforeStartDateError,
-              RuleTaxYearNotSupportedError,
-              RuleAlreadySubmittedError,
-              RuleEarlySubmissionError,
-              RuleLateSubmissionError,
-              RuleNonMatchingPeriodError,
-              RuleBusinessValidationFailureTys
-            ) =>
-          BadRequest(Json.toJson(errorWrapper))
-
-        case NotFoundError => NotFound(Json.toJson(errorWrapper))
-        case InternalError => InternalServerError(Json.toJson(errorWrapper))
-        case _             => unhandledError(errorWrapper)
-      }
-    }
-  }
-
-  private def hasBvr(errorWrapper: ErrorWrapper): Boolean = {
-    errorWrapper.error match {
-      case MtdErrorWithCode(RuleBusinessValidationFailure.code) => true
-      case MtdErrorWithCode(BadRequestError.code) =>
-        errorWrapper.errors.toSeq.flatten.exists {
-          case MtdErrorWithCode(RuleBusinessValidationFailure.code) => true
-          case _                                                    => false
-        }
-
-      case _ => false
-    }
-  }
 }

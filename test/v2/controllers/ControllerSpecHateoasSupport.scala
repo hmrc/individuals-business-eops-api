@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package utils
+package v2.controllers
 
-import java.time.LocalDate
+import play.api.libs.json.{JsObject, Json}
+import v2.models.hateoas.Link
+import v2.models.hateoas.Method.GET
 
-import v1.models.request.DownstreamTaxYear
+trait ControllerSpecHateoasSupport {
 
-object DateUtils {
+  val hateoaslinks: Seq[Link] = Seq(Link(href = "/foo/bar", method = GET, rel = "test-relationship"))
 
-  def getDownstreamTaxYear(dateProvided: Any): DownstreamTaxYear = dateProvided match {
-    case taxYear: String => DownstreamTaxYear.toYearYYYY(taxYear)
-    case current: LocalDate =>
-      val fiscalYearStartDate = LocalDate.parse(s"${current.getYear.toString}-04-05")
+  val hateoaslinksJson: JsObject = Json
+    .parse("""
+        |{
+        |  "links": [{
+        |    "href": "/foo/bar",
+        |    "method": "GET",
+        |    "rel": "test-relationship"
+        |  }]
+        |}""".stripMargin)
+    .as[JsObject]
 
-      if(current.isAfter(fiscalYearStartDate)){
-        DownstreamTaxYear((current.getYear + 1).toString)
-      } else {
-        DownstreamTaxYear(current.getYear.toString)
-      }
-  }
 }
