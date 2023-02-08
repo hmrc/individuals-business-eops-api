@@ -19,7 +19,8 @@ package v2.connectors
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.JsObject
 import v2.data.SubmitEndOfPeriodStatementData._
-import v2.models.domain.{ Nino, TaxYear }
+import v2.models.domain.{Nino, TaxYear}
+import v2.models.downstream.TypeOfBusiness
 import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
 import v2.models.request.SubmitEndOfPeriodStatementRequest
@@ -62,7 +63,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
     protected def stubTysHttpResponse(outcome: DownstreamOutcome[Unit]): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
       willPost(
         url = s"$baseUrl/income-tax/income-sources/${taxYear.asTysDownstream}/" +
-          s"$nino/$incomeSourceId/$incomeSourceType/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration",
+          s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration",
         body = JsObject.empty,
       ).returns(Future.successful(outcome))
     }
