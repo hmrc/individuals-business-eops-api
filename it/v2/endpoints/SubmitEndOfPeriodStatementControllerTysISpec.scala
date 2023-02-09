@@ -71,6 +71,46 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
       }
     }
 
+    "return a 400 status code" when {
+
+      "any invalid request is made and returned with error by DES" in new TysIfsTest {
+        val nrsSuccess: JsValue = Json.parse(
+          s"""
+             |{
+             |  "nrSubmissionId":"2dd537bc-4244-4ebf-bac9-96321be13cdc",
+             |  "cadesTSignature":"30820b4f06092a864886f70111111111c0445c464",
+             |  "timestamp":""
+             |}
+         """.stripMargin
+        )
+
+        val desResponse: String = s"""
+                                     |{
+                                     | "failures": [
+                                     |    {
+                                     |      "code": "INVALID_INCOME_SOURCE_TYPE",
+                                     |      "reason": "Submission has not passed validation. Invalid parameter incomeSourceType."
+                                     |    },
+                                     |    {
+                                     |      "code": "INVALID_PAYLOAD",
+                                     |      "reason": "Submission has not passed validation. Invalid payload."
+                                     |    }
+                                     |  ]
+                                     |}""".stripMargin
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          MtdIdLookupStub.ninoFound(nino)
+          NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
+          DownstreamStub.onError(DownstreamStub.POST, downstreamUri, BAD_REQUEST, desResponse)
+        }
+
+        val response: WSResponse = await(request().post(validMtdRequestJson))
+        response.status shouldBe INTERNAL_SERVER_ERROR
+        response.header("X-CorrelationId").nonEmpty shouldBe true
+      }
+    }
+
     "return error according to spec" when {
 
       "validation error" when {

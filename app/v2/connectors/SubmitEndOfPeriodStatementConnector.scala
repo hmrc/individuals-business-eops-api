@@ -18,13 +18,14 @@ package v2.connectors
 
 import config.AppConfig
 import play.api.libs.json.JsObject
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient }
-import v2.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import v2.connectors.DownstreamUri.{IfsUri, TaxYearSpecificIfsUri}
 import v2.connectors.httpparsers.StandardDownstreamHttpParser._
+import v2.models.downstream.TypeOfBusiness
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector {
@@ -44,7 +45,7 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
       if (taxYear.useTaxYearSpecificApi) {
         TaxYearSpecificIfsUri[Unit](
           s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
-            s"$nino/$incomeSourceId/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
+            s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
       } else {
         IfsUri[Unit](
           s"income-tax/income-sources/nino/" +

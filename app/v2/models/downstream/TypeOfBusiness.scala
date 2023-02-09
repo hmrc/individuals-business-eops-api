@@ -34,4 +34,13 @@ object TypeOfBusiness {
   implicit val format: Format[TypeOfBusiness] = Enums.format[TypeOfBusiness]
 
   val parser: PartialFunction[String, TypeOfBusiness] = Enums.parser[TypeOfBusiness]
+
+  def toTys(tob: TypeOfBusiness): String = tob match {
+    case `self-employment` => "01"
+    case `uk-property` => "02"
+    case `foreign-property` => "15"
+  }
+
 }
+
+
