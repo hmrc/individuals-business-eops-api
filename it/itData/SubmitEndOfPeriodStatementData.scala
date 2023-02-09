@@ -22,7 +22,7 @@ import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 object SubmitEndOfPeriodStatementData {
 
-  val incomeSourceType : String = "04"
+  val incomeSourceType : String = "15"
   val accountingPeriodStartDate = "2021-04-06"
   val accountingPeriodEndDate = "2022-04-05"
   val incomeSourceId = "XAIS12345678910"

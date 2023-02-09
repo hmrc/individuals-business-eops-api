@@ -38,7 +38,7 @@ object TypeOfBusiness {
   def toTys(tob: TypeOfBusiness): String = tob match {
     case `self-employment` => "01"
     case `uk-property` => "02"
-    case `foreign-property` => "04"
+    case `foreign-property` => "15"
   }
 
 }
