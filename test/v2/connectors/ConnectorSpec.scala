@@ -122,6 +122,16 @@ trait ConnectorSpec extends UnitSpec
         )
     }
 
+    protected def willPostEmpty[T](url: String): CallHandler[Future[T]] = {
+      MockedHttpClient
+        .postEmpty(
+          url = url,
+          config = dummyHeaderCarrierConfig,
+          requiredHeaders = requiredHeaders ++ Seq("Content-Type" -> "application/json"),
+          excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+        )
+    }
+
     protected def willPut[BODY, T](url: String, body: BODY): CallHandler[Future[T]] = {
       MockedHttpClient
         .put(
