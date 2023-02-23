@@ -47,10 +47,10 @@ trait BaseDownstreamConnector extends Logging {
   }
 
   def postEmpty[Resp](uri: DownstreamUri[Resp])(implicit
-                                                                     ec: ExecutionContext,
-                                                                     hc: HeaderCarrier,
-                                                                     httpReads: HttpReads[DownstreamOutcome[Resp]],
-                                                                     correlationId: String): Future[DownstreamOutcome[Resp]] = {
+                                                ec: ExecutionContext,
+                                                hc: HeaderCarrier,
+                                                httpReads: HttpReads[DownstreamOutcome[Resp]],
+                                                correlationId: String): Future[DownstreamOutcome[Resp]] = {
 
     def doPostEmpty(implicit hc: HeaderCarrier): Future[DownstreamOutcome[Resp]] = {
       http.POSTEmpty(getBackendUri(uri))
