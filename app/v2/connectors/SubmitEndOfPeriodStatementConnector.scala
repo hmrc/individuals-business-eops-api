@@ -41,20 +41,21 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
     val accountingPeriodEndDate   = submitEndOfPeriod.accountingPeriod.endDate
     val incomeSourceId            = submitEndOfPeriod.businessId
 
-    val downstreamUri =
-      if (taxYear.useTaxYearSpecificApi) {
-        TaxYearSpecificIfsUri[Unit](
+    if (taxYear.useTaxYearSpecificApi) {
+      postEmpty(
+        uri = TaxYearSpecificIfsUri[Unit](
           s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
             s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
-      } else {
-        IfsUri[Unit](
+      )
+    } else {
+      post(
+        body = JsObject.empty,
+        uri = IfsUri[Unit](
           s"income-tax/income-sources/nino/" +
             s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
-      }
+      )
+    }
 
-    post(
-      body = JsObject.empty,
-      uri = downstreamUri
-    )
+
   }
 }

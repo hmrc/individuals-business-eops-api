@@ -61,10 +61,9 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
     }
 
     protected def stubTysHttpResponse(outcome: DownstreamOutcome[Unit]): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
-      willPost(
+      willPostEmpty(
         url = s"$baseUrl/income-tax/income-sources/${taxYear.asTysDownstream}/" +
           s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration",
-        body = JsObject.empty,
       ).returns(Future.successful(outcome))
     }
   }
@@ -79,7 +78,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         stubHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(request))
+        val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(request))
 
         result shouldBe outcome
       }
@@ -91,7 +90,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         stubTysHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(tysRequest))
+        val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
 
         result shouldBe outcome
       }
@@ -108,7 +107,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         stubHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(request))
+        val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(request))
 
         result shouldBe outcome
       }
@@ -118,7 +117,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         stubTysHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(tysRequest))
+        val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
 
         result shouldBe outcome
       }
@@ -135,7 +134,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         stubHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(request))
+        val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(request))
 
         result shouldBe outcome
       }
@@ -145,7 +144,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
         stubTysHttpResponse(outcome)
 
-        val result = await(connector.submitPeriodStatement(tysRequest))
+        val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
 
         result shouldBe outcome
       }
