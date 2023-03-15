@@ -16,22 +16,23 @@
 
 package v2.services
 
-import cats.data.EitherT
+import cats.syntax.either._
 import v2.connectors.SubmitEndOfPeriodStatementConnector
-import v2.controllers.{EndpointLogContext, RequestContext}
+import v2.controllers.{ EndpointLogContext, RequestContext }
 import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector) extends BaseService {
 
   def submit(request: SubmitEndOfPeriodStatementRequest)(implicit ctx: RequestContext, ec: ExecutionContext): Future[ServiceOutcome[Unit]] = {
-
-    EitherT(connector.submitPeriodStatement(request)).leftMap(errorOrBvrMap).value
+    connector
+      .submitPeriodStatement(request)
+      .map(_.leftMap(errorOrBvrMap))
   }
 
   def errorOrBvrMap(downstreamResponseWrapper: ResponseWrapper[DownstreamError])(implicit logContext: EndpointLogContext): ErrorWrapper = {

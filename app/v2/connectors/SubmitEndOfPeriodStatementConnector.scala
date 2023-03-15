@@ -17,15 +17,17 @@
 package v2.connectors
 
 import config.AppConfig
+import play.api.http.Status.{ ACCEPTED, NO_CONTENT }
 import play.api.libs.json.JsObject
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import v2.connectors.DownstreamUri.{IfsUri, TaxYearSpecificIfsUri}
-import v2.connectors.httpparsers.StandardDownstreamHttpParser._
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
+import v2.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
+import v2.connectors.httpparsers.StandardDownstreamHttpParser
+import v2.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
 import v2.models.downstream.TypeOfBusiness
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector {
@@ -33,7 +35,6 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
   def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(implicit hc: HeaderCarrier,
                                                                         ec: ExecutionContext,
                                                                         correlationId: String): Future[DownstreamOutcome[Unit]] = {
-
     import request._
     val nino                      = request.nino.nino
     val incomeSourceType          = submitEndOfPeriod.typeOfBusiness
@@ -42,12 +43,18 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
     val incomeSourceId            = submitEndOfPeriod.businessId
 
     if (taxYear.useTaxYearSpecificApi) {
+      implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] =
+        StandardDownstreamHttpParser.readsEmpty(successCode = SuccessCode(ACCEPTED))
+
       postEmpty(
         uri = TaxYearSpecificIfsUri[Unit](
           s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
             s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
       )
     } else {
+      implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] =
+        StandardDownstreamHttpParser.readsEmpty(successCode = SuccessCode(NO_CONTENT))
+
       post(
         body = JsObject.empty,
         uri = IfsUri[Unit](
@@ -55,7 +62,6 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
             s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
       )
     }
-
 
   }
 }

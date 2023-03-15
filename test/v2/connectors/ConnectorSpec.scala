@@ -16,20 +16,17 @@
 
 package v2.connectors
 
-import mocks.{MockAppConfig}
+import mocks.MockAppConfig
 import org.scalamock.handlers.CallHandler
 import play.api.Configuration
-import play.api.http.{HeaderNames, MimeTypes, Status}
+import play.api.http.{ HeaderNames, MimeTypes, Status }
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.mocks.MockHttpClient
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
-trait ConnectorSpec extends UnitSpec
-  with Status
-  with MimeTypes
-  with HeaderNames {
+trait ConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames {
 
   lazy val baseUrl                   = "http://test-BaseUrl"
   implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
@@ -118,7 +115,7 @@ trait ConnectorSpec extends UnitSpec
           config = dummyHeaderCarrierConfig,
           body = body,
           requiredHeaders = requiredHeaders ++ Seq("Content-Type" -> "application/json"),
-          excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          excludedHeaders = Seq("AnotherHeader"                   -> "HeaderValue")
         )
     }
 
@@ -127,7 +124,6 @@ trait ConnectorSpec extends UnitSpec
         .postEmpty(
           url = url,
           config = dummyHeaderCarrierConfig,
-          requiredHeaders = requiredHeaders ++ Seq("Content-Type" -> "application/json"),
           excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
         )
     }
@@ -139,7 +135,7 @@ trait ConnectorSpec extends UnitSpec
           config = dummyHeaderCarrierConfig,
           body = body,
           requiredHeaders = requiredHeaders ++ Seq("Content-Type" -> "application/json"),
-          excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
+          excludedHeaders = Seq("AnotherHeader"                   -> "HeaderValue")
         )
     }
 

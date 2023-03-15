@@ -49,7 +49,7 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
           NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
-          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, NO_CONTENT)
+          DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, ACCEPTED)
         }
 
         val response: WSResponse = await(request().post(validMtdRequestJson))
@@ -73,7 +73,7 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
 
     "return a 400 status code" when {
 
-      "any invalid request is made and returned with error by DES" in new TysIfsTest {
+      "any invalid request is made and downstream returns an error" in new TysIfsTest {
         val nrsSuccess: JsValue = Json.parse(
           s"""
              |{
@@ -84,25 +84,25 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
          """.stripMargin
         )
 
-        val desResponse: String = s"""
-                                     |{
-                                     | "failures": [
-                                     |    {
-                                     |      "code": "INVALID_INCOME_SOURCE_TYPE",
-                                     |      "reason": "Submission has not passed validation. Invalid parameter incomeSourceType."
-                                     |    },
-                                     |    {
-                                     |      "code": "INVALID_PAYLOAD",
-                                     |      "reason": "Submission has not passed validation. Invalid payload."
-                                     |    }
-                                     |  ]
-                                     |}""".stripMargin
+        val downstreamResponse: String = s"""
+          |{
+          | "failures": [
+          |    {
+          |      "code": "INVALID_INCOME_SOURCE_TYPE",
+          |      "reason": "Submission has not passed validation. Invalid parameter incomeSourceType."
+          |    },
+          |    {
+          |      "code": "INVALID_PAYLOAD",
+          |      "reason": "Submission has not passed validation. Invalid payload."
+          |    }
+          |  ]
+          |}""".stripMargin
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
           NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
-          DownstreamStub.onError(DownstreamStub.POST, downstreamUri, BAD_REQUEST, desResponse)
+          DownstreamStub.onError(DownstreamStub.POST, downstreamUri, BAD_REQUEST, downstreamResponse)
         }
 
         val response: WSResponse = await(request().post(validMtdRequestJson))

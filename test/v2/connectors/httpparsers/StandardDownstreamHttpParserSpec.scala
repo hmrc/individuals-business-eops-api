@@ -21,6 +21,7 @@ import play.api.libs.json._
 import support.UnitSpec
 import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 import v2.connectors.DownstreamOutcome
+import v2.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
 import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
 
@@ -63,14 +64,15 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
     handleUnexpected4xxResponseCorrectly
   }
 
-  "The generic HTTP parser for empty response" when {
-    implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] = StandardDownstreamHttpParser.readsEmpty
+  "The generic HTTP parser for an empty downstream response" when {
+    implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] = StandardDownstreamHttpParser.readsEmpty(successCode = SuccessCode(ACCEPTED))
 
-    "receiving a 204 response" should {
+    "receiving a 202 response" should {
       "return a Right Downstream Response with the correct correlationId and no responseData" in {
-        val httpResponse = HttpResponse(NO_CONTENT, "", Map("CorrelationId" -> Seq(correlationId)))
+        val httpResponse = HttpResponse(ACCEPTED, "", Map("CorrelationId" -> Seq(correlationId)))
 
-        httpReads.read(method, url, httpResponse) shouldBe Right(ResponseWrapper(correlationId, ()))
+        val result = httpReads.read(method, url, httpResponse)
+        result shouldBe Right(ResponseWrapper(correlationId, ()))
       }
     }
 
@@ -81,32 +83,34 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
 
   private def bvrErrorJson(types: String*) = {
     val items = types.zipWithIndex.map {
-      case (tpe, i) => Json.parse(s"""
-                                     |{
-                                     |   "id": "ID $i", "type":"$tpe", "text":"MESSAGE $i"
-                                     |}
-                                     |""".stripMargin)
+      case (tpe, i) =>
+        Json.parse(s"""
+          |{
+          |   "id": "ID $i", "type":"$tpe", "text":"MESSAGE $i"
+          |}
+          |""".stripMargin)
     }
 
     Json.parse(s"""
-                  |{
-                  |   "bvrfailureResponseElement":{
-                  |      "code":"CODE",
-                  |      "reason":"Ignored top-level reason",
-                  |      "validationRuleFailures": ${JsArray(items)}
-                  |   }
-                  |}""".stripMargin)
+      |{
+      |   "bvrfailureResponseElement":{
+      |      "code":"CODE",
+      |      "reason":"Ignored top-level reason",
+      |      "validationRuleFailures": ${JsArray(items)}
+      |   }
+      |}""".stripMargin)
   }
 
-  val standardErrorJson: JsValue = Json.parse("""
-                                        |{
-                                        |   "failures": [
-                                        |       {
-                                        |           "code": "CODE", "reason": "ignored"
-                                        |       }
-                                        |   ]
-                                        |}
-                                        |""".stripMargin)
+  val standardErrorJson: JsValue =
+    Json.parse("""
+      |{
+      |   "failures": [
+      |       {
+      |           "code": "CODE", "reason": "ignored"
+      |       }
+      |   ]
+      |}
+      |""".stripMargin)
 
   private def handleErrorsCorrectly[A](implicit httpReads: HttpReads[DownstreamOutcome[A]]): Unit =
     Seq(BAD_REQUEST, NOT_FOUND, FORBIDDEN, CONFLICT, UNPROCESSABLE_ENTITY).foreach(responseCode =>

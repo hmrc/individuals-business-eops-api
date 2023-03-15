@@ -17,7 +17,7 @@
 package v2.controllers
 
 import play.api.libs.json.JsValue
-import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents}
+import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents }
 import utils.IdGenerator
 import v2.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v2.models.request.SubmitEndOfPeriodStatementRawData
