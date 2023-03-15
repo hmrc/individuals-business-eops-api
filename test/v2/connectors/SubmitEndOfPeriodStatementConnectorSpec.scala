@@ -19,7 +19,7 @@ package v2.connectors
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.JsObject
 import v2.data.SubmitEndOfPeriodStatementData._
-import v2.models.domain.{Nino, TaxYear}
+import v2.models.domain.{ Nino, TaxYear }
 import v2.models.downstream.TypeOfBusiness
 import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
@@ -75,11 +75,9 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
     "a valid request is supplied" should {
       "return a successful response with the correct correlationId" in new IfsTest with Test {
         def taxYear: TaxYear = preTysTaxYear
-
         stubHttpResponse(outcome)
 
         val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(request))
-
         result shouldBe outcome
       }
     }
@@ -87,11 +85,9 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
     "a valid request is supplied for a Tax Year Specific tax year" should {
       "return a successful response with the correct correlationId" in new TysIfsTest with Test {
         def taxYear: TaxYear = tysTaxYear
-
         stubTysHttpResponse(outcome)
 
         val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
-
         result shouldBe outcome
       }
     }
@@ -104,21 +100,17 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
       "return an unsuccessful response with the correct correlationId and a single error" in new IfsTest with Test {
         def taxYear: TaxYear = preTysTaxYear
-
         stubHttpResponse(outcome)
 
         val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(request))
-
         result shouldBe outcome
       }
 
       "return an unsuccessful response with the correct correlationId and a single error given a TYS tax year request" in new TysIfsTest with Test {
         def taxYear: TaxYear = tysTaxYear
-
         stubTysHttpResponse(outcome)
 
         val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
-
         result shouldBe outcome
       }
     }
@@ -131,21 +123,17 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
       "return an unsuccessful response with the correct correlationId and multiple errors" in new IfsTest with Test {
         def taxYear: TaxYear = preTysTaxYear
-
         stubHttpResponse(outcome)
 
         val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(request))
-
         result shouldBe outcome
       }
 
       "return an unsuccessful response with the correct correlationId and multiple errors given a TYS tax year request" in new TysIfsTest with Test {
         def taxYear: TaxYear = tysTaxYear
-
         stubTysHttpResponse(outcome)
 
         val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
-
         result shouldBe outcome
       }
     }
