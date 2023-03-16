@@ -2,20 +2,23 @@ Individuals Business End of Period Statement API
 ========================
 The Individuals Business End of Period Statement API allows software packages to:
 
-* to submit a declaration that the submission data for a business is complete. 
+* to submit a declaration that the submission data for a business is complete.
 
 ## Requirements
+
 - Scala 2.12.x
-- Java 8
-- sbt 1.3.13
-- [Service Manager](https://github.com/hmrc/service-manager)
+- Java 11
+- sbt 1.7.x
+- [Service Manager V2](https://github.com/hmrc/sm2)
 
 ## Development Setup
+
 To run the microservice from console, use `sbt run`. (starts on port 7785 by default)
 
 To start the service manager profile: `sm --start MTDFB_BUSINESS_EOPS`.
- 
+
 ## Run Tests
+
 ```
 sbt test
 sbt it:test
@@ -31,14 +34,18 @@ Then go to http://localhost:9680/api-documentation/docs/openapi/preview and use 
 
 ## Changelog
 
-You can see our changelog [here](https://github.com/hmrc/income-tax-mtd-changelog/wiki)
+You can see our changelog [here](https://github.com/hmrc/income-tax-mtd-changelog)
 
 ## Support and Reporting Issues
 
 You can create a GitHub issue [here](https://github.com/hmrc/income-tax-mtd-changelog/issues)
 
-## API Reference / Documentation 
-Available on the [HMRC Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/individuals-business-eops-api/1.0)
+## API Reference / Documentation
+
+Available on
+the [HMRC Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/individuals-business-eops-api)
 
 ## License
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
+
+This code is open source software licensed under
+the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
