@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.connectors.httpparsers
+package api.connectors.httpparsers
 
 import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package v2.connectors.httpparsers
+package api.connectors.httpparsers
 
+import api.connectors.DownstreamOutcome
+import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
 import play.api.http.Status._
 import play.api.libs.json._
 import support.UnitSpec
-import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
-import v2.connectors.DownstreamOutcome
-import v2.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
+import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import v2.models.errors._
 import v2.models.outcomes.ResponseWrapper
 

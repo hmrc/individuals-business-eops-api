@@ -16,6 +16,7 @@
 
 package v2.connectors
 
+import api.connectors.MtdIdLookupOutcome
 import mocks.MockAppConfig
 import v2.mocks.MockHttpClient
 import v2.models.errors.InternalError

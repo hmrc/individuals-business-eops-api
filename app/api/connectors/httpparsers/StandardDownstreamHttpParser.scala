@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package v2.connectors.httpparsers
+package api.connectors.httpparsers
 
+import api.connectors.DownstreamOutcome
 import play.api.http.Status._
 import play.api.libs.json.Reads
-import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
-import v2.connectors.DownstreamOutcome
-import v2.models.errors.{ InternalError, OutboundError }
+import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import v2.models.errors.{InternalError, OutboundError}
 import v2.models.outcomes.ResponseWrapper
 
 object StandardDownstreamHttpParser extends HttpParser {

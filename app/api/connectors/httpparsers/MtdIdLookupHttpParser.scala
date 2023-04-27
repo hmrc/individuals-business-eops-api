@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package v2.connectors.httpparsers
+package api.connectors.httpparsers
 
-import play.api.http.Status.{ FORBIDDEN, OK, UNAUTHORIZED }
+import api.connectors.MtdIdLookupOutcome
+import play.api.http.Status.{FORBIDDEN, OK, UNAUTHORIZED}
 import play.api.libs.json._
-import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
-import v2.connectors.MtdIdLookupOutcome
-import v2.models.errors.{ InternalError, InvalidBearerTokenError, NinoFormatError }
+import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import v2.models.errors.{InternalError, InvalidBearerTokenError, NinoFormatError}
 
 object MtdIdLookupHttpParser extends HttpParser {
 
