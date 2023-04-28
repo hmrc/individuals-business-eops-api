@@ -16,10 +16,10 @@
 
 package v2.support
 
+import api.controllers.EndpointLogContext
 import utils.Logging
-import v2.controllers.EndpointLogContext
 import v2.models.errors._
-import v2.models.outcomes.ResponseWrapper
+import api.models.outcomes.ResponseWrapper
 
 trait DownstreamResponseMappingSupport {
   self: Logging =>

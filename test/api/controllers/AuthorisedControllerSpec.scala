@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package api.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{ Action, AnyContent }
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService}
+import v2.mocks.services.{ MockEnrolmentsAuthService, MockMtdIdLookupService }
 import v2.models.errors._
-import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
+import v2.services.{ EnrolmentsAuthService, MtdIdLookupService }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

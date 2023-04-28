@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package api.controllers
 
+import api.controllers.requestParsers.RequestParser
+import api.hateoas.{ HateoasFactory, HateoasLinksFactory }
+import api.models.outcomes.ResponseWrapper
 import cats.data.EitherT
 import cats.implicits._
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.{ JsValue, Json, Writes }
 import play.api.mvc.Result
 import play.api.mvc.Results.InternalServerError
 import utils.Logging
-import v2.controllers.requestParsers.RequestParser
-import v2.hateoas.{HateoasFactory, HateoasLinksFactory}
 import v2.models.errors._
-import v2.models.hateoas.{HateoasData, HateoasWrapper}
-import v2.models.outcomes.ResponseWrapper
-import v2.models.request.RawData
+import v2.models.hateoas.{ HateoasData, HateoasWrapper }
+import api.models.request.RawData
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait RequestHandler[InputRaw <: RawData] {
 
@@ -93,8 +93,8 @@ object RequestHandler {
       * withResultCreator(ResultCreator.hateoasWrapping(hateoasFactory, successStatus)(data))
       * }}}
       */
-    def withHateoasResultFrom[HData <: HateoasData](
-        hateoasFactory: HateoasFactory)(data: (Input, Output) => HData, successStatus: Int = Status.OK)(implicit
+    def withHateoasResultFrom[HData <: HateoasData](hateoasFactory: HateoasFactory)(data: (Input, Output) => HData, successStatus: Int = Status.OK)(
+        implicit
         linksFactory: HateoasLinksFactory[Output, HData],
         writes: Writes[HateoasWrapper[Output]]): RequestHandlerBuilder[InputRaw, Input, Output] =
       withResultCreator(ResultCreator.hateoasWrapping(hateoasFactory, successStatus)(data))
@@ -104,7 +104,8 @@ object RequestHandler {
       * withResultCreator(ResultCreator.hateoasWrapping(hateoasFactory, successStatus)((_,_) => data))
       * }}}
       */
-    def withHateoasResult[HData <: HateoasData](hateoasFactory: HateoasFactory)(data: HData, successStatus: Int = Status.OK)(implicit
+    def withHateoasResult[HData <: HateoasData](hateoasFactory: HateoasFactory)(data: HData, successStatus: Int = Status.OK)(
+        implicit
         linksFactory: HateoasLinksFactory[Output, HData],
         writes: Writes[HateoasWrapper[Output]]): RequestHandlerBuilder[InputRaw, Input, Output] =
       withResultCreator(ResultCreator.hateoasWrapping(hateoasFactory, successStatus)((_, _) => data))
@@ -136,9 +137,10 @@ object RequestHandler {
           for {
             parsedRequest   <- EitherT.fromEither[Future](parser.parseRequest(rawData))
             serviceResponse <- EitherT(service(parsedRequest))
-          } yield doWithContext(ctx.withCorrelationId(serviceResponse.correlationId)) { implicit ctx: RequestContext =>
-            handleSuccess(rawData, parsedRequest, serviceResponse)
-          }
+          } yield
+            doWithContext(ctx.withCorrelationId(serviceResponse.correlationId)) { implicit ctx: RequestContext =>
+              handleSuccess(rawData, parsedRequest, serviceResponse)
+            }
 
         result.leftMap { errorWrapper =>
           doWithContext(ctx.withCorrelationId(errorWrapper.correlationId)) { implicit ctx: RequestContext =>
@@ -150,9 +152,9 @@ object RequestHandler {
       private def doWithContext[A](ctx: RequestContext)(f: RequestContext => A) = f(ctx)
 
       private def handleSuccess(rawData: InputRaw, parsedRequest: Input, serviceResponse: ResponseWrapper[Output])(implicit
-          ctx: RequestContext,
-          request: UserRequest[_],
-          ec: ExecutionContext): Result = {
+                                                                                                                   ctx: RequestContext,
+                                                                                                                   request: UserRequest[_],
+                                                                                                                   ec: ExecutionContext): Result = {
         logger.info(
           s"[${ctx.endpointLogContext.controllerName}][${ctx.endpointLogContext.endpointName}] - " +
             s"Success response received with CorrelationId: ${ctx.correlationId}")
@@ -189,9 +191,9 @@ object RequestHandler {
       }
 
       def auditIfRequired(httpStatus: Int, response: Either[ErrorWrapper, Option[JsValue]])(implicit
-          ctx: RequestContext,
-          request: UserRequest[_],
-          ec: ExecutionContext): Unit =
+                                                                                            ctx: RequestContext,
+                                                                                            request: UserRequest[_],
+                                                                                            ec: ExecutionContext): Unit =
         auditHandler.foreach { creator =>
           creator.performAudit(request.userDetails, httpStatus, response)
         }

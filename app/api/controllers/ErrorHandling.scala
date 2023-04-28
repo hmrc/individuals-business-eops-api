@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package api.controllers
 
-case class EndpointLogContext(
-                               controllerName: String,
-                               endpointName: String
-                             )
+import play.api.libs.json.Json
+import play.api.mvc.Result
+import play.api.mvc.Results.Status
+import v2.models.errors.ErrorWrapper
+
+case class ErrorHandling(errorHandler: PartialFunction[ErrorWrapper, Result])
+
+object ErrorHandling {
+
+  val Default: ErrorHandling = ErrorHandling {
+    case errorWrapper: ErrorWrapper =>
+      Status(errorWrapper.error.httpStatus)(Json.toJson(errorWrapper))
+  }
+
+}

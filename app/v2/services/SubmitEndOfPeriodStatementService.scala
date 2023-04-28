@@ -16,11 +16,12 @@
 
 package v2.services
 
+import api.controllers.{ EndpointLogContext, RequestContext }
+import api.models.outcomes.ResponseWrapper
+import api.services.ServiceOutcome
 import cats.syntax.either._
 import v2.connectors.SubmitEndOfPeriodStatementConnector
-import v2.controllers.{ EndpointLogContext, RequestContext }
 import v2.models.errors._
-import v2.models.outcomes.ResponseWrapper
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
 import javax.inject.{ Inject, Singleton }

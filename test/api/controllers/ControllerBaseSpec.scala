@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package api.controllers
 
-import play.api.http.{HeaderNames, MimeTypes, Status}
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
+import api.controllers.ControllerTestRunner.validNino
+import play.api.http.{ HeaderNames, MimeTypes, Status }
+import play.api.libs.json.{ JsValue, Json }
+import play.api.mvc.{ AnyContentAsEmpty, ControllerComponents, Result }
 import play.api.test.Helpers.stubControllerComponents
-import play.api.test.{FakeRequest, ResultExtractors}
+import play.api.test.{ FakeRequest, ResultExtractors }
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.controllers.ControllerTestRunner.validNino
 import v2.mocks.MockIdGenerator
-import v2.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockMtdIdLookupService}
-import v2.models.audit.{AuditError, AuditEvent, AuditResponse, GenericAuditDetail}
+import v2.mocks.services.{ MockAuditService, MockEnrolmentsAuthService, MockMtdIdLookupService }
+import v2.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
 import v2.models.errors.MtdError
 
 import scala.concurrent.Future

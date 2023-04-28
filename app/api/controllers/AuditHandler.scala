@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package api.controllers
 
 import cats.syntax.either._
-import play.api.libs.json.{JsValue, Writes}
-import v2.models.audit.{AuditEvent, AuditResponse, GenericAuditDetail}
+import play.api.libs.json.{ JsValue, Writes }
+import v2.models.audit.{ AuditEvent, AuditResponse, GenericAuditDetail }
 import v2.models.auth.UserDetails
 import v2.models.errors.ErrorWrapper
 import v2.services.AuditService
@@ -29,8 +29,8 @@ import scala.concurrent.ExecutionContext
 trait AuditHandler extends RequestContextImplicits {
 
   def performAudit(userDetails: UserDetails, httpStatus: Int, response: Either[ErrorWrapper, Option[JsValue]])(implicit
-      ctx: RequestContext,
-      ec: ExecutionContext): Unit
+                                                                                                               ctx: RequestContext,
+                                                                                                               ec: ExecutionContext): Unit
 
 }
 
@@ -79,8 +79,8 @@ object AuditHandler {
       extends AuditHandler {
 
     def performAudit(userDetails: UserDetails, httpStatus: Int, response: Either[ErrorWrapper, Option[JsValue]])(implicit
-        ctx: RequestContext,
-        ec: ExecutionContext): Unit = {
+                                                                                                                 ctx: RequestContext,
+                                                                                                                 ec: ExecutionContext): Unit = {
 
       val auditEvent = {
         val auditResponse = AuditResponse(httpStatus, response.map(responseBodyMap).leftMap(ew => ew.auditErrors))

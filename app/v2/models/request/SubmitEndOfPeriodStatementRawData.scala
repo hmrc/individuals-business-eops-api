@@ -16,6 +16,7 @@
 
 package v2.models.request
 
+import api.models.request.RawData
 import play.api.mvc.AnyContentAsJson
 
 case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData

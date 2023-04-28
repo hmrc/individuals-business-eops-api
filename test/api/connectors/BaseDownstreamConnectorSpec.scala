@@ -17,11 +17,11 @@
 package api.connectors
 
 import api.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
+import api.models.outcomes.ResponseWrapper
 import config.AppConfig
 import mocks.MockAppConfig
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
 import v2.mocks.MockHttpClient
-import v2.models.outcomes.ResponseWrapper
 
 import scala.concurrent.Future
 

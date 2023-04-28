@@ -16,13 +16,14 @@
 
 package v2.mocks.services
 
+import api.controllers.RequestContext
+import api.services.ServiceOutcome
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import v2.controllers.RequestContext
 import v2.models.request.SubmitEndOfPeriodStatementRequest
-import v2.services.{ServiceOutcome, SubmitEndOfPeriodStatementService}
+import v2.services.SubmitEndOfPeriodStatementService
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait MockSubmitEndOfPeriodStatementService extends MockFactory {
 

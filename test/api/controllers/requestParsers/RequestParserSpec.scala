@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package v2.controllers.requestParsers
+package api.controllers.requestParsers
 
+import api.controllers.requestParsers.validators.Validator
 import support.UnitSpec
-import v2.controllers.requestParsers.validators.Validator
+import api.models.request.RawData
 import v2.models.domain.Nino
-import v2.models.errors.{BadRequestError, ErrorWrapper, NinoFormatError, RuleIncorrectOrEmptyBodyError}
-import v2.models.request.RawData
+import v2.models.errors.{ BadRequestError, ErrorWrapper, NinoFormatError, RuleIncorrectOrEmptyBodyError }
 
 class RequestParserSpec extends UnitSpec {
 
   implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
-  private val nino = "AA123456A"
+  private val nino                   = "AA123456A"
   case class Raw(nino: String) extends RawData
   case class Request(nino: Nino)
 
@@ -62,7 +62,8 @@ class RequestParserSpec extends UnitSpec {
       "the validator returns multiple errors" in new Test {
         lazy val validator: Validator[Raw] = (_: Raw) => List(NinoFormatError, RuleIncorrectOrEmptyBodyError)
 
-        parser.parseRequest(Raw(nino)) shouldBe Left(ErrorWrapper(correlationId, BadRequestError, Some(Seq(NinoFormatError, RuleIncorrectOrEmptyBodyError))))
+        parser.parseRequest(Raw(nino)) shouldBe Left(
+          ErrorWrapper(correlationId, BadRequestError, Some(Seq(NinoFormatError, RuleIncorrectOrEmptyBodyError))))
       }
     }
   }

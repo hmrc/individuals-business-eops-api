@@ -16,8 +16,8 @@
 
 package v2.services
 
+import api.controllers.RequestContextImplicits
 import utils.Logging
-import v2.controllers.RequestContextImplicits
 import v2.support.DownstreamResponseMappingSupport
 
 trait BaseService extends RequestContextImplicits with DownstreamResponseMappingSupport with Logging

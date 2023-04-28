@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package v2.hateoas
+package api.hateoas
 
 import cats.Functor
 import config.AppConfig
 import mocks.MockAppConfig
 import support.UnitSpec
 import v2.models.hateoas.Method.GET
-import v2.models.hateoas.{HateoasData, HateoasWrapper, Link}
+import v2.models.hateoas.{ HateoasData, HateoasWrapper, Link }
 
 class HateoasFactorySpec extends UnitSpec with MockAppConfig {
 

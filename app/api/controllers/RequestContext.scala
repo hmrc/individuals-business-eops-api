@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package api.controllers
 
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.IdGenerator

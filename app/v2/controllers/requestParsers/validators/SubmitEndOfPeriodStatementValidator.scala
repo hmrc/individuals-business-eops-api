@@ -16,6 +16,7 @@
 
 package v2.controllers.requestParsers.validators
 
+import api.controllers.requestParsers.validators.Validator
 import v2.controllers.requestParsers.validators.validations._
 import v2.models.errors._
 import v2.models.request.{ SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData }

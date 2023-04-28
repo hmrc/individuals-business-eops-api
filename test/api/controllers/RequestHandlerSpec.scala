@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package api.controllers
 
+import api.controllers.requestParsers.RequestParser
+import api.hateoas.HateoasLinksFactory
+import api.models.outcomes.ResponseWrapper
 import config.AppConfig
 import org.scalamock.handlers.CallHandler
-import play.api.http.{HeaderNames, Status}
-import play.api.libs.json.{JsString, Json, OWrites}
+import play.api.http.{ HeaderNames, Status }
+import play.api.libs.json.{ JsString, Json, OWrites }
 import play.api.mvc.AnyContent
-import play.api.test.{FakeRequest, ResultExtractors}
+import play.api.test.{ FakeRequest, ResultExtractors }
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import v2.controllers.requestParsers.RequestParser
-import v2.hateoas.HateoasLinksFactory
 import v2.mocks.MockIdGenerator
 import v2.mocks.hateoas.MockHateoasFactory
 import v2.mocks.services.MockAuditService
-import v2.models.audit.{AuditError, AuditEvent, AuditResponse, GenericAuditDetail}
+import v2.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
 import v2.models.auth.UserDetails
-import v2.models.errors.{ErrorWrapper, NinoFormatError}
-import v2.models.hateoas.{HateoasData, HateoasWrapper, Link}
-import v2.models.outcomes.ResponseWrapper
-import v2.models.request.RawData
-import v2.services.ServiceOutcome
+import v2.models.errors.{ ErrorWrapper, NinoFormatError }
+import v2.models.hateoas.{ HateoasData, HateoasWrapper, Link }
+import api.models.request.RawData
+import api.services.ServiceOutcome
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class RequestHandlerSpec
     extends UnitSpec

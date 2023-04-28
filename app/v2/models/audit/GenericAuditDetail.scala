@@ -16,9 +16,9 @@
 
 package v2.models.audit
 
+import api.controllers.{ AuditHandler, RequestContext }
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{ JsPath, JsValue, OWrites }
-import v2.controllers.{ AuditHandler, RequestContext }
 import v2.models.auth.UserDetails
 
 case class GenericAuditDetail(userType: String,

@@ -18,12 +18,12 @@ package api.connectors.httpparsers
 
 import api.connectors.DownstreamOutcome
 import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
+import api.models.outcomes.ResponseWrapper
 import play.api.http.Status._
 import play.api.libs.json._
 import support.UnitSpec
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
 import v2.models.errors._
-import v2.models.outcomes.ResponseWrapper
 
 // WLOG if Reads tested elsewhere
 case class SomeModel(data: String)

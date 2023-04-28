@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package v2.controllers.requestParsers.validators
+package api.controllers.requestParsers.validators
 
 import org.scalamock.scalatest.MockFactory
 import play.api.http.Status._
 import support.UnitSpec
 import v2.models.errors.MtdError
-import v2.models.request.RawData
+import api.models.request.RawData
 
 class ValidatorSpec extends UnitSpec with MockFactory {
 
