@@ -36,7 +36,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import api.models.request.RawData
 import api.services.ServiceOutcome
-import v2.mocks.hateoas.MockHateoasFactory
+import api.mocks.hateoas.MockHateoasFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ ExecutionContext, Future }

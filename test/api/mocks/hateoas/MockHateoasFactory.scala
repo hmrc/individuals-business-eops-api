@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.mocks.hateoas
+package api.mocks.hateoas
 
 import api.hateoas.{ HateoasFactory, HateoasLinksFactory, HateoasListLinksFactory }
 import api.models.hateoas.{ HateoasData, HateoasWrapper }
