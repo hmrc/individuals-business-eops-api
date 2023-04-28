@@ -17,6 +17,7 @@
 package v2.services
 
 import api.models.domain.Nino
+import api.services.ServiceSpec
 import api.models.errors._
 import api.models.outcomes.ResponseWrapper
 import v2.data.SubmitEndOfPeriodStatementData.validRequest
