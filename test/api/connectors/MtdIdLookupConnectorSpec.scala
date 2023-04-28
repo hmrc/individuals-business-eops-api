@@ -16,9 +16,9 @@
 
 package api.connectors
 
+import api.models.errors.InternalError
 import mocks.MockAppConfig
 import v2.mocks.MockHttpClient
-import v2.models.errors.InternalError
 
 import scala.concurrent.Future
 

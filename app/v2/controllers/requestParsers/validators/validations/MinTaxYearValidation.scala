@@ -16,7 +16,7 @@
 
 package v2.controllers.requestParsers.validators.validations
 
-import v2.models.errors.{MtdError, RuleTaxYearNotSupportedError, TaxYearFormatError}
+import api.models.errors.{ MtdError, RuleTaxYearNotSupportedError, TaxYearFormatError }
 import v2.models.request.DownstreamTaxYear
 
 object MinTaxYearValidation {

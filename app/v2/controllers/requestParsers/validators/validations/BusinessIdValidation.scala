@@ -16,12 +16,12 @@
 
 package v2.controllers.requestParsers.validators.validations
 
-import v2.models.errors.{BusinessIdFormatError, MtdError}
+import api.models.errors.{ BusinessIdFormatError, MtdError }
 
 object BusinessIdValidation {
 
-  def validateBusinessId(businessId: String): List[MtdError] ={
+  def validateBusinessId(businessId: String): List[MtdError] = {
     //400 FORMAT_BUSINESS_ID The provided Business ID is invalid
-    if(businessId.matches("^X[A-Z0-9]{1}IS[0-9]{11}$")) NoValidationErrors else List(BusinessIdFormatError)
+    if (businessId.matches("^X[A-Z0-9]{1}IS[0-9]{11}$")) NoValidationErrors else List(BusinessIdFormatError)
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.models.errors
+package api.models.errors
 
 import play.api.libs.json.{ JsError, JsValue, Json }
 import support.UnitSpec

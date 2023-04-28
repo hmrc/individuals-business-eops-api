@@ -18,12 +18,13 @@ package api.connectors.httpparsers
 
 import api.connectors.DownstreamOutcome
 import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
+import api.models.errors
+import api.models.errors.{ DownstreamBvrError, DownstreamErrorCode, DownstreamStandardError, DownstreamValidationRuleFailure, OutboundError }
 import api.models.outcomes.ResponseWrapper
 import play.api.http.Status._
 import play.api.libs.json._
 import support.UnitSpec
 import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
-import v2.models.errors._
 
 // WLOG if Reads tested elsewhere
 case class SomeModel(data: String)
@@ -56,7 +57,7 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
       val badFieldTypeJson = Json.obj("something" -> 1234)
       val httpResponse     = HttpResponse(OK, badFieldTypeJson, Map("CorrelationId" -> Seq(correlationId)))
 
-      httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(InternalError)))
+      httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(errors.InternalError)))
     }
 
     handleErrorsCorrectly
@@ -126,7 +127,7 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
           val malformedErrorJson = Json.obj("something" -> 1234)
           val httpResponse       = HttpResponse(responseCode, malformedErrorJson, Map("CorrelationId" -> Seq(correlationId)))
 
-          httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(InternalError)))
+          httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(errors.InternalError)))
         }
 
         "trim any non-ERR items from a BVR error" in {
@@ -145,7 +146,7 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
           val downstreamErrorsJson: JsValue = bvrErrorJson("WARN")
           val httpResponse                  = HttpResponse(responseCode, downstreamErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
 
-          httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(InternalError)))
+          httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(errors.InternalError)))
         }
     })
 
@@ -161,6 +162,6 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
       val errorJsonIgnored: JsValue = JsObject.empty
       val httpResponse              = HttpResponse(responseCode, errorJsonIgnored, Map("CorrelationId" -> Seq(correlationId)))
 
-      httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(InternalError)))
+      httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(errors.InternalError)))
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.models.errors
+package api.models.errors
 
 import play.api.libs.json.Json
 import support.UnitSpec
@@ -38,7 +38,7 @@ class MtdErrorSpec extends UnitSpec {
 
     "written to JSON with and errorId" should {
       "produce the expected JsObject" in {
-        RuleBusinessValidationFailure("Some message","someId").asJson shouldBe Json.parse(
+        RuleBusinessValidationFailure("Some message", "someId").asJson shouldBe Json.parse(
           """
             |{
             |   "code": "RULE_BUSINESS_VALIDATION_FAILURE",

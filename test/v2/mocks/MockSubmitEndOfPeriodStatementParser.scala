@@ -16,10 +16,10 @@
 
 package v2.mocks
 
+import api.models.errors.MtdError
 import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
 import v2.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
-import v2.models.errors.MtdError
 import v2.models.request.SubmitEndOfPeriodStatementRawData
 
 class MockSubmitEndOfPeriodStatementParser extends MockFactory {
@@ -27,6 +27,7 @@ class MockSubmitEndOfPeriodStatementParser extends MockFactory {
   val mockValidator: SubmitEndOfPeriodStatementValidator = mock[SubmitEndOfPeriodStatementValidator]
 
   object MockValidator {
+
     def validate(data: SubmitEndOfPeriodStatementRawData): CallHandler1[SubmitEndOfPeriodStatementRawData, List[MtdError]] = {
       (mockValidator.validate(_: SubmitEndOfPeriodStatementRawData)).expects(data)
     }

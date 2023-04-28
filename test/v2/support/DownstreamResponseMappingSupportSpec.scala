@@ -17,12 +17,12 @@
 package v2.support
 
 import api.controllers.EndpointLogContext
+import api.models.errors._
 import api.models.outcomes.ResponseWrapper
 import api.support.DownstreamResponseMappingSupport
 import play.api.http.Status.BAD_REQUEST
 import support.UnitSpec
 import utils.Logging
-import v2.models.errors._
 
 class DownstreamResponseMappingSupportSpec extends UnitSpec {
 

@@ -16,10 +16,10 @@
 
 package api.models.audit
 
+import api.models.errors.TaxYearFormatError
 import play.api.http.Status.{ BAD_REQUEST, OK }
 import play.api.libs.json.{ JsValue, Json }
 import support.UnitSpec
-import v2.models.errors.TaxYearFormatError
 
 class GenericAuditDetailSpec extends UnitSpec {
 

@@ -17,10 +17,10 @@
 package v2.services
 
 import api.models.domain.Nino
+import api.models.errors._
 import api.models.outcomes.ResponseWrapper
 import v2.data.SubmitEndOfPeriodStatementData.validRequest
 import v2.mocks.connectors.MockSubmitEndOfPeriodStatementConnector
-import v2.models.errors._
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
 import scala.concurrent.Future

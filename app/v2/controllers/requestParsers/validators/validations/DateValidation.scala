@@ -16,9 +16,9 @@
 
 package v2.controllers.requestParsers.validators.validations
 
-import java.time.LocalDate
+import api.models.errors.{ EndDateFormatError, MtdError, RuleEndDateBeforeStartDateError, StartDateFormatError }
 
-import v2.models.errors.{ EndDateFormatError, MtdError, RuleEndDateBeforeStartDateError, StartDateFormatError }
+import java.time.LocalDate
 
 object DateValidation {
 

@@ -16,7 +16,7 @@
 
 package v2.controllers.requestParsers.validators.validations
 
-import v2.models.errors.{ FinalisedFormatError, MtdError }
+import api.models.errors.{ FinalisedFormatError, MtdError }
 
 object FinalisedValidation {
 

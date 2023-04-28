@@ -17,18 +17,18 @@
 package api.support
 
 import api.controllers.EndpointLogContext
-import api.models.outcomes.ResponseWrapper
-import utils.Logging
-import v2.models.errors.{
-  InternalError,
+import api.models.errors.{
   BadRequestError,
   DownstreamBvrError,
   DownstreamError,
   DownstreamStandardError,
   ErrorWrapper,
+  InternalError,
   MtdError,
   OutboundError
 }
+import api.models.outcomes.ResponseWrapper
+import utils.Logging
 
 trait DownstreamResponseMappingSupport {
   self: Logging =>

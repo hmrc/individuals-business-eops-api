@@ -16,8 +16,8 @@
 
 package v2.controllers.requestParsers.validators.validations
 
+import api.models.errors.TypeOfBusinessFormatError
 import support.UnitSpec
-import v2.models.errors.TypeOfBusinessFormatError
 
 class TypeOfBusinessValidationSpec extends UnitSpec {
 

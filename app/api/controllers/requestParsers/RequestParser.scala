@@ -17,9 +17,10 @@
 package api.controllers.requestParsers
 
 import api.controllers.requestParsers.validators.Validator
+import api.models.errors
+import api.models.errors.{ BadRequestError, ErrorWrapper }
 import api.models.request.RawData
 import utils.Logging
-import v2.models.errors.{ BadRequestError, ErrorWrapper }
 
 trait RequestParser[Raw <: RawData, Request] extends Logging {
   val validator: Validator[Raw]
@@ -37,12 +38,12 @@ trait RequestParser[Raw <: RawData, Request] extends Logging {
         logger.warn(
           "[RequestParser][parseRequest] " +
             s"Validation failed with ${err.code} error for the request with CorrelationId: $correlationId")
-        Left(ErrorWrapper(correlationId, err, None))
+        Left(errors.ErrorWrapper(correlationId, err, None))
       case errs =>
         logger.warn(
           "[RequestParser][parseRequest] " +
             s"Validation failed with ${errs.map(_.code).mkString(",")} error for the request with CorrelationId: $correlationId")
-        Left(ErrorWrapper(correlationId, BadRequestError, Some(errs)))
+        Left(errors.ErrorWrapper(correlationId, BadRequestError, Some(errs)))
     }
   }
 }
