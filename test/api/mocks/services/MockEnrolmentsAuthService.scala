@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package v2.mocks.services
+package api.mocks.services
 
 import api.models.auth.UserDetails
+import api.models.outcomes.AuthOutcome
 import api.services.EnrolmentsAuthService
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
-import api.models.outcomes.AuthOutcome
 
 import scala.concurrent.{ ExecutionContext, Future }
 

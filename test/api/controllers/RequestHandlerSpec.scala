@@ -18,6 +18,7 @@ package api.controllers
 
 import api.controllers.requestParsers.RequestParser
 import api.hateoas.HateoasLinksFactory
+import api.mocks.services.MockAuditService
 import api.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
 import api.models.auth.UserDetails
 import api.models.errors.{ ErrorWrapper, NinoFormatError }
@@ -34,7 +35,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import v2.mocks.MockIdGenerator
 import v2.mocks.hateoas.MockHateoasFactory
-import v2.mocks.services.MockAuditService
 import api.models.request.RawData
 import api.services.ServiceOutcome
 
