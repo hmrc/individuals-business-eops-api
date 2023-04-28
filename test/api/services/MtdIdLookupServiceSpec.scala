@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package v2.services
+package api.services
 
 import api.connectors.MockMtdIdLookupConnector
 import api.models.domain.Nino
 import api.models.errors.{ ClientNotAuthorisedError, InternalError, NinoFormatError }
-import api.services.{ MtdIdLookupService, ServiceSpec }
 
 import scala.concurrent.Future
 

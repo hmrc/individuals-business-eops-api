@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package v2.services
+package api.services
 
 import api.models.auth.UserDetails
 import api.models.errors.{ ClientNotAuthorisedError, InternalError }
-import api.services.{ EnrolmentsAuthService, ServiceSpec }
 import config.ConfidenceLevelConfig
 import mocks.MockAppConfig
 import org.scalamock.handlers.CallHandler

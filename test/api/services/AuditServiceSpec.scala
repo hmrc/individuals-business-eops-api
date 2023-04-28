@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package v2.services
+package api.services
 
 import api.models.audit.AuditEvent
-import api.services.{ AuditService, ServiceSpec }
 import play.api.Configuration
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
