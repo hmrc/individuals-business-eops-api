@@ -16,11 +16,12 @@
 
 package v1.connectors
 
+import api.connectors.DownstreamUri.IfsUri
 import config.AppConfig
 import play.api.libs.json.Writes
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait BaseDownstreamConnector {
   val http: HttpClient
@@ -34,7 +35,7 @@ trait BaseDownstreamConnector {
         // Contract headers
         Seq(
           "Authorization" -> s"Bearer ${appConfig.ifsToken}",
-          "Environment" -> appConfig.ifsEnv,
+          "Environment"   -> appConfig.ifsEnv,
           "CorrelationId" -> correlationId
         ) ++
         // Other headers (i.e Gov-Test-Scenario, Content-Type)

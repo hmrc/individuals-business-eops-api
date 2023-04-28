@@ -16,23 +16,22 @@
 
 package v1.connectors
 
+import api.connectors.DownstreamUri.IfsUri
 import config.AppConfig
 
-import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import javax.inject.{ Inject, Singleton }
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient }
 import v1.models.downstream.EmptyJsonBody
 import v1.models.request.SubmitEndOfPeriodStatementRequest
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient,
-                                                    val appConfig: AppConfig) extends BaseDownstreamConnector {
+class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector {
 
-  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext,
-    correlationId: String): Future[DownstreamOutcome[Unit]] = {
+  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(implicit hc: HeaderCarrier,
+                                                                        ec: ExecutionContext,
+                                                                        correlationId: String): Future[DownstreamOutcome[Unit]] = {
 
     import v1.connectors.httpparsers.StandardDownstreamHttpParser._
 
@@ -44,7 +43,8 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient,
 
     post(
       body = EmptyJsonBody,
-      uri = IfsUri[Unit]("income-tax/income-sources/nino/" +
+      uri = IfsUri[Unit](
+        "income-tax/income-sources/nino/" +
           s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId")
     )
   }
