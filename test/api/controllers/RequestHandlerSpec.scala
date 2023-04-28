@@ -18,6 +18,7 @@ package api.controllers
 
 import api.controllers.requestParsers.RequestParser
 import api.hateoas.HateoasLinksFactory
+import api.mocks.MockIdGenerator
 import api.mocks.services.MockAuditService
 import api.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
 import api.models.auth.UserDetails
@@ -33,10 +34,9 @@ import play.api.test.{ FakeRequest, ResultExtractors }
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import v2.mocks.MockIdGenerator
-import v2.mocks.hateoas.MockHateoasFactory
 import api.models.request.RawData
 import api.services.ServiceOutcome
+import v2.mocks.hateoas.MockHateoasFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ ExecutionContext, Future }

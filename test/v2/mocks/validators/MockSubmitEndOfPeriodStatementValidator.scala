@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.mocks
+package v2.mocks.validators
 
 import api.models.errors.MtdError
 import org.scalamock.handlers.CallHandler1
@@ -22,7 +22,7 @@ import org.scalamock.scalatest.MockFactory
 import v2.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
 import v2.models.request.SubmitEndOfPeriodStatementRawData
 
-class MockSubmitEndOfPeriodStatementParser extends MockFactory {
+class MockSubmitEndOfPeriodStatementValidator extends MockFactory {
 
   val mockValidator: SubmitEndOfPeriodStatementValidator = mock[SubmitEndOfPeriodStatementValidator]
 

@@ -16,13 +16,12 @@
 
 package api.connectors
 
-import mocks.MockAppConfig
+import mocks.{ MockAppConfig, MockHttpClient }
 import org.scalamock.handlers.CallHandler
 import play.api.Configuration
 import play.api.http.{ HeaderNames, MimeTypes, Status }
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.mocks.MockHttpClient
 
 import scala.concurrent.{ ExecutionContext, Future }
 

@@ -17,8 +17,7 @@
 package v2.connectors
 
 import api.connectors.ConnectorSpec
-import mocks.MockAppConfig
-import v2.mocks.MockHttpClient
+import mocks.{ MockAppConfig, MockHttpClient }
 import v2.models.downstream.TypeOfBusiness.`foreign-property`
 import v2.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
 

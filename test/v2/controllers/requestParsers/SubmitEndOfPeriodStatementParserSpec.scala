@@ -21,7 +21,7 @@ import api.models.errors.{ BadRequestError, ErrorWrapper, NinoFormatError, TypeO
 import support.UnitSpec
 import play.api.mvc.AnyContentAsJson
 import v2.data.SubmitEndOfPeriodStatementData
-import v2.mocks.MockSubmitEndOfPeriodStatementParser
+import v2.mocks.validators.MockSubmitEndOfPeriodStatementValidator
 import v2.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
 
 class SubmitEndOfPeriodStatementParserSpec extends UnitSpec {
@@ -31,7 +31,7 @@ class SubmitEndOfPeriodStatementParserSpec extends UnitSpec {
   val inputData: SubmitEndOfPeriodStatementRawData =
     SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(SubmitEndOfPeriodStatementData.successJson))
 
-  trait Test extends MockSubmitEndOfPeriodStatementParser {
+  trait Test extends MockSubmitEndOfPeriodStatementValidator {
     lazy val parser = new SubmitEndOfPeriodStatementParser(mockValidator)
   }
 
