@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package v2.models.audit
+package api.models.audit
 
-import play.api.libs.json.Json
-import support.UnitSpec
+import play.api.libs.json.{ JsValue, Json, OWrites }
 
-class AuditErrorSpec extends UnitSpec {
+case class AuditResponse(httpStatus: Int, errors: Option[Seq[AuditError]], body: Option[JsValue])
 
-  private val auditError = AuditError("FORMAT_NINO")
+object AuditResponse {
+  implicit val writes: OWrites[AuditResponse] = Json.writes[AuditResponse]
 
-  "writes" when {
-    "passed an audit error model" should {
-      "produce valid json" in {
-
-         val json = Json.parse(
-          s"""
-             |{
-             |  "errorCode": "FORMAT_NINO"
-             |}
-           """.stripMargin)
-
-        Json.toJson(auditError) shouldBe json
-      }
+  def apply(httpStatus: Int, response: Either[Seq[AuditError], Option[JsValue]]): AuditResponse =
+    response match {
+      case Right(body) => AuditResponse(httpStatus, None, body)
+      case Left(errs)  => AuditResponse(httpStatus, Some(errs), None)
     }
-  }
 }

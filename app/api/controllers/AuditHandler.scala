@@ -16,12 +16,12 @@
 
 package api.controllers
 
+import api.models.audit.{ AuditEvent, AuditResponse, GenericAuditDetail }
+import api.services.AuditService
 import cats.syntax.either._
 import play.api.libs.json.{ JsValue, Writes }
-import v2.models.audit.{ AuditEvent, AuditResponse, GenericAuditDetail }
 import v2.models.auth.UserDetails
 import v2.models.errors.ErrorWrapper
-import v2.services.AuditService
 
 import scala.Function.const
 import scala.concurrent.ExecutionContext

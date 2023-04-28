@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.models.audit
+package api.models.audit
 
 import api.controllers.{ AuditHandler, RequestContext }
 import play.api.libs.functional.syntax._

@@ -16,8 +16,8 @@
 
 package v2.models.errors
 
+import api.models.audit.AuditError
 import play.api.libs.json.{ JsObject, Json, Writes }
-import v2.models.audit.AuditError
 
 case class ErrorWrapper(correlationId: String, error: MtdError, errors: Option[Seq[MtdError]] = None) {
 
@@ -42,7 +42,7 @@ object ErrorWrapper {
 
     errorResponse.errors match {
       case Some(errors) if errors.nonEmpty => json + ("errors" -> Json.toJson(errors))
-      case _ => json
+      case _                               => json
     }
   }
 }

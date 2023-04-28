@@ -14,10 +14,27 @@
  * limitations under the License.
  */
 
-package v2.services
+package api.models.audit
 
-import api.controllers.RequestContextImplicits
-import utils.Logging
-import v2.support.DownstreamResponseMappingSupport
+import play.api.libs.json.Json
+import support.UnitSpec
 
-trait BaseService extends RequestContextImplicits with DownstreamResponseMappingSupport with Logging
+class AuditErrorSpec extends UnitSpec {
+
+  private val auditError = AuditError("FORMAT_NINO")
+
+  "writes" when {
+    "passed an audit error model" should {
+      "produce valid json" in {
+
+        val json = Json.parse(s"""
+             |{
+             |  "errorCode": "FORMAT_NINO"
+             |}
+           """.stripMargin)
+
+        Json.toJson(auditError) shouldBe json
+      }
+    }
+  }
+}

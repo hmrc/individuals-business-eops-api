@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package v2.services
+package api.services
 
 import config.AppConfig
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
+import uk.gov.hmrc.auth.core.AffinityGroup.{ Agent, Individual, Organisation }
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -26,23 +26,24 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.Logging
 import v2.models.auth.UserDetails
-import v2.models.errors.{ClientNotAuthorisedError, InternalError}
+import v2.models.errors.{ ClientNotAuthorisedError, InternalError }
 import v2.models.outcomes.AuthOutcome
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-class EnrolmentsAuthService @Inject() (val connector: AuthConnector, val appConfig: AppConfig) extends Logging {
+class EnrolmentsAuthService @Inject()(val connector: AuthConnector, val appConfig: AppConfig) extends Logging {
 
   private val authFunction: AuthorisedFunctions = new AuthorisedFunctions {
     override def authConnector: AuthConnector = connector
   }
 
-  def getAgentReferenceFromEnrolments(enrolments: Enrolments): Option[String] = enrolments
-    .getEnrolment("HMRC-AS-AGENT")
-    .flatMap(_.getIdentifier("AgentReferenceNumber"))
-    .map(_.value)
+  def getAgentReferenceFromEnrolments(enrolments: Enrolments): Option[String] =
+    enrolments
+      .getEnrolment("HMRC-AS-AGENT")
+      .flatMap(_.getIdentifier("AgentReferenceNumber"))
+      .map(_.value)
 
   def buildPredicate(predicate: Predicate): Predicate =
     if (appConfig.confidenceLevelConfig.authValidationEnabled) {

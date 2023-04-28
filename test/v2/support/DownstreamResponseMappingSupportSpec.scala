@@ -18,6 +18,7 @@ package v2.support
 
 import api.controllers.EndpointLogContext
 import api.models.outcomes.ResponseWrapper
+import api.support.DownstreamResponseMappingSupport
 import play.api.http.Status.BAD_REQUEST
 import support.UnitSpec
 import utils.Logging

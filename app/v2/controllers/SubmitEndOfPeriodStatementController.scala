@@ -17,6 +17,7 @@
 package v2.controllers
 
 import api.controllers.{ AuthorisedController, EndpointLogContext, RequestContext, RequestHandler }
+import api.services.{ EnrolmentsAuthService, MtdIdLookupService }
 import play.api.libs.json.JsValue
 import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents }
 import utils.IdGenerator

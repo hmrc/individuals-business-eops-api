@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-package v2.models.audit
+package api.models.audit
 
-import data.AuditData._
-import play.api.libs.json.Json
-import support.UnitSpec
+import play.api.libs.json.{ Json, OFormat }
 
-class AuditResponseSpec extends UnitSpec {
+case class AuditError(errorCode: String)
 
-  "AuditResponse" when {
-    "written to JSON with a body" should {
-      "produce the expected JsObject" in {
-        Json.toJson(auditResponseModelWithBody) shouldBe auditResponseJsonWithBody
-      }
-    }
-  }
-  "written to JSON with Audit Errors" should {
-    "produce the expected JsObject" in {
-      Json.toJson(auditResponseModelWithErrors) shouldBe auditResponseJsonWithErrors
-    }
-  }
+object AuditError {
+  implicit val format: OFormat[AuditError] = Json.format[AuditError]
 }

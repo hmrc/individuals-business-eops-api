@@ -16,9 +16,9 @@
 
 package v2.models.errors
 
+import api.models.audit.AuditError
 import play.api.libs.json.Json
 import support.UnitSpec
-import v2.models.audit.AuditError
 
 class ErrorWrapperSpec extends UnitSpec {
   val correlationId = "X-123"

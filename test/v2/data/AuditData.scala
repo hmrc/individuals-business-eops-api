@@ -16,13 +16,13 @@
 
 package v2.data
 
-import play.api.http.Status.{BAD_REQUEST, OK}
-import play.api.libs.json.{JsValue, Json}
-import v2.models.audit.{AuditError, AuditResponse}
+import api.models.audit.{ AuditError, AuditResponse }
+import play.api.http.Status.{ BAD_REQUEST, OK }
+import play.api.libs.json.{ JsValue, Json }
 
 object AuditData {
 
-  val body: JsValue = Json.parse("""{ "aField" : "aValue" }""")
+  val body: JsValue                = Json.parse("""{ "aField" : "aValue" }""")
   val auditErrors: Seq[AuditError] = Seq(AuditError(errorCode = "FORMAT_NINO"))
 
   val auditResponseModelWithBody: AuditResponse =

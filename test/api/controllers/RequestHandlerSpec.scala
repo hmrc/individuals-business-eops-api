@@ -18,6 +18,7 @@ package api.controllers
 
 import api.controllers.requestParsers.RequestParser
 import api.hateoas.HateoasLinksFactory
+import api.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
 import api.models.outcomes.ResponseWrapper
 import config.AppConfig
 import org.scalamock.handlers.CallHandler
@@ -31,7 +32,6 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import v2.mocks.MockIdGenerator
 import v2.mocks.hateoas.MockHateoasFactory
 import v2.mocks.services.MockAuditService
-import v2.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
 import v2.models.auth.UserDetails
 import v2.models.errors.{ ErrorWrapper, NinoFormatError }
 import v2.models.hateoas.{ HateoasData, HateoasWrapper, Link }

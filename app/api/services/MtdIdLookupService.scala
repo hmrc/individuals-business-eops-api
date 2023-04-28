@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package v2.services
+package api.services
 
 import api.connectors.{ MtdIdLookupConnector, MtdIdLookupOutcome }
-
-import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.models.domain.Nino
 import v2.models.errors.NinoFormatError
 
+import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton

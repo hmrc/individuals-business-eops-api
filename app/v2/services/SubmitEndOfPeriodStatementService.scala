@@ -18,7 +18,7 @@ package v2.services
 
 import api.controllers.{ EndpointLogContext, RequestContext }
 import api.models.outcomes.ResponseWrapper
-import api.services.ServiceOutcome
+import api.services.{ BaseService, ServiceOutcome }
 import cats.syntax.either._
 import v2.connectors.SubmitEndOfPeriodStatementConnector
 import v2.models.errors._
