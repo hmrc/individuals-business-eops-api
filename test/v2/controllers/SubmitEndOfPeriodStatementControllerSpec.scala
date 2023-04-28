@@ -17,12 +17,12 @@
 package v2.controllers
 
 import api.controllers.{ ControllerBaseSpec, ControllerTestRunner }
+import api.models.domain.Nino
 import api.models.outcomes.ResponseWrapper
 import play.api.mvc.{ AnyContentAsJson, Result }
 import v2.data.SubmitEndOfPeriodStatementData._
 import v2.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v2.mocks.services._
-import v2.models.domain.Nino
 import v2.models.errors._
 import v2.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
 

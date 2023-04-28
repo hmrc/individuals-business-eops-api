@@ -16,6 +16,7 @@
 
 package api.services
 
+import api.models.auth.UserDetails
 import config.AppConfig
 import uk.gov.hmrc.auth.core.AffinityGroup.{ Agent, Individual, Organisation }
 import uk.gov.hmrc.auth.core._
@@ -25,9 +26,8 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.Logging
-import v2.models.auth.UserDetails
 import v2.models.errors.{ ClientNotAuthorisedError, InternalError }
-import v2.models.outcomes.AuthOutcome
+import api.models.outcomes.AuthOutcome
 
 import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }

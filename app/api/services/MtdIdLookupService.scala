@@ -17,8 +17,8 @@
 package api.services
 
 import api.connectors.{ MtdIdLookupConnector, MtdIdLookupOutcome }
+import api.models.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.models.domain.Nino
 import v2.models.errors.NinoFormatError
 
 import javax.inject.{ Inject, Singleton }

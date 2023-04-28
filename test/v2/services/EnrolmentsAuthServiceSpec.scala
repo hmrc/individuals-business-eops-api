@@ -16,6 +16,7 @@
 
 package v2.services
 
+import api.models.auth.UserDetails
 import api.services.EnrolmentsAuthService
 import config.ConfidenceLevelConfig
 import mocks.MockAppConfig
@@ -26,7 +27,6 @@ import uk.gov.hmrc.auth.core.authorise.{ AlternatePredicate, CompositePredicate,
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.{ Retrieval, ~ }
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.models.auth.UserDetails
 import v2.models.errors.{ ClientNotAuthorisedError, InternalError }
 
 import scala.concurrent.{ ExecutionContext, Future }

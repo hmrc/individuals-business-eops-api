@@ -18,6 +18,7 @@ package api.controllers
 
 import api.controllers.requestParsers.RequestParser
 import api.hateoas.{ HateoasFactory, HateoasLinksFactory }
+import api.models.hateoas.{ HateoasData, HateoasWrapper }
 import api.models.outcomes.ResponseWrapper
 import cats.data.EitherT
 import cats.implicits._
@@ -27,7 +28,6 @@ import play.api.mvc.Result
 import play.api.mvc.Results.InternalServerError
 import utils.Logging
 import v2.models.errors._
-import v2.models.hateoas.{ HateoasData, HateoasWrapper }
 import api.models.request.RawData
 
 import scala.concurrent.{ ExecutionContext, Future }

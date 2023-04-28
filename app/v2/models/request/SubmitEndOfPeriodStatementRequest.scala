@@ -16,7 +16,7 @@
 
 package v2.models.request
 
-import v2.models.domain.{ Nino, TaxYear }
+import api.models.domain.{ Nino, TaxYear }
 
 case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod) {
   val taxYear: TaxYear = TaxYear.fromIso(submitEndOfPeriod.accountingPeriod.endDate)

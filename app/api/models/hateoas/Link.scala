@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package v2.models
+package api.models.hateoas
 
-import v2.models.auth.UserDetails
-import v2.models.errors.MtdError
+import play.api.libs.json.{ Json, Writes }
 
-package object outcomes {
-  type AuthOutcome = Either[MtdError, UserDetails]
+case class Link(href: String, method: Method, rel: String)
+
+object Link {
+  implicit val writes: Writes[Link] = Json.writes[Link]
 }

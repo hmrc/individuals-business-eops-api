@@ -16,9 +16,9 @@
 
 package api.controllers
 
+import api.models.hateoas.Link
 import play.api.libs.json.{ JsObject, Json }
-import v2.models.hateoas.Link
-import v2.models.hateoas.Method.GET
+import api.models.hateoas.Method.GET
 
 trait ControllerSpecHateoasSupport {
 

@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package v2.models.hateoas
+package api.models.hateoas
 
-import play.api.libs.json.{Json, OWrites}
+import api.models.hateoas.Method.GET
+import play.api.libs.json.{ Json, OWrites }
 import support.UnitSpec
-import v2.models.hateoas.Method.GET
 
 class HateoasWrapperSpec extends UnitSpec {
 
   case class TestMtdResponse(field1: String, field2: Int)
 
   val field2 = 123
-
 
   object TestMtdResponse {
     implicit val writes: OWrites[TestMtdResponse] = Json.writes[TestMtdResponse]

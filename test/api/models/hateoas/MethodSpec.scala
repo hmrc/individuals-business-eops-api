@@ -14,29 +14,12 @@
  * limitations under the License.
  */
 
-package v2.models.outcomes
+package api.models.hateoas
 
-import api.models.outcomes.ResponseWrapper
-import play.api.libs.json.Json
+import api.models.hateoas.Method._
 import support.UnitSpec
+import utils.enums.EnumJsonSpecSupport
 
-class ResponseWrapperSpec extends UnitSpec {
-
-  "ResponseWrapper" should {
-
-    val responseData = Json.parse(
-      """
-        |{
-        |   "who": "Knows"
-        |}
-    """.stripMargin
-    )
-
-    val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
-    val wrapper       = ResponseWrapper(correlationId, responseData)
-
-    "read in a singleError" in {
-      wrapper.map(a => a) shouldBe ResponseWrapper(correlationId, responseData)
-    }
-  }
+class MethodSpec extends UnitSpec with EnumJsonSpecSupport {
+  testRoundTrip[Method](("GET", GET), ("POST", POST), ("DELETE", DELETE))
 }

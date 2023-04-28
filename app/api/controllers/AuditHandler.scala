@@ -17,10 +17,10 @@
 package api.controllers
 
 import api.models.audit.{ AuditEvent, AuditResponse, GenericAuditDetail }
+import api.models.auth.UserDetails
 import api.services.AuditService
 import cats.syntax.either._
 import play.api.libs.json.{ JsValue, Writes }
-import v2.models.auth.UserDetails
 import v2.models.errors.ErrorWrapper
 
 import scala.Function.const

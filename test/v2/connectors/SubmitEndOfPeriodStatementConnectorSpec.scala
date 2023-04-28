@@ -17,11 +17,11 @@
 package v2.connectors
 
 import api.connectors.{ ConnectorSpec, DownstreamOutcome }
+import api.models.domain.{ Nino, TaxYear }
 import api.models.outcomes.ResponseWrapper
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.JsObject
 import v2.data.SubmitEndOfPeriodStatementData._
-import v2.models.domain.{ Nino, TaxYear }
 import v2.models.downstream.TypeOfBusiness
 import v2.models.errors._
 import v2.models.request.SubmitEndOfPeriodStatementRequest

@@ -14,12 +14,28 @@
  * limitations under the License.
  */
 
-package v2.models.hateoas
+package api.models.outcomes
 
-/**
-  * Marker trait that represents data to be used as parameters to the links that are to be returned
-  * for a particular endpoint. This data may be identifiers (e.g. nino and/or other resource id) to embed in
-  * links, or data from the response that determines whether or not a particular link should be returned in
-  * certain scenarios.
-  */
-trait HateoasData
+import play.api.libs.json.Json
+import support.UnitSpec
+
+class ResponseWrapperSpec extends UnitSpec {
+
+  "ResponseWrapper" should {
+
+    val responseData = Json.parse(
+      """
+        |{
+        |   "who": "Knows"
+        |}
+    """.stripMargin
+    )
+
+    val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
+    val wrapper       = ResponseWrapper(correlationId, responseData)
+
+    "read in a singleError" in {
+      wrapper.map(a => a) shouldBe ResponseWrapper(correlationId, responseData)
+    }
+  }
+}
