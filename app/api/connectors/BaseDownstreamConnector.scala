@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package v2.connectors
+package api.connectors
 
-import api.connectors.DownstreamOutcome
-import config.{AppConfig, FeatureSwitches}
-import play.api.http.{HeaderNames, MimeTypes}
+import api.connectors.DownstreamUri.{ DesUri, IfsUri, TaxYearSpecificIfsUri }
+import config.{ AppConfig, FeatureSwitches }
+import play.api.http.{ HeaderNames, MimeTypes }
 import play.api.libs.json.Writes
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
 import utils.Logging
-import v2.connectors.DownstreamUri.{DesUri, IfsUri, TaxYearSpecificIfsUri}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait BaseDownstreamConnector extends Logging {
   val http: HttpClient
@@ -107,6 +106,7 @@ trait BaseDownstreamConnector extends Logging {
     def doDelete(implicit hc: HeaderCarrier): Future[DownstreamOutcome[Resp]] = {
       http.DELETE(getBackendUri(uri))
     }
+
     doDelete(getBackendHeaders(uri, hc, correlationId))
   }
 
@@ -137,7 +137,6 @@ trait BaseDownstreamConnector extends Logging {
   }
 
   private def configFor[Resp](uri: DownstreamUri[Resp]) =
-
     uri match {
       case DesUri(_)                => appConfig.desDownstreamConfig
       case IfsUri(_)                => appConfig.ifsDownstreamConfig

@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package v2.connectors
+package api.connectors
 
-sealed trait DownstreamUri[Resp] {
-  val value: String
-}
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
+import uk.gov.hmrc.http.HeaderCarrier
 
-object DownstreamUri {
-  case class DesUri[Resp](value: String)                extends DownstreamUri[Resp]
-  case class IfsUri[Resp](value: String)                extends DownstreamUri[Resp]
-  case class TaxYearSpecificIfsUri[Resp](value: String) extends DownstreamUri[Resp]
+import scala.concurrent.{ ExecutionContext, Future }
+
+trait MockMtdIdLookupConnector extends MockFactory {
+
+  val mockMtdIdLookupConnector: MtdIdLookupConnector = mock[MtdIdLookupConnector]
+
+  object MockedMtdIdLookupConnector {
+
+    def lookup(nino: String): CallHandler[Future[MtdIdLookupOutcome]] = {
+      (mockMtdIdLookupConnector
+        .getMtdId(_: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, *, *)
+    }
+  }
 }

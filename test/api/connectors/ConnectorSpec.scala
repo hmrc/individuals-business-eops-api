@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.connectors
+package api.connectors
 
 import mocks.MockAppConfig
 import org.scalamock.handlers.CallHandler

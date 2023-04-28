@@ -16,19 +16,19 @@
 
 package v2.connectors
 
-import api.connectors.DownstreamOutcome
+import api.connectors.{ BaseDownstreamConnector, DownstreamOutcome }
 import api.connectors.httpparsers.StandardDownstreamHttpParser
 import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
+import api.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
 import config.AppConfig
-import play.api.http.Status.{ACCEPTED, NO_CONTENT}
+import play.api.http.Status.{ ACCEPTED, NO_CONTENT }
 import play.api.libs.json.JsObject
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
-import v2.connectors.DownstreamUri.{IfsUri, TaxYearSpecificIfsUri}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
 import v2.models.downstream.TypeOfBusiness
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector {
