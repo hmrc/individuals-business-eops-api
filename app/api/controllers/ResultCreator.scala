@@ -18,11 +18,11 @@ package api.controllers
 
 import api.hateoas.{ HateoasFactory, HateoasLinksFactory, HateoasListLinksFactory }
 import api.models.hateoas.{ HateoasData, HateoasWrapper }
+import api.models.request.RawData
 import cats.Functor
 import play.api.http.{ HttpEntity, Status }
 import play.api.libs.json.{ JsValue, Json, Writes }
 import play.api.mvc.{ ResponseHeader, Result, Results }
-import api.models.request.RawData
 
 import scala.language.higherKinds
 

@@ -19,8 +19,8 @@ package v1.connectors
 import mocks.MockAppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.data.SubmitEndOfPeriodStatementData._
-import v1.models.domain.Nino
 import v1.mocks._
+import v1.models.domain.Nino
 import v1.models.downstream.EmptyJsonBody
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
@@ -33,6 +33,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
   val nino: String = "AA123456A"
 
   class Test extends MockHttpClient with MockAppConfig {
+
     val connector: SubmitEndOfPeriodStatementConnector = new SubmitEndOfPeriodStatementConnector(
       http = mockHttpClient,
       appConfig = mockAppConfig
@@ -46,7 +47,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
   "Submit end of period statement" when {
 
-    implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
+    implicit val hc: HeaderCarrier                    = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
     val requiredIfsHeadersPost: Seq[(String, String)] = requiredIfsHeaders ++ Seq("Content-Type" -> "application/json")
 
     "a valid request is supplied" should {
@@ -56,18 +57,18 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         MockedHttpClient
           .post(
             url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+              s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
             requiredHeaders = requiredIfsHeadersPost,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(expected))
+          )
+          .returns(Future.successful(expected))
 
-        await(connector.submitPeriodStatement(
-          SubmitEndOfPeriodStatementRequest(
-            nino = Nino(nino),
-            validRequest)
-        )) shouldBe expected
+        await(
+          connector.submitPeriodStatement(
+            SubmitEndOfPeriodStatementRequest(nino = Nino(nino), validRequest)
+          )) shouldBe expected
       }
     }
 
@@ -78,18 +79,18 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         MockedHttpClient
           .post(
             url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+              s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
             requiredHeaders = requiredIfsHeadersPost,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(expected))
+          )
+          .returns(Future.successful(expected))
 
-        await(connector.submitPeriodStatement(
-          SubmitEndOfPeriodStatementRequest(
-            nino = Nino(nino),
-            validRequest)
-        )) shouldBe expected
+        await(
+          connector.submitPeriodStatement(
+            SubmitEndOfPeriodStatementRequest(nino = Nino(nino), validRequest)
+          )) shouldBe expected
       }
     }
 
@@ -100,18 +101,18 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         MockedHttpClient
           .post(
             url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
-            s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
+              s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
             config = dummyHeaderCarrierConfig,
             body = EmptyJsonBody,
             requiredHeaders = requiredIfsHeadersPost,
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue")
-          ).returns(Future.successful(expected))
+          )
+          .returns(Future.successful(expected))
 
-        await(connector.submitPeriodStatement(
-          SubmitEndOfPeriodStatementRequest(
-            nino = Nino(nino),
-            validRequest)
-        )) shouldBe expected
+        await(
+          connector.submitPeriodStatement(
+            SubmitEndOfPeriodStatementRequest(nino = Nino(nino), validRequest)
+          )) shouldBe expected
       }
     }
   }

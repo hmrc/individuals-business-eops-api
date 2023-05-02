@@ -32,7 +32,6 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 class EnrolmentsAuthServiceSpec extends ServiceSpec with MockAppConfig {
 
-
   private val extraPredicatesAnd = CompositePredicate(
     _,
     AlternatePredicate(

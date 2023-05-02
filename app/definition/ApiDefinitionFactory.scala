@@ -18,14 +18,15 @@ package definition
 
 import config.AppConfig
 import definition.Versions._
-import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.auth.core.ConfidenceLevel
+
+import javax.inject.{ Inject, Singleton }
 
 @Singleton
 class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
 
-  private val readScope = "read:self-assessment"
+  private val readScope  = "read:self-assessment"
   private val writeScope = "write:self-assessment"
 
   lazy val confidenceLevel: ConfidenceLevel = {
@@ -58,21 +59,16 @@ class ApiDefinitionFactory @Inject()(appConfig: AppConfig) {
         context = appConfig.apiGatewayContext,
         categories = Seq("INCOME_TAX_MTD"),
         versions = Seq(
-          APIVersion(
-            version = VERSION_1,
-            status = buildAPIStatus(VERSION_1),
-            endpointsEnabled = appConfig.endpointsEnabled(VERSION_1)),
-          APIVersion(
-            version = VERSION_2,
-            status = buildAPIStatus(VERSION_2),
-            endpointsEnabled = appConfig.endpointsEnabled(VERSION_2))
+          APIVersion(version = VERSION_1, status = buildAPIStatus(VERSION_1), endpointsEnabled = appConfig.endpointsEnabled(VERSION_1)),
+          APIVersion(version = VERSION_2, status = buildAPIStatus(VERSION_2), endpointsEnabled = appConfig.endpointsEnabled(VERSION_2))
         ),
         requiresTrust = None
       )
     )
 
   private[definition] def buildAPIStatus(version: String): APIStatus = {
-    APIStatus.parser.lift(appConfig.apiStatus(version))
+    APIStatus.parser
+      .lift(appConfig.apiStatus(version))
       .getOrElse {
         logger.error(s"[ApiDefinition][buildApiStatus] no API Status found in config.  Reverting to Alpha")
         APIStatus.ALPHA

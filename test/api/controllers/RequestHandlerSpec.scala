@@ -19,12 +19,15 @@ package api.controllers
 import api.controllers.requestParsers.RequestParser
 import api.hateoas.HateoasLinksFactory
 import api.mocks.MockIdGenerator
+import api.mocks.hateoas.MockHateoasFactory
 import api.mocks.services.MockAuditService
 import api.models.audit.{ AuditError, AuditEvent, AuditResponse, GenericAuditDetail }
 import api.models.auth.UserDetails
 import api.models.errors.{ ErrorWrapper, NinoFormatError }
 import api.models.hateoas.{ HateoasData, HateoasWrapper, Link }
 import api.models.outcomes.ResponseWrapper
+import api.models.request.RawData
+import api.services.ServiceOutcome
 import config.AppConfig
 import org.scalamock.handlers.CallHandler
 import play.api.http.{ HeaderNames, Status }
@@ -34,9 +37,6 @@ import play.api.test.{ FakeRequest, ResultExtractors }
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import api.models.request.RawData
-import api.services.ServiceOutcome
-import api.mocks.hateoas.MockHateoasFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ ExecutionContext, Future }

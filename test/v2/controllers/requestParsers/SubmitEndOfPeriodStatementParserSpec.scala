@@ -18,8 +18,8 @@ package v2.controllers.requestParsers
 
 import api.models.domain.Nino
 import api.models.errors.{ BadRequestError, ErrorWrapper, NinoFormatError, TypeOfBusinessFormatError }
-import support.UnitSpec
 import play.api.mvc.AnyContentAsJson
+import support.UnitSpec
 import v2.data.SubmitEndOfPeriodStatementData
 import v2.mocks.validators.MockSubmitEndOfPeriodStatementValidator
 import v2.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }

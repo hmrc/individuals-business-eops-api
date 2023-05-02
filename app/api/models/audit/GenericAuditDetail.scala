@@ -17,9 +17,9 @@
 package api.models.audit
 
 import api.controllers.{ AuditHandler, RequestContext }
+import api.models.auth.UserDetails
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{ JsPath, JsValue, OWrites }
-import api.models.auth.UserDetails
 
 case class GenericAuditDetail(userType: String,
                               agentReferenceNumber: Option[String],

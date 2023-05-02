@@ -23,16 +23,18 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v2.connectors.SubmitEndOfPeriodStatementConnector
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait MockSubmitEndOfPeriodStatementConnector extends MockFactory {
 
-  val connector : SubmitEndOfPeriodStatementConnector = mock[SubmitEndOfPeriodStatementConnector]
+  val connector: SubmitEndOfPeriodStatementConnector = mock[SubmitEndOfPeriodStatementConnector]
 
   object MockSubmitEndOfPeriodStatementConnector {
 
-    def submitEndOfPeriodStatement(submitEndOfPeriodStatementRequest: SubmitEndOfPeriodStatementRequest): CallHandler[Future[DownstreamOutcome[Unit]]] = {
-      (connector.submitPeriodStatement(_ : SubmitEndOfPeriodStatementRequest)(_ : HeaderCarrier, _: ExecutionContext, _: String))
+    def submitEndOfPeriodStatement(
+        submitEndOfPeriodStatementRequest: SubmitEndOfPeriodStatementRequest): CallHandler[Future[DownstreamOutcome[Unit]]] = {
+      (connector
+        .submitPeriodStatement(_: SubmitEndOfPeriodStatementRequest)(_: HeaderCarrier, _: ExecutionContext, _: String))
         .expects(submitEndOfPeriodStatementRequest, *, *, *)
     }
   }

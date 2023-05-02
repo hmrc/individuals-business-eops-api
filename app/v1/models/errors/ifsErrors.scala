@@ -16,7 +16,7 @@
 
 package v1.models.errors
 
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.{ Json, Reads }
 
 case class IfsErrorCode(code: String) {
   def toMtd: MtdError = MtdError(code = code, message = "")
@@ -31,8 +31,8 @@ sealed trait IfsError
 case class IfsErrors(errors: List[IfsErrorCode]) extends IfsError
 
 object IfsErrors {
-  def single(error: IfsErrorCode): IfsErrors = IfsErrors(List(error))
-  def multiple(errors: Seq[IfsErrorCode]): IfsErrors =  IfsErrors(errors.toList)
+  def single(error: IfsErrorCode): IfsErrors         = IfsErrors(List(error))
+  def multiple(errors: Seq[IfsErrorCode]): IfsErrors = IfsErrors(errors.toList)
 }
 
 case class OutboundError(error: MtdError, errors: Option[Seq[MtdError]] = None) extends IfsError

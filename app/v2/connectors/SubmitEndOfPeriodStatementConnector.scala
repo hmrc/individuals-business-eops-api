@@ -16,10 +16,10 @@
 
 package v2.connectors
 
-import api.connectors.{ BaseDownstreamConnector, DownstreamOutcome }
+import api.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
 import api.connectors.httpparsers.StandardDownstreamHttpParser
 import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
-import api.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
+import api.connectors.{ BaseDownstreamConnector, DownstreamOutcome }
 import api.models.downstream.TypeOfBusiness
 import config.AppConfig
 import play.api.http.Status.{ ACCEPTED, NO_CONTENT }

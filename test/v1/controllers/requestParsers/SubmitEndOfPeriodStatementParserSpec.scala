@@ -16,20 +16,20 @@
 
 package v1.controllers.requestParsers
 
-import support.UnitSpec
 import play.api.mvc.AnyContentAsJson
+import support.UnitSpec
 import v1.data.SubmitEndOfPeriodStatementData
-import v1.models.domain.Nino
-import v1.models.errors.{BadRequestError, ErrorWrapper, NinoFormatError, TypeOfBusinessFormatError}
 import v1.mocks.MockSubmitEndOfPeriodStatementParser
-import v1.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
+import v1.models.domain.Nino
+import v1.models.errors.{ BadRequestError, ErrorWrapper, NinoFormatError, TypeOfBusinessFormatError }
+import v1.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
 
-class SubmitEndOfPeriodStatementParserSpec extends UnitSpec{
-  val nino = "AA123456B"
+class SubmitEndOfPeriodStatementParserSpec extends UnitSpec {
+  val nino                           = "AA123456B"
   implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
-
-  val inputData: SubmitEndOfPeriodStatementRawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(SubmitEndOfPeriodStatementData.successJson))
+  val inputData: SubmitEndOfPeriodStatementRawData =
+    SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(SubmitEndOfPeriodStatementData.successJson))
 
   trait Test extends MockSubmitEndOfPeriodStatementParser {
     lazy val parser = new SubmitEndOfPeriodStatementParser(mockValidator)
@@ -41,8 +41,7 @@ class SubmitEndOfPeriodStatementParserSpec extends UnitSpec{
         MockValidator.validate(inputData).returns(Nil)
 
         parser.parseRequest(inputData) shouldBe
-          Right(SubmitEndOfPeriodStatementRequest(Nino(nino),
-            SubmitEndOfPeriodStatementData.validRequest))
+          Right(SubmitEndOfPeriodStatementRequest(Nino(nino), SubmitEndOfPeriodStatementData.validRequest))
       }
     }
 
@@ -56,7 +55,8 @@ class SubmitEndOfPeriodStatementParserSpec extends UnitSpec{
       "multiple validation errors occur" in new Test {
         MockValidator.validate(inputData).returns(List(NinoFormatError, TypeOfBusinessFormatError))
 
-        parser.parseRequest(inputData) shouldBe Left(ErrorWrapper(correlationId, BadRequestError, Some(Seq(NinoFormatError, TypeOfBusinessFormatError))))
+        parser.parseRequest(inputData) shouldBe Left(
+          ErrorWrapper(correlationId, BadRequestError, Some(Seq(NinoFormatError, TypeOfBusinessFormatError))))
       }
     }
   }

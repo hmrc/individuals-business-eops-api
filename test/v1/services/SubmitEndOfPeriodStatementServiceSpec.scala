@@ -17,8 +17,8 @@
 package v1.services
 
 import v1.data.SubmitEndOfPeriodStatementData.validRequest
-import v1.models.domain.Nino
 import v1.mocks.connectors.MockSubmitEndOfPeriodStatementConnector
+import v1.models.domain.Nino
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
 import v1.models.request.SubmitEndOfPeriodStatementRequest
@@ -38,7 +38,8 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
   "service" when {
     "service call successful" must {
       "return mapped result" in new Test {
-        MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(requestData)
+        MockSubmitEndOfPeriodStatementConnector
+          .submitEndOfPeriodStatement(requestData)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, ()))))
 
         await(service.submit(requestData)) shouldBe Right(ResponseWrapper(correlationId, ()))
@@ -51,7 +52,8 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
         def serviceError(ifsErrorCode: String, error: MtdError): Unit =
           s"a $ifsErrorCode error is returned from the service" in new Test {
 
-            MockSubmitEndOfPeriodStatementConnector.submitEndOfPeriodStatement(requestData)
+            MockSubmitEndOfPeriodStatementConnector
+              .submitEndOfPeriodStatement(requestData)
               .returns(Future.successful(Left(ResponseWrapper(correlationId, IfsErrors.single(IfsErrorCode(ifsErrorCode))))))
 
             await(service.submit(requestData)) shouldBe Left(ErrorWrapper(correlationId, error))

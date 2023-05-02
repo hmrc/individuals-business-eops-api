@@ -19,13 +19,14 @@ package v1.connectors.httpparsers
 import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
 import utils.Logging
-import v1.models.errors.{IfsErrors, _}
+import v1.models.errors._
 
-import scala.util.{Success, Try}
+import scala.util.{ Success, Try }
 
 trait HttpParser extends Logging {
 
   implicit class KnownJsonResponse(response: HttpResponse) {
+
     def validateJson[T](implicit reads: Reads[T]): Option[T] = {
       Try(response.json) match {
         case Success(json: JsValue) => parseResult(json)
@@ -35,8 +36,7 @@ trait HttpParser extends Logging {
       }
     }
 
-    def parseResult[T](json: JsValue)
-                      (implicit reads: Reads[T]): Option[T] = json.validate[T] match {
+    def parseResult[T](json: JsValue)(implicit reads: Reads[T]): Option[T] = json.validate[T] match {
 
       case JsSuccess(value, _) => Some(value)
       case JsError(error) =>
@@ -51,22 +51,31 @@ trait HttpParser extends Logging {
 
   private val allowedBvrList =
     List(
-      "C55503", "C55316", "C55525", "C55008", "C55013", "C55014", "C55317", "C55318", "C55501", "C55502"
+      "C55503",
+      "C55316",
+      "C55525",
+      "C55008",
+      "C55013",
+      "C55014",
+      "C55317",
+      "C55318",
+      "C55501",
+      "C55502"
     )
   private val bvrErrorReads: Reads[Seq[IfsErrorCode]] = {
     implicit val errorIdReads: Reads[IfsErrorCode] = (__ \ "id").read[String].map(IfsErrorCode(_))
     (__ \ "bvrfailureResponseElement" \ "validationRuleFailures").read[Seq[IfsErrorCode]]
   }
 
-
   def parseErrors(response: HttpResponse): IfsError = {
-    val singleError = response.validateJson[IfsErrorCode].map(err => IfsErrors(List(err)))
+    val singleError         = response.validateJson[IfsErrorCode].map(err => IfsErrors(List(err)))
     lazy val multipleErrors = response.validateJson(multipleErrorReads).map(errs => IfsErrors(errs))
-    lazy val bvrErrors = response.validateJson(bvrErrorReads)
+    lazy val bvrErrors = response
+      .validateJson(bvrErrorReads)
       .map(errs => {
         val bvrErrorList = errs.map {
           case err if allowedBvrList.contains(err.code) => err
-          case _@err => err.copy(code = "BVR_UNKNOWN_ID")
+          case _ @err                                   => err.copy(code = "BVR_UNKNOWN_ID")
         }
         IfsErrors(bvrErrorList.toList)
       })

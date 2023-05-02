@@ -20,13 +20,14 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import v1.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v1.models.errors.ErrorWrapper
-import v1.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
+import v1.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
 
 trait MockSubmitEndOfPeriodStatementParser extends MockFactory {
 
   val mockSubmitEndOfPeriodStatementParser: SubmitEndOfPeriodStatementParser = mock[SubmitEndOfPeriodStatementParser]
 
   object MockSubmitEndOfPeriodStatementParser {
+
     def parseRequest(data: SubmitEndOfPeriodStatementRawData): CallHandler[Either[ErrorWrapper, SubmitEndOfPeriodStatementRequest]] = {
       (mockSubmitEndOfPeriodStatementParser.parseRequest(_: SubmitEndOfPeriodStatementRawData)(_: String)).expects(data, *)
     }

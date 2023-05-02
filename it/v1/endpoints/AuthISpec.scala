@@ -20,10 +20,10 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import itData.SubmitEndOfPeriodStatementData.fullValidJson
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status
-import play.api.libs.ws.{WSRequest, WSResponse}
+import play.api.libs.ws.{ WSRequest, WSResponse }
 import play.api.test.Helpers.AUTHORIZATION
 import support.V1IntegrationBaseSpec
-import v1.stubs.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
+import v1.stubs.{ AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub }
 
 class AuthISpec extends V1IntegrationBaseSpec {
 
@@ -38,8 +38,7 @@ class AuthISpec extends V1IntegrationBaseSpec {
     def ifsUri(nino: String = nino,
                incomeSourceType: String = "self-employment",
                accountingPeriodStartDate: String = "2021-04-06",
-               accountingPeriodEndDate: String = "2022-04-05"
-              ): String = {
+               accountingPeriodEndDate: String = "2022-04-05"): String = {
       s"/income-tax/income-sources/nino/" +
         s"$nino/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration"
     }
@@ -49,9 +48,7 @@ class AuthISpec extends V1IntegrationBaseSpec {
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri)
-        .withHttpHeaders(
-          (ACCEPT, "application/vnd.hmrc.1.0+json"),
-          (AUTHORIZATION, "Bearer 123")) // some bearer token))
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.1.0+json"), (AUTHORIZATION, "Bearer 123")) // some bearer token))
     }
 
     def errorBody(code: String, message: String): String =

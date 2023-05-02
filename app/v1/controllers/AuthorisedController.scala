@@ -24,9 +24,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import v1.models.auth.UserDetails
 import v1.models.errors._
-import v1.services.{EnrolmentsAuthService, MtdIdLookupService}
+import v1.services.{ EnrolmentsAuthService, MtdIdLookupService }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class UserRequest[A](userDetails: UserDetails, request: Request[A]) extends WrappedRequest[A](request)
 
@@ -34,6 +34,7 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
 
   val authService: EnrolmentsAuthService
   val lookupService: MtdIdLookupService
+
   // $COVERAGE-OFF$
   //TODO Add coverage back on when another api with a body is added
   def authorisedAction(nino: String): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
@@ -61,11 +62,11 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
       implicit val headerCarrier: HeaderCarrier = hc(request)
 
       lookupService.lookup(nino).flatMap[Result] {
-        case Right(mtdId)            => invokeBlockWithAuthCheck(mtdId, request, block)
-        case Left(NinoFormatError)   => Future.successful(BadRequest(Json.toJson(NinoFormatError)))
-        case Left(UnauthorisedError) => Future.successful(Forbidden(Json.toJson(UnauthorisedError)))
+        case Right(mtdId)                  => invokeBlockWithAuthCheck(mtdId, request, block)
+        case Left(NinoFormatError)         => Future.successful(BadRequest(Json.toJson(NinoFormatError)))
+        case Left(UnauthorisedError)       => Future.successful(Forbidden(Json.toJson(UnauthorisedError)))
         case Left(InvalidBearerTokenError) => Future.successful(Unauthorized(Json.toJson(InvalidBearerTokenError)))
-        case Left(_)                 => Future.successful(InternalServerError(Json.toJson(DownstreamError)))
+        case Left(_)                       => Future.successful(InternalServerError(Json.toJson(DownstreamError)))
       }
     }
   }

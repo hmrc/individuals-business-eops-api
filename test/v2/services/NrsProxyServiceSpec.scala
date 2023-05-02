@@ -16,8 +16,8 @@
 
 package v2.services
 
-import api.services.ServiceSpec
 import api.models.downstream.TypeOfBusiness.`foreign-property`
+import api.services.ServiceSpec
 import v2.mocks.connectors.MockNrsProxyConnector
 import v2.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
 

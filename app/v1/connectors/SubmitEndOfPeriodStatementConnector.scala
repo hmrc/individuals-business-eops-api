@@ -18,12 +18,11 @@ package v1.connectors
 
 import api.connectors.DownstreamUri.IfsUri
 import config.AppConfig
-
-import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient }
 import v1.models.downstream.EmptyJsonBody
 import v1.models.request.SubmitEndOfPeriodStatementRequest
 
+import javax.inject.{ Inject, Singleton }
 import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton

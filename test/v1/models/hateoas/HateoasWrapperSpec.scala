@@ -16,7 +16,7 @@
 
 package v1.models.hateoas
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{ Json, OWrites }
 import support.UnitSpec
 import v1.models.hateoas.Method.GET
 
@@ -25,7 +25,6 @@ class HateoasWrapperSpec extends UnitSpec {
   case class TestMtdResponse(field1: String, field2: Int)
 
   val field2 = 123
-
 
   object TestMtdResponse {
     implicit val writes: OWrites[TestMtdResponse] = Json.writes[TestMtdResponse]

@@ -18,10 +18,10 @@ package v2.controllers.requestParsers
 
 import api.controllers.requestParsers.RequestParser
 import api.models.domain.Nino
-
-import javax.inject.{ Inject, Singleton }
 import v2.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
 import v2.models.request.{ SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
+
+import javax.inject.{ Inject, Singleton }
 
 @Singleton
 class SubmitEndOfPeriodStatementParser @Inject()(val validator: SubmitEndOfPeriodStatementValidator)

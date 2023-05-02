@@ -16,14 +16,14 @@
 
 package v2.models.requestData
 
-import java.time.LocalDate
-
 import support.UnitSpec
 import v2.models.request.DownstreamTaxYear
 
+import java.time.LocalDate
+
 class DownstreamTaxYearSpec extends UnitSpec {
 
-  val taxYear = "2018-19"
+  val taxYear           = "2018-19"
   val downstreamTaxYear = "2019"
 
   "DownstreamTaxYear" should {
@@ -39,7 +39,7 @@ class DownstreamTaxYearSpec extends UnitSpec {
         year.value shouldBe taxYear
       }
     }
-    "generate a tax year as a string" when{
+    "generate a tax year as a string" when {
       "given a string" in {
         val year = DownstreamTaxYear("2018-19")
         year.toString shouldBe taxYear

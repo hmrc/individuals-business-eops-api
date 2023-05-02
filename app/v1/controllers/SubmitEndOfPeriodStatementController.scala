@@ -18,10 +18,9 @@ package v1.controllers
 
 import cats.data.EitherT
 import cats.implicits._
-import javax.inject._
 import play.api.http.MimeTypes
-import play.api.libs.json.{JsDefined, JsObject, JsUndefined, JsValue, Json}
-import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
+import play.api.libs.json._
+import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents, Result }
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import utils.{ IdGenerator, Logging }
@@ -31,7 +30,8 @@ import v1.models.errors._
 import v1.models.request.SubmitEndOfPeriodStatementRawData
 import v1.services._
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject._
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class SubmitEndOfPeriodStatementController @Inject()(val authService: EnrolmentsAuthService,
@@ -42,14 +42,15 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
                                                      requestParser: SubmitEndOfPeriodStatementParser,
                                                      auditService: AuditService,
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
-    extends AuthorisedController(cc) with BaseController with Logging {
+    extends AuthorisedController(cc)
+    with BaseController
+    with Logging {
 
-  implicit val endpointLogContext: EndpointLogContext = EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController",
-    endpointName = "Submit end of period statement")
+  implicit val endpointLogContext: EndpointLogContext =
+    EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController", endpointName = "Submit end of period statement")
 
   def handleRequest(nino: String): Action[JsValue] =
     authorisedAction(nino).async(parse.json) { implicit request =>
-
       implicit val correlationId: String = idGenerator.generateCorrelationId
       logger.info(
         s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
@@ -58,7 +59,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
       val auditRequestJson = request.body \ "finalised" match {
         case JsDefined(finalised) =>
           request.body.as[JsObject] - "finalised" ++ Json.obj("endOfPeriodStatementFinalised" -> finalised)
-        case _: JsUndefined       => request.body
+        case _: JsUndefined => request.body
       }
 
       val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
@@ -74,22 +75,26 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
             s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
               s"Success response received with CorrelationId: ${serviceResponse.correlationId}")
 
-          auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson,
-            correlationId, AuditResponse(NO_CONTENT, Right(None))))
+          auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson, correlationId, AuditResponse(NO_CONTENT, Right(None))))
 
-          NoContent.withApiHeaders(serviceResponse.correlationId)
+          NoContent
+            .withApiHeaders(serviceResponse.correlationId)
             .as(MimeTypes.JSON)
         }
 
       result.leftMap { errorWrapper =>
         val resCorrelationId = errorWrapper.correlationId
-        val result = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
+        val result           = errorResult(errorWrapper).withApiHeaders(resCorrelationId)
         logger.warn(
           s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
             s"Error response received with CorrelationId: $resCorrelationId")
 
-        auditSubmission(GenericAuditDetail(request.userDetails, nino, auditRequestJson,
-          correlationId, AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
+        auditSubmission(
+          GenericAuditDetail(request.userDetails,
+                             nino,
+                             auditRequestJson,
+                             correlationId,
+                             AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
 
         result
       }.merge
@@ -97,32 +102,14 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
 
   private def errorResult(errorWrapper: ErrorWrapper): Result = {
     (errorWrapper.error) match {
-      case BadRequestError |
-           NinoFormatError |
-           TypeOfBusinessFormatError |
-           BusinessIdFormatError |
-           StartDateFormatError |
-           EndDateFormatError |
-           FinalisedFormatError |
-           CustomMtdError(RuleIncorrectOrEmptyBodyError.code) |
-           RangeEndDateBeforeStartDateError |
-           RuleNotFinalisedError
-                => BadRequest(Json.toJson(errorWrapper))
+      case BadRequestError | NinoFormatError | TypeOfBusinessFormatError | BusinessIdFormatError | StartDateFormatError | EndDateFormatError |
+          FinalisedFormatError | CustomMtdError(RuleIncorrectOrEmptyBodyError.code) | RangeEndDateBeforeStartDateError | RuleNotFinalisedError =>
+        BadRequest(Json.toJson(errorWrapper))
 
-      case BVRError |
-           RuleAlreadySubmittedError |
-           RuleEarlySubmissionError |
-           RuleLateSubmissionError |
-           RuleNonMatchingPeriodError |
-           RuleConsolidatedExpensesError |
-           RuleMismatchedStartDateError |
-           RuleMismatchedEndDateError |
-           RuleClass4Over16Error |
-           RuleClass4PensionAge |
-           RuleFHLPrivateUseAdjustment |
-           RuleNonFHLPrivateUseAdjustment |
-           RuleBusinessValidationFailure
-                => Forbidden(Json.toJson(errorWrapper))
+      case BVRError | RuleAlreadySubmittedError | RuleEarlySubmissionError | RuleLateSubmissionError | RuleNonMatchingPeriodError |
+          RuleConsolidatedExpensesError | RuleMismatchedStartDateError | RuleMismatchedEndDateError | RuleClass4Over16Error | RuleClass4PensionAge |
+          RuleFHLPrivateUseAdjustment | RuleNonFHLPrivateUseAdjustment | RuleBusinessValidationFailure =>
+        Forbidden(Json.toJson(errorWrapper))
 
       case NotFoundError   => NotFound(Json.toJson(errorWrapper))
       case DownstreamError => InternalServerError(Json.toJson(errorWrapper))

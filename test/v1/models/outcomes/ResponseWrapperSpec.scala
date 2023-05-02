@@ -32,7 +32,7 @@ class ResponseWrapperSpec extends UnitSpec {
     )
 
     val correlationId = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
-    val wrapper  = ResponseWrapper(correlationId, responseData)
+    val wrapper       = ResponseWrapper(correlationId, responseData)
 
     "read in a singleError" in {
       wrapper.map(a => a) shouldBe ResponseWrapper(correlationId, responseData)

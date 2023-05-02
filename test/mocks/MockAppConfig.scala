@@ -16,7 +16,7 @@
 
 package mocks
 
-import config.{AppConfig, ConfidenceLevelConfig}
+import config.{ AppConfig, ConfidenceLevelConfig }
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import play.api.Configuration
@@ -49,11 +49,13 @@ trait MockAppConfig extends MockFactory {
     def ifsEnvironmentHeaders: CallHandler[Option[Seq[String]]] = (mockAppConfig.ifsEnvironmentHeaders _).expects()
 
     // API Config
-    def featureSwitches: CallHandler[Configuration]                     = (mockAppConfig.featureSwitches _: () => Configuration).expects()
-    def apiGatewayContext: CallHandler[String]                          = (mockAppConfig.apiGatewayContext _: () => String).expects()
-    def apiStatus(status: String): CallHandler[String]                  = (mockAppConfig.apiStatus: String => String).expects(status)
-    def endpointsEnabled(version: String): CallHandler[Boolean]         = (mockAppConfig.endpointsEnabled: String => Boolean).expects(version)
-    def confidenceLevelCheckEnabled: CallHandler[ConfidenceLevelConfig] = (mockAppConfig.confidenceLevelConfig _: () => ConfidenceLevelConfig).expects()
+    def featureSwitches: CallHandler[Configuration]             = (mockAppConfig.featureSwitches _: () => Configuration).expects()
+    def apiGatewayContext: CallHandler[String]                  = (mockAppConfig.apiGatewayContext _: () => String).expects()
+    def apiStatus(status: String): CallHandler[String]          = (mockAppConfig.apiStatus: String => String).expects(status)
+    def endpointsEnabled(version: String): CallHandler[Boolean] = (mockAppConfig.endpointsEnabled: String => Boolean).expects(version)
+
+    def confidenceLevelCheckEnabled: CallHandler[ConfidenceLevelConfig] =
+      (mockAppConfig.confidenceLevelConfig _: () => ConfidenceLevelConfig).expects()
 
     // NRS Config
     def mtdNrsProxyBaseUrl: CallHandler[String] = (mockAppConfig.mtdNrsProxyBaseUrl _).expects()
