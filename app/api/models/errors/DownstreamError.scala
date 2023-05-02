@@ -16,7 +16,7 @@
 
 package api.models.errors
 
-import play.api.libs.json.{ JsPath, Json, Reads }
+import play.api.libs.json.{ JsPath, Json, Reads, __ }
 
 case class DownstreamErrorCode(code: String) {
   def toMtd(httpStatus: Int): MtdError = MtdError(code = code, message = "", httpStatus = httpStatus)
@@ -35,14 +35,17 @@ object DownstreamError {
       implicitly[Reads[DownstreamBvrError]].map[DownstreamError](identity)
 }
 
-case class DownstreamErrors(failures: List[DownstreamErrorCode]) extends DownstreamError {}
+case class DownstreamErrors(errors: List[DownstreamErrorCode]) extends DownstreamError {}
 
 object DownstreamErrors {
-  implicit val reads: Reads[DownstreamErrors] = Json.reads
+  implicit val reads: Reads[DownstreamErrors] = (
+    (__ \ "errors").read[List[DownstreamErrorCode]].map(DownstreamErrors(_)) orElse
+      (__ \ "failures").read[List[DownstreamErrorCode]].map(DownstreamErrors(_))
+  )
 
   def single(error: DownstreamErrorCode): DownstreamErrors = DownstreamErrors(List(error))
 
-  def apply(failures: DownstreamErrorCode*): DownstreamErrors = DownstreamErrors(failures.toList)
+  def apply(errors: DownstreamErrorCode*): DownstreamErrors = DownstreamErrors(errors.toList)
 }
 
 case class DownstreamBvrError(

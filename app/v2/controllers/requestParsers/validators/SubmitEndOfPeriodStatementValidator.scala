@@ -17,15 +17,7 @@
 package v2.controllers.requestParsers.validators
 
 import api.controllers.requestParsers.validators.Validator
-import api.controllers.requestParsers.validators.validations.{
-  BusinessIdValidation,
-  DateValidation,
-  FinalisedValidation,
-  JsonFormatValidation,
-  NinoValidation,
-  NoValidationErrors,
-  TypeOfBusinessValidation
-}
+import api.controllers.requestParsers.validators.validations._
 import api.models.errors.MtdError
 import v2.models.request.{ SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData }
 
