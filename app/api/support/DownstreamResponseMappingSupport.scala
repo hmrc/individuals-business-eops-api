@@ -33,10 +33,10 @@ trait DownstreamResponseMappingSupport {
     }
 
     downstreamResponseWrapper match {
-      case ResponseWrapper(correlationId, DownstreamStandardError(error :: Nil)) =>
+      case ResponseWrapper(correlationId, DownstreamErrors(error :: Nil)) =>
         ErrorWrapper(correlationId, errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping), None)
 
-      case ResponseWrapper(correlationId, DownstreamStandardError(errorCodes)) =>
+      case ResponseWrapper(correlationId, DownstreamErrors(errorCodes)) =>
         val mtdErrors = errorCodes.map(error => errorCodeMap.applyOrElse(error.code, defaultErrorCodeMapping))
 
         if (mtdErrors.contains(InternalError)) {

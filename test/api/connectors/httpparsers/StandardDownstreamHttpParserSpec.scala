@@ -19,7 +19,7 @@ package api.connectors.httpparsers
 import api.connectors.DownstreamOutcome
 import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
 import api.models.errors
-import api.models.errors.{ DownstreamBvrError, DownstreamErrorCode, DownstreamStandardError, DownstreamValidationRuleFailure, OutboundError }
+import api.models.errors.{ DownstreamBvrError, DownstreamErrorCode, DownstreamErrors, DownstreamValidationRuleFailure, OutboundError }
 import api.models.outcomes.ResponseWrapper
 import play.api.http.Status._
 import play.api.libs.json._
@@ -119,8 +119,7 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
         "be able to parse a standard error" in {
           val httpResponse = HttpResponse(responseCode, standardErrorJson, Map("CorrelationId" -> Seq(correlationId)))
 
-          httpReads.read(method, url, httpResponse) shouldBe Left(
-            ResponseWrapper(correlationId, DownstreamStandardError(DownstreamErrorCode("CODE"))))
+          httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, DownstreamErrors(DownstreamErrorCode("CODE"))))
         }
 
         "return an outbound error when the error returned doesn't match the Error model" in {

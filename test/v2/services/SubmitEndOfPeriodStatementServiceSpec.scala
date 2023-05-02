@@ -60,7 +60,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
 
         def simpleServiceError(downstreamErrorCode: String, singleMtdError: MtdError): Unit =
           s"a $downstreamErrorCode error is returned from the service" in
-            fullServiceErrorTest(DownstreamStandardError(List(DownstreamErrorCode(downstreamErrorCode))), ErrorWrapper(correlationId, singleMtdError))
+            fullServiceErrorTest(DownstreamErrors(List(DownstreamErrorCode(downstreamErrorCode))), ErrorWrapper(correlationId, singleMtdError))
 
         val errors = Seq(
           ("INVALID_IDTYPE", InternalError),

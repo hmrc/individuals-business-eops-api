@@ -39,7 +39,7 @@ class DownstreamErrorsSpec extends UnitSpec {
           |}""".stripMargin
       )
 
-      downstreamErrorsJson.as[DownstreamError] shouldBe DownstreamStandardError(List(DownstreamErrorCode("CODE 1"), DownstreamErrorCode("CODE 2")))
+      downstreamErrorsJson.as[DownstreamError] shouldBe DownstreamErrors(List(DownstreamErrorCode("CODE 1"), DownstreamErrorCode("CODE 2")))
     }
 
     "be able to read a JSON bvr error format" in {

@@ -18,27 +18,31 @@ package api.models.errors
 
 import play.api.libs.json.{ JsPath, Json, Reads }
 
+case class DownstreamErrorCode(code: String) {
+  def toMtd(httpStatus: Int): MtdError = MtdError(code = code, message = "", httpStatus = httpStatus)
+}
+
+object DownstreamErrorCode {
+  implicit val reads: Reads[DownstreamErrorCode] = Json.reads[DownstreamErrorCode]
+}
+
 sealed trait DownstreamError
 
 object DownstreamError {
   // Note that we only deserialize for standard and BVR error formats; OutboundError is created programmatically as required
   implicit def reads: Reads[DownstreamError] =
-    implicitly[Reads[DownstreamStandardError]].map[DownstreamError](identity) orElse
+    implicitly[Reads[DownstreamErrors]].map[DownstreamError](identity) orElse
       implicitly[Reads[DownstreamBvrError]].map[DownstreamError](identity)
 }
 
-case class DownstreamStandardError(failures: List[DownstreamErrorCode]) extends DownstreamError
+case class DownstreamErrors(failures: List[DownstreamErrorCode]) extends DownstreamError {}
 
-object DownstreamStandardError {
-  implicit val reads: Reads[DownstreamStandardError] = Json.reads
+object DownstreamErrors {
+  implicit val reads: Reads[DownstreamErrors] = Json.reads
 
-  def apply(failures: DownstreamErrorCode*): DownstreamStandardError = DownstreamStandardError(failures.toList)
-}
+  def single(error: DownstreamErrorCode): DownstreamErrors = DownstreamErrors(List(error))
 
-case class DownstreamErrorCode(code: String)
-
-object DownstreamErrorCode {
-  implicit val reads: Reads[DownstreamErrorCode] = Json.reads[DownstreamErrorCode]
+  def apply(failures: DownstreamErrorCode*): DownstreamErrors = DownstreamErrors(failures.toList)
 }
 
 case class DownstreamBvrError(
