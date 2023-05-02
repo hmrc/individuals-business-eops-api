@@ -16,13 +16,10 @@
 
 package v2.models.request
 
-import play.api.libs.json.{Json, OFormat}
-import v2.models.downstream.TypeOfBusiness
+import api.models.downstream.TypeOfBusiness
+import play.api.libs.json.{ Json, OFormat }
 
-case class SubmitEndOfPeriod(typeOfBusiness: TypeOfBusiness,
-                             businessId: String,
-                             accountingPeriod: AccountingPeriod,
-                             finalised: Boolean)
+case class SubmitEndOfPeriod(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
 
 object SubmitEndOfPeriod {
   implicit val format: OFormat[SubmitEndOfPeriod] = Json.format[SubmitEndOfPeriod]

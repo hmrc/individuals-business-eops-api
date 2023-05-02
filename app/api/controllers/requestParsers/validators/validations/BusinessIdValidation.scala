@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package v2.controllers.requestParsers.validators
+package api.controllers.requestParsers.validators.validations
 
-package object validations {
-  val NoValidationErrors = List()
+import api.models.errors.{ BusinessIdFormatError, MtdError }
+
+object BusinessIdValidation {
+
+  def validateBusinessId(businessId: String): List[MtdError] = {
+    //400 FORMAT_BUSINESS_ID The provided Business ID is invalid
+    if (businessId.matches("^X[A-Z0-9]{1}IS[0-9]{11}$")) NoValidationErrors else List(BusinessIdFormatError)
+  }
 }

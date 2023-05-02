@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.models.downstream
+package api.models.downstream
 
 import play.api.libs.json._
 import utils.enums.Enums
@@ -36,11 +36,9 @@ object TypeOfBusiness {
   val parser: PartialFunction[String, TypeOfBusiness] = Enums.parser[TypeOfBusiness]
 
   def toTys(tob: TypeOfBusiness): String = tob match {
-    case `self-employment` => "01"
-    case `uk-property` => "02"
+    case `self-employment`  => "01"
+    case `uk-property`      => "02"
     case `foreign-property` => "15"
   }
 
 }
-
-

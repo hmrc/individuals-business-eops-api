@@ -20,11 +20,11 @@ import api.connectors.{ BaseDownstreamConnector, DownstreamOutcome }
 import api.connectors.httpparsers.StandardDownstreamHttpParser
 import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
 import api.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
+import api.models.downstream.TypeOfBusiness
 import config.AppConfig
 import play.api.http.Status.{ ACCEPTED, NO_CONTENT }
 import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
-import v2.models.downstream.TypeOfBusiness
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
 import javax.inject.{ Inject, Singleton }

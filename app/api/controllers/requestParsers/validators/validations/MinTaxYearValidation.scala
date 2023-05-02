@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package v2.controllers.requestParsers.validators.validations
+package api.controllers.requestParsers.validators.validations
 
 import api.models.errors.{ MtdError, RuleTaxYearNotSupportedError, TaxYearFormatError }
 import v2.models.request.DownstreamTaxYear

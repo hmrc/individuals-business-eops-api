@@ -16,10 +16,11 @@
 
 package v2.models.downstream
 
+import api.models.downstream.TypeOfBusiness
+import api.models.downstream.TypeOfBusiness.{ `foreign-property`, `self-employment`, `uk-property` }
 import support.UnitSpec
 import utils.enums.EnumJsonSpecSupport
-import v2.models.downstream.TypeOfBusiness.{`foreign-property`, `self-employment`, `uk-property`}
 
 class TypeOfBusinessSpec extends UnitSpec with EnumJsonSpecSupport {
-  testRoundTrip[TypeOfBusiness](("self-employment",`self-employment` ), ("uk-property", `uk-property`),("foreign-property",`foreign-property`))
+  testRoundTrip[TypeOfBusiness](("self-employment", `self-employment`), ("uk-property", `uk-property`), ("foreign-property", `foreign-property`))
 }

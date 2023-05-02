@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package v2.controllers.requestParsers.validators.validations
+package api.controllers.requestParsers.validators.validations
 
+import api.models.downstream.TypeOfBusiness
 import api.models.errors.{ MtdError, TypeOfBusinessFormatError }
-import v2.models.downstream.TypeOfBusiness
 
 object TypeOfBusinessValidation {
 
