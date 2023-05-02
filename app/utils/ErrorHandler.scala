@@ -16,8 +16,7 @@
 
 package utils
 
-import api.models.errors
-import api.models.errors.{ BadRequestError, ClientNotAuthenticatedError, InvalidBodyTypeError, InvalidHttpMethodError, MtdError, NotFoundError }
+import api.models.errors._
 import definition.Versions
 import play.api.Configuration
 import play.api.http.Status._
@@ -94,12 +93,12 @@ class ErrorHandler @Inject()(config: Configuration, auditConnector: AuditConnect
       case _: NotFoundException      => (NotFoundError, "ResourceNotFound")
       case _: AuthorisationException => (ClientNotAuthenticatedError, "ClientError")
       case _: JsValidationException  => (BadRequestError, "ServerValidationError")
-      case e: HttpException          => (BadRequestError, "ServerValidationError")
+      case _: HttpException          => (BadRequestError, "ServerValidationError")
       case e: UpstreamErrorResponse if UpstreamErrorResponse.Upstream4xxResponse.unapply(e).isDefined =>
         (BadRequestError, "ServerValidationError")
       case e: UpstreamErrorResponse if UpstreamErrorResponse.Upstream5xxResponse.unapply(e).isDefined =>
-        (errors.InternalError, "ServerInternalError")
-      case _ => (errors.InternalError, "ServerInternalError")
+        (InternalError, "ServerInternalError")
+      case _ => (InternalError, "ServerInternalError")
     }
 
     auditConnector.sendEvent(

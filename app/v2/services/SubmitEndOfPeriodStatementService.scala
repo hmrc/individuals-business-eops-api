@@ -17,7 +17,6 @@
 package v2.services
 
 import api.controllers.{ EndpointLogContext, RequestContext }
-import api.models
 import api.models.errors._
 import api.models.outcomes.ResponseWrapper
 import api.services.{ BaseService, ServiceOutcome }
@@ -55,31 +54,31 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
 
   private val downstreamErrorMap: Map[String, MtdError] = {
     val errors = Map(
-      "INVALID_IDTYPE"                    -> models.errors.InternalError,
+      "INVALID_IDTYPE"                    -> InternalError,
       "INVALID_IDVALUE"                   -> NinoFormatError,
       "INVALID_ACCOUNTINGPERIODSTARTDATE" -> StartDateFormatError,
       "INVALID_ACCOUNTINGPERIODENDDATE"   -> EndDateFormatError,
       "INVALID_INCOMESOURCEID"            -> BusinessIdFormatError,
       "INVALID_INCOMESOURCETYPE"          -> TypeOfBusinessFormatError,
-      "INVALID_CORRELATIONID"             -> models.errors.InternalError,
+      "INVALID_CORRELATIONID"             -> InternalError,
       "EARLY_SUBMISSION"                  -> RuleEarlySubmissionError,
       "LATE_SUBMISSION"                   -> RuleLateSubmissionError,
       "NON_MATCHING_PERIOD"               -> RuleNonMatchingPeriodError,
       "NOT_FOUND"                         -> NotFoundError,
       "CONFLICT"                          -> RuleAlreadySubmittedError,
-      "SERVER_ERROR"                      -> models.errors.InternalError,
-      "SERVICE_UNAVAILABLE"               -> models.errors.InternalError
+      "SERVER_ERROR"                      -> InternalError,
+      "SERVICE_UNAVAILABLE"               -> InternalError
     )
 
     val extraTysErrors = Map(
-      "INVALID_TAX_YEAR"           -> models.errors.InternalError,
+      "INVALID_TAX_YEAR"           -> InternalError,
       "INVALID_TAXABLE_ENTITY_ID"  -> NinoFormatError,
       "INVALID_START_DATE"         -> StartDateFormatError,
       "INVALID_END_DATE"           -> EndDateFormatError,
       "INVALID_INCOME_SOURCE_ID"   -> BusinessIdFormatError,
       "INVALID_INCOME_SOURCE_TYPE" -> TypeOfBusinessFormatError,
-      "INVALID_PAYLOAD"            -> models.errors.InternalError,
-      "INVALID_QUERY_PARAMETERS"   -> models.errors.InternalError,
+      "INVALID_PAYLOAD"            -> InternalError,
+      "INVALID_QUERY_PARAMETERS"   -> InternalError,
       "PERIOD_MISMATCH"            -> RuleNonMatchingPeriodError,
       "BVR_FAILURE"                -> RuleBusinessValidationFailureTys,
       "TAX_YEAR_NOT_SUPPORTED"     -> RuleTaxYearNotSupportedError

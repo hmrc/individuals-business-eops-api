@@ -37,7 +37,7 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
                                                                         ec: ExecutionContext,
                                                                         correlationId: String): Future[DownstreamOutcome[Unit]] = {
     import request._
-    val nino                      = request.nino.nino
+
     val incomeSourceType          = submitEndOfPeriod.typeOfBusiness
     val accountingPeriodStartDate = submitEndOfPeriod.accountingPeriod.startDate
     val accountingPeriodEndDate   = submitEndOfPeriod.accountingPeriod.endDate

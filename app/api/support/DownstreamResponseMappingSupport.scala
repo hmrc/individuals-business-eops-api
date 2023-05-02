@@ -17,16 +17,7 @@
 package api.support
 
 import api.controllers.EndpointLogContext
-import api.models.errors.{
-  BadRequestError,
-  DownstreamBvrError,
-  DownstreamError,
-  DownstreamStandardError,
-  ErrorWrapper,
-  InternalError,
-  MtdError,
-  OutboundError
-}
+import api.models.errors._
 import api.models.outcomes.ResponseWrapper
 import utils.Logging
 
