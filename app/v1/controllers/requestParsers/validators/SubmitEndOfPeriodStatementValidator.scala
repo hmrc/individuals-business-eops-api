@@ -16,15 +16,17 @@
 
 package v1.controllers.requestParsers.validators
 
-import javax.inject.Singleton
-import play.api.libs.json.{JsLookupResult, JsValue}
+import api.controllers.requestParsers.validators.validations.NoValidationErrors
+import play.api.libs.json.{ JsLookupResult, JsValue }
 import v1.controllers.requestParsers.validators.validations.BusinessIdValidation._
+import v1.controllers.requestParsers.validators.validations.DateValidation._
 import v1.controllers.requestParsers.validators.validations.FinalisedValidation._
 import v1.controllers.requestParsers.validators.validations.TypeOfBusinessValidation._
-import v1.controllers.requestParsers.validators.validations.DateValidation._
 import v1.controllers.requestParsers.validators.validations._
 import v1.models.errors._
-import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData}
+import v1.models.request.{ AccountingPeriod, SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData }
+
+import javax.inject.Singleton
 
 @Singleton
 class SubmitEndOfPeriodStatementValidator extends Validator[SubmitEndOfPeriodStatementRawData] {
@@ -38,23 +40,22 @@ class SubmitEndOfPeriodStatementValidator extends Validator[SubmitEndOfPeriodSta
   def jsonValidation(json: JsValue): List[MtdError] = {
 
     val typeOfBusiness: Option[String] = (json \ "typeOfBusiness").asOpt[String]
-    val businessId = (json \ "businessId").asOpt[String]
-    val accountingPeriod = (json \ "accountingPeriod").asOpt[AccountingPeriod]
-    val finalised: JsLookupResult = json \ "finalised"
+    val businessId                     = (json \ "businessId").asOpt[String]
+    val accountingPeriod               = (json \ "accountingPeriod").asOpt[AccountingPeriod]
+    val finalised: JsLookupResult      = json \ "finalised"
 
     typeOfBusiness.map(typeOfBusinessFormat).getOrElse(NoValidationErrors) ++
       businessId.map(validateBusinessId).getOrElse(NoValidationErrors) ++
-      accountingPeriod.map(period => validateDates(period.startDate,period.endDate)).getOrElse(NoValidationErrors) ++
+      accountingPeriod.map(period => validateDates(period.startDate, period.endDate)).getOrElse(NoValidationErrors) ++
       validateFinalised(finalised)
   }
 
   private def bodyFormatValidator: SubmitEndOfPeriodStatementRawData => List[List[MtdError]] = { data =>
-
-    val jsonValidationErrors = jsonValidation(data.body.json)
+    val jsonValidationErrors                     = jsonValidation(data.body.json)
     lazy val jsonModelValidation: List[MtdError] = JsonFormatValidation.validate[SubmitEndOfPeriod](data.body.json)
 
     val errors = List(
-      if(jsonValidationErrors.nonEmpty) jsonValidationErrors else jsonModelValidation
+      if (jsonValidationErrors.nonEmpty) jsonValidationErrors else jsonModelValidation
     )
 
     List(Validator.flattenErrors(errors))

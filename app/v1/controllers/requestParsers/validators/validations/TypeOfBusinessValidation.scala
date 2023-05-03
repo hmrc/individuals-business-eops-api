@@ -16,15 +16,16 @@
 
 package v1.controllers.requestParsers.validators.validations
 
+import api.controllers.requestParsers.validators.validations.NoValidationErrors
 import play.api.Logger
 import play.api.libs.json.Json
 import v1.models.downstream.TypeOfBusiness
-import v1.models.errors.{MtdError, TypeOfBusinessFormatError}
+import v1.models.errors.{ MtdError, TypeOfBusinessFormatError }
 
 object TypeOfBusinessValidation {
 
   lazy val logger: Logger = Logger(this.getClass)
-  lazy val log = s"[JsonFormatValidation][validate] - Request body failed validation with errors -"
+  lazy val log            = s"[JsonFormatValidation][validate] - Request body failed validation with errors -"
 
   def typeOfBusinessFormat(typeOfBusiness: String): List[MtdError] = {
     val validTypeOfBusiness: Boolean = {
@@ -32,7 +33,7 @@ object TypeOfBusinessValidation {
     }
 
     //400 FORMAT_TYPE_OF_BUSINESS The provided Type of business is invalid
-    if(validTypeOfBusiness){ NoValidationErrors } else {
+    if (validTypeOfBusiness) { NoValidationErrors } else {
       logger.warn(s"$log typeOfBusiness is invalid. typeOfBusiness: $typeOfBusiness")
       List(TypeOfBusinessFormatError)
     }

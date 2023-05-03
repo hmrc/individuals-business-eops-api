@@ -16,10 +16,10 @@
 
 package v2.connectors
 
-import mocks.MockAppConfig
-import v2.mocks.MockHttpClient
-import v2.models.downstream.TypeOfBusiness.`foreign-property`
-import v2.models.request.{AccountingPeriod, SubmitEndOfPeriod}
+import api.connectors.ConnectorSpec
+import api.models.downstream.TypeOfBusiness.`foreign-property`
+import mocks.{ MockAppConfig, MockHttpClient }
+import v2.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
 
 import scala.concurrent.Future
 
@@ -53,9 +53,10 @@ class NrsProxyConnectorSpec extends ConnectorSpec {
             url = s"$baseUrl/mtd-api-nrs-proxy/$nino/itsa-eops",
             config = dummyHeaderCarrierConfig,
             body = submitEndOfPeriodRequestBody
-          ).returns(Future.successful((): Unit))
+          )
+          .returns(Future.successful((): Unit))
 
-        await(connector.submit(nino, submitEndOfPeriodRequestBody)) shouldBe (():Unit)
+        await(connector.submit(nino, submitEndOfPeriodRequestBody)) shouldBe ((): Unit)
       }
     }
   }

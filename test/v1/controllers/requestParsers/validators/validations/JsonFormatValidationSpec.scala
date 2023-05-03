@@ -16,7 +16,7 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{ Json, OFormat }
 import support.UnitSpec
 import v1.models.errors.RuleIncorrectOrEmptyBodyError
 import v1.models.utils.JsonErrorValidators
@@ -26,7 +26,7 @@ class JsonFormatValidationSpec extends UnitSpec with JsonErrorValidators {
   case class TestDataObject(fieldOne: String, fieldTwo: String)
   case class TestDataWrapper(arrayField: Option[Seq[TestDataObject]])
 
-  implicit val testDataObjectFormat: OFormat[TestDataObject] = Json.format[TestDataObject]
+  implicit val testDataObjectFormat: OFormat[TestDataObject]   = Json.format[TestDataObject]
   implicit val testDataWrapperFormat: OFormat[TestDataWrapper] = Json.format[TestDataWrapper]
 
   "validate" should {
@@ -65,14 +65,15 @@ class JsonFormatValidationSpec extends UnitSpec with JsonErrorValidators {
         val json = Json.parse("""{ "arrayField" : [{}, {}]}""")
 
         val validationResult = JsonFormatValidation.validate[TestDataWrapper](json)
-        validationResult shouldBe List(RuleIncorrectOrEmptyBodyError.copy(paths =
-          Some(Seq(
-            "/arrayField/0/fieldOne",
-            "/arrayField/0/fieldTwo",
-            "/arrayField/1/fieldOne",
-            "/arrayField/1/fieldTwo"
-          ))
-        ))
+        validationResult shouldBe List(
+          RuleIncorrectOrEmptyBodyError.copy(
+            paths = Some(
+              Seq(
+                "/arrayField/0/fieldOne",
+                "/arrayField/0/fieldTwo",
+                "/arrayField/1/fieldOne",
+                "/arrayField/1/fieldTwo"
+              ))))
       }
 
       "empty body is submitted" in {

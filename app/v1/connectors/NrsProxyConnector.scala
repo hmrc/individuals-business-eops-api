@@ -17,15 +17,14 @@
 package v1.connectors
 
 import config.AppConfig
-import javax.inject.{ Inject, Singleton }
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads, HttpResponse }
 import v1.models.request.SubmitEndOfPeriod
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
-class NrsProxyConnector @Inject()(http: HttpClient,
-                                  appConfig: AppConfig) {
+class NrsProxyConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
   def submit[T](nino: String, body: SubmitEndOfPeriod)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     implicit val readsEmpty: HttpReads[Unit] = (_: String, _: String, _: HttpResponse) => ()

@@ -16,14 +16,15 @@
 
 package v2.connectors
 
+import api.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
+import api.connectors.httpparsers.StandardDownstreamHttpParser
+import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
+import api.connectors.{ BaseDownstreamConnector, DownstreamOutcome }
+import api.models.downstream.TypeOfBusiness
 import config.AppConfig
 import play.api.http.Status.{ ACCEPTED, NO_CONTENT }
 import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
-import v2.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
-import v2.connectors.httpparsers.StandardDownstreamHttpParser
-import v2.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
-import v2.models.downstream.TypeOfBusiness
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
 import javax.inject.{ Inject, Singleton }
@@ -36,7 +37,7 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
                                                                         ec: ExecutionContext,
                                                                         correlationId: String): Future[DownstreamOutcome[Unit]] = {
     import request._
-    val nino                      = request.nino.nino
+
     val incomeSourceType          = submitEndOfPeriod.typeOfBusiness
     val accountingPeriodStartDate = submitEndOfPeriod.accountingPeriod.startDate
     val accountingPeriodEndDate   = submitEndOfPeriod.accountingPeriod.endDate

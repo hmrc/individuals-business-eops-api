@@ -16,12 +16,12 @@
 
 package v2.services
 
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.connectors.NrsProxyConnector
 import v2.models.request.SubmitEndOfPeriod
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{ Inject, Singleton }
+import scala.concurrent.{ ExecutionContext, Future }
 
 @Singleton
 class NrsProxyService @Inject()(val connector: NrsProxyConnector) {

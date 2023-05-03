@@ -16,7 +16,7 @@
 
 package v1.models.hateoas
 
-import play.api.libs.json.{JsObject, Json, OWrites, Writes}
+import play.api.libs.json.{ JsObject, Json, OWrites, Writes }
 
 object HateoasWrapper {
   implicit def writes[A: OWrites]: Writes[HateoasWrapper[A]] = Writes { w =>

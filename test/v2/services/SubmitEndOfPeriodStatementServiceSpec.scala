@@ -16,11 +16,12 @@
 
 package v2.services
 
+import api.models.domain.Nino
+import api.models.errors._
+import api.models.outcomes.ResponseWrapper
+import api.services.ServiceSpec
 import v2.data.SubmitEndOfPeriodStatementData.validRequest
 import v2.mocks.connectors.MockSubmitEndOfPeriodStatementConnector
-import v2.models.domain.Nino
-import v2.models.errors._
-import v2.models.outcomes.ResponseWrapper
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
 import scala.concurrent.Future
@@ -59,7 +60,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
 
         def simpleServiceError(downstreamErrorCode: String, singleMtdError: MtdError): Unit =
           s"a $downstreamErrorCode error is returned from the service" in
-            fullServiceErrorTest(DownstreamStandardError(List(DownstreamErrorCode(downstreamErrorCode))), ErrorWrapper(correlationId, singleMtdError))
+            fullServiceErrorTest(DownstreamErrors(List(DownstreamErrorCode(downstreamErrorCode))), ErrorWrapper(correlationId, singleMtdError))
 
         val errors = Seq(
           ("INVALID_IDTYPE", InternalError),

@@ -16,7 +16,7 @@
 
 package v1.models.audit
 
-import play.api.libs.json.{JsValue, Json, OWrites}
+import play.api.libs.json.{ JsValue, Json, OWrites }
 import v1.models.auth.UserDetails
 
 case class GenericAuditDetail(userType: String,
@@ -29,11 +29,7 @@ case class GenericAuditDetail(userType: String,
 object GenericAuditDetail {
   implicit val writes: OWrites[GenericAuditDetail] = Json.writes[GenericAuditDetail]
 
-  def apply(userDetails: UserDetails,
-            nino: String,
-            request: JsValue,
-           `X-CorrelationId`: String,
-            auditResponse: AuditResponse): GenericAuditDetail = {
+  def apply(userDetails: UserDetails, nino: String, request: JsValue, `X-CorrelationId`: String, auditResponse: AuditResponse): GenericAuditDetail = {
 
     GenericAuditDetail(
       userType = userDetails.userType,

@@ -16,13 +16,14 @@
 
 package v2.connectors
 
+import api.connectors.{ ConnectorSpec, DownstreamOutcome }
+import api.models.domain.{ Nino, TaxYear }
+import api.models.downstream.TypeOfBusiness
+import api.models.errors.{ DownstreamErrorCode, DownstreamErrors }
+import api.models.outcomes.ResponseWrapper
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.JsObject
 import v2.data.SubmitEndOfPeriodStatementData._
-import v2.models.domain.{ Nino, TaxYear }
-import v2.models.downstream.TypeOfBusiness
-import v2.models.errors._
-import v2.models.outcomes.ResponseWrapper
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
 import scala.concurrent.Future
@@ -94,8 +95,8 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
     "a request returning a single error" should {
 
-      val downstreamErrorResponse: DownstreamStandardError =
-        DownstreamStandardError(List(DownstreamErrorCode("FORMAT_NINO")))
+      val downstreamErrorResponse: DownstreamErrors =
+        DownstreamErrors(List(DownstreamErrorCode("FORMAT_NINO")))
       val outcome = Left(ResponseWrapper(correlationId, downstreamErrorResponse))
 
       "return an unsuccessful response with the correct correlationId and a single error" in new IfsTest with Test {
@@ -117,8 +118,8 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
     "a request returning multiple errors" should {
 
-      val downstreamErrorResponse: DownstreamStandardError =
-        DownstreamStandardError(List(DownstreamErrorCode("FORMAT_NINO"), DownstreamErrorCode("INTERNAL_SERVER_ERROR")))
+      val downstreamErrorResponse: DownstreamErrors =
+        DownstreamErrors(List(DownstreamErrorCode("FORMAT_NINO"), DownstreamErrorCode("INTERNAL_SERVER_ERROR")))
       val outcome = Left(ResponseWrapper(correlationId, downstreamErrorResponse))
 
       "return an unsuccessful response with the correct correlationId and multiple errors" in new IfsTest with Test {

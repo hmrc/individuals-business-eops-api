@@ -19,7 +19,7 @@ package v1.models.errors
 import play.api.libs.json.Json
 import support.UnitSpec
 
-class ErrorSpec extends UnitSpec{
+class ErrorSpec extends UnitSpec {
 
   "writes" should {
     "generate the correct JSON" in {

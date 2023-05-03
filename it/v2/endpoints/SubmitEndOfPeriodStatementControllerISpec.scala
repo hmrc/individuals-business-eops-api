@@ -16,6 +16,7 @@
 
 package v2.endpoints
 
+import api.models.errors._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import itData.SubmitEndOfPeriodStatementData._
 import play.api.http.HeaderNames.ACCEPT
@@ -24,10 +25,9 @@ import play.api.libs.json.{ JsValue, Json }
 import play.api.libs.ws.{ WSRequest, WSResponse }
 import play.api.test.Helpers.AUTHORIZATION
 import support.V2IntegrationBaseSpec
-import v2.models.errors._
 import v2.stubs._
 
-class SubmitEndOfPeriodStatementISpec extends V2IntegrationBaseSpec {
+class SubmitEndOfPeriodStatementControllerISpec extends V2IntegrationBaseSpec {
 
   "Calling the submit eops endpoint" should {
 

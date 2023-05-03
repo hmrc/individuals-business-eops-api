@@ -37,7 +37,7 @@ object ErrorWrapper {
 
     errorResponse.errors match {
       case Some(errors) if errors.nonEmpty => json + ("errors" -> Json.toJson(errors))
-      case _ => json
+      case _                               => json
     }
   }
 }

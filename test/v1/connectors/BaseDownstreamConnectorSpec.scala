@@ -16,9 +16,10 @@
 
 package v1.connectors
 
+import api.connectors.DownstreamUri.IfsUri
 import config.AppConfig
 import mocks.MockAppConfig
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 
@@ -30,17 +31,18 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
   case class Result(value: Int)
 
   // WLOG
-  val body = "body"
+  val body    = "body"
   val outcome = Right(ResponseWrapper(correlationId, Result(2)))
 
-  val url = "some/url?param=value"
+  val url         = "some/url?param=value"
   val absoluteUrl = s"$baseUrl/$url"
 
   implicit val httpReads: HttpReads[DownstreamOutcome[Result]] = mock[HttpReads[DownstreamOutcome[Result]]]
 
   class Test(ifsEnvironmentHeaders: Option[Seq[String]]) extends MockHttpClient with MockAppConfig {
+
     val connector: BaseDownstreamConnector = new BaseDownstreamConnector {
-      val http: HttpClient = mockHttpClient
+      val http: HttpClient     = mockHttpClient
       val appConfig: AppConfig = mockAppConfig
     }
 
@@ -52,10 +54,10 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
 
   "BaseDownstreamConnector" when {
     val requiredHeaders: Seq[(String, String)] = Seq(
-      "Environment" -> "ifs-environment",
-      "Authorization" -> "Bearer ifs-token",
-      "User-Agent" -> "individuals-business-eops-api",
-      "CorrelationId" -> correlationId,
+      "Environment"       -> "ifs-environment",
+      "Authorization"     -> "Bearer ifs-token",
+      "User-Agent"        -> "individuals-business-eops-api",
+      "CorrelationId"     -> correlationId,
       "Gov-Test-Scenario" -> "DEFAULT"
     )
 
@@ -68,9 +70,9 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
 
       "exclude all `otherHeaders` when no external service header allow-list is found" should {
         val requiredHeaders: Seq[(String, String)] = Seq(
-          "Environment" -> "ifs-environment",
+          "Environment"   -> "ifs-environment",
           "Authorization" -> "Bearer ifs-token",
-          "User-Agent" -> "individuals-business-eops-api",
+          "User-Agent"    -> "individuals-business-eops-api",
           "CorrelationId" -> correlationId,
         )
 
@@ -85,10 +87,11 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
                       ifsEnvironmentHeaders: Option[Seq[String]]): Unit = {
 
     "POST" in new Test(ifsEnvironmentHeaders) {
-      implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
+      implicit val hc: HeaderCarrier                 = HeaderCarrier(otherHeaders = otherHeaders ++ Seq("Content-Type" -> "application/json"))
       val requiredHeadersPost: Seq[(String, String)] = requiredHeaders ++ Seq("Content-Type" -> "application/json")
 
-      MockedHttpClient.post(absoluteUrl, config, body, requiredHeadersPost, excludedHeaders)
+      MockedHttpClient
+        .post(absoluteUrl, config, body, requiredHeadersPost, excludedHeaders)
         .returns(Future.successful(outcome))
 
       await(connector.post(body, IfsUri[Result](url))) shouldBe outcome

@@ -25,7 +25,7 @@ trait DownstreamResponseMappingSupport {
   self: Logging =>
 
   final def mapDownstreamErrors[D](errorCodeMap: PartialFunction[String, MtdError])(downstreamResponseWrapper: ResponseWrapper[IfsError])(
-    implicit logContext: EndpointLogContext): ErrorWrapper = {
+      implicit logContext: EndpointLogContext): ErrorWrapper = {
 
     lazy val defaultErrorCodeMapping: String => MtdError = { code =>
       logger.warn(s"[${logContext.controllerName}] [${logContext.endpointName}] - No mapping found for error code $code")
@@ -57,7 +57,7 @@ trait DownstreamResponseMappingSupport {
               RuleBusinessValidationFailure
             )
           allowedErrorList.exists(mtdErrors.contains(_)) match {
-            case true => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
+            case true  => ErrorWrapper(correlationId, BVRError, Some(mtdErrors))
             case false => ErrorWrapper(correlationId, BadRequestError, Some(mtdErrors))
           }
         }

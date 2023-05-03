@@ -16,8 +16,9 @@
 
 package v2.controllers.requestParsers.validators
 
-import v2.controllers.requestParsers.validators.validations._
-import v2.models.errors._
+import api.controllers.requestParsers.validators.Validator
+import api.controllers.requestParsers.validators.validations._
+import api.models.errors.MtdError
 import v2.models.request.{ SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData }
 
 import javax.inject.Singleton

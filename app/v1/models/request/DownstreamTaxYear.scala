@@ -30,7 +30,7 @@ case class DownstreamTaxYear(value: String) extends AnyVal {
 
 object DownstreamTaxYear {
 
-  val startOfYear = 2
+  val startOfYear      = 2
   val startYearAndDash = 5
 
   //TODO MOVE TO VALIDATION ONLY
@@ -42,12 +42,12 @@ object DownstreamTaxYear {
     * @param taxYear the tax year string (2018)
     */
   def toMTDYear(taxYear: String): DownstreamTaxYear =
-    DownstreamTaxYear((taxYear.toInt -1) + "-" + taxYear.drop(startOfYear))
+    DownstreamTaxYear((taxYear.toInt - 1) + "-" + taxYear.drop(startOfYear))
 
   //TODO UPDATE IF NEEDED TO USE 2017-18 FORMAT
   def mostRecentTaxYear(date: LocalDate = LocalDate.now()): DownstreamTaxYear = {
     val limit = LocalDate.parse(s"${date.getYear}-04-05", DateTimeFormatter.ISO_DATE)
-    if(date.isBefore(limit)) {
+    if (date.isBefore(limit)) {
       DownstreamTaxYear(s"${date.getYear - 1}")
     } else {
       DownstreamTaxYear(s"${date.getYear}")

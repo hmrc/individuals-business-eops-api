@@ -17,15 +17,15 @@
 package v1.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import itData.SubmitEndOfPeriodStatementData._
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
 import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.libs.ws.{ WSRequest, WSResponse }
-import v1.models.errors._
-import v1.stubs.{ AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub, NrsStub }
-import itData.SubmitEndOfPeriodStatementData._
 import play.api.test.Helpers.AUTHORIZATION
 import support.V1IntegrationBaseSpec
+import v1.models.errors._
+import v1.stubs._
 
 class SubmitEndOfPeriodStatementControllerISpec extends V1IntegrationBaseSpec {
 

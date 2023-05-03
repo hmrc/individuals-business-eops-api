@@ -16,9 +16,10 @@
 
 package v2.services
 
+import api.models.downstream.TypeOfBusiness.`foreign-property`
+import api.services.ServiceSpec
 import v2.mocks.connectors.MockNrsProxyConnector
-import v2.models.downstream.TypeOfBusiness.`foreign-property`
-import v2.models.request.{AccountingPeriod, SubmitEndOfPeriod}
+import v2.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
 
 import scala.concurrent.Future
 
@@ -44,7 +45,8 @@ class NrsProxyServiceSpec extends ServiceSpec {
     "call the Nrs Proxy connector" when {
       "the connector is valid" in new Test {
 
-        MockNrsProxyConnector.submit(nino, submitEndOfPeriodRequestBody)
+        MockNrsProxyConnector
+          .submit(nino, submitEndOfPeriodRequestBody)
           .returns(Future.successful((): Unit))
 
         await(service.submit(nino, submitEndOfPeriodRequestBody)) shouldBe ((): Unit)

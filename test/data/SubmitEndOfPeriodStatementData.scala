@@ -16,29 +16,31 @@
 
 package data
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{ JsValue, Json }
 import v1.models.downstream.TypeOfBusiness
 import v1.models.downstream.TypeOfBusiness.`foreign-property`
-import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
+import v1.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
 
 object SubmitEndOfPeriodStatementData {
 
-  val incomeSourceType : TypeOfBusiness = `foreign-property`
-  val accountingPeriodStartDate = "2021-04-06"
-  val accountingPeriodEndDate = "2022-04-05"
-  val incomeSourceId = "XAIS12345678910"
+  val incomeSourceType: TypeOfBusiness = `foreign-property`
+  val accountingPeriodStartDate        = "2021-04-06"
+  val accountingPeriodEndDate          = "2022-04-05"
+  val incomeSourceId                   = "XAIS12345678910"
 
-  val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(`foreign-property`, "XAIS12345678910", accountingPeriod = AccountingPeriod(
-    "2021-04-06","2022-04-05"
-  ),finalised = true)
+  val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(`foreign-property`,
+                                                          "XAIS12345678910",
+                                                          accountingPeriod = AccountingPeriod(
+                                                            "2021-04-06",
+                                                            "2022-04-05"
+                                                          ),
+                                                          finalised = true)
 
   def fullValidJson(typeOfBusiness: String = "self-employment",
                     businessId: String = "XAIS12345678910",
                     startDate: String = "2021-04-06",
                     endDate: String = "2022-04-05",
-                    finalised: String = "true"
-
-                   ): JsValue = Json.parse(
+                    finalised: String = "true"): JsValue = Json.parse(
     s"""{
        | "typeOfBusiness":"$typeOfBusiness",
        | "businessId":"$businessId",
@@ -62,16 +64,13 @@ object SubmitEndOfPeriodStatementData {
       |    },
       |    "finalised": true
       |}""".stripMargin
-
   )
 
   def fullValidAuditJson(typeOfBusiness: String = "self-employment",
-                    businessId: String = "XAIS12345678910",
-                    startDate: String = "2021-04-06",
-                    endDate: String = "2022-04-05",
-                    finalised: String = "true"
-
-                   ): JsValue = Json.parse(
+                         businessId: String = "XAIS12345678910",
+                         startDate: String = "2021-04-06",
+                         endDate: String = "2022-04-05",
+                         finalised: String = "true"): JsValue = Json.parse(
     s"""{
        | "typeOfBusiness":"$typeOfBusiness",
        | "businessId":"$businessId",

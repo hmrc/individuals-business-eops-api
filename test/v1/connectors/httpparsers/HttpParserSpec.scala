@@ -16,11 +16,11 @@
 
 package v1.connectors.httpparsers
 
-import play.api.http.Status.{BAD_REQUEST, CONFLICT, FORBIDDEN, NOT_FOUND, UNPROCESSABLE_ENTITY}
-import play.api.libs.json.{JsValue, Json}
+import play.api.http.Status._
+import play.api.libs.json.{ JsValue, Json }
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
-import v1.models.errors.{IfsErrorCode, IfsErrors}
+import v1.models.errors.{ IfsErrorCode, IfsErrors }
 
 class HttpParserSpec extends UnitSpec {
 
@@ -150,6 +150,6 @@ class HttpParserSpec extends UnitSpec {
 
             httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("C55013"), IfsErrorCode("BVR_UNKNOWN_ID")))
           }
-        }
+      }
     )
 }

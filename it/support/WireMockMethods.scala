@@ -24,7 +24,10 @@ import play.api.libs.json.Writes
 
 trait WireMockMethods {
 
-  def when(method: HTTPMethod, uri: String, queryParams: Map[String, String] = Map.empty, headers: Map[String, String] = Map.empty,
+  def when(method: HTTPMethod,
+           uri: String,
+           queryParams: Map[String, String] = Map.empty,
+           headers: Map[String, String] = Map.empty,
            body: Option[String] = None): Mapping = {
     new Mapping(method, uri, queryParams, headers, body)
   }
@@ -43,7 +46,7 @@ trait WireMockMethods {
 
       body match {
         case Some(extractedBody) => uriMappingWithHeaders.withRequestBody(equalTo(extractedBody))
-        case None => uriMappingWithHeaders
+        case None                => uriMappingWithHeaders
       }
     }
 
@@ -68,7 +71,7 @@ trait WireMockMethods {
         }
         body match {
           case Some(extractedBody) => responseWithHeaders.withBody(extractedBody)
-          case None => responseWithHeaders
+          case None                => responseWithHeaders
         }
       }
 
