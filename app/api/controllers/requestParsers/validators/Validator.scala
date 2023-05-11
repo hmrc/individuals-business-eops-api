@@ -16,52 +16,38 @@
 
 package api.controllers.requestParsers.validators
 
-import api.models.errors.MtdError
+import api.models.errors.{ BadRequestError, ErrorWrapper, MtdError }
+//import api.models.errors.{ BadRequestError, ErrorWrapper, MtdError, InternalError }
 import api.models.request.RawData
+import utils.Logging
 
-trait Validator[A <: RawData] {
+trait Validator[A <: RawData] extends Logging {
 
   type ValidationLevel[T] = T => List[MtdError]
 
-  // $COVERAGE-OFF$
-  //TODO Add coverage back on when paths have been added to the validator
+  protected def validations: List[A => List[MtdError]]
 
-  def validate(data: A): List[MtdError]
+  def validateRequest(rawData: A): Option[List[MtdError]] = {
+    val result = validations.foldLeft(List.empty[MtdError])((errors, validation) => errors ++ validation(rawData))
 
-  def run(validationSet: List[A => List[List[MtdError]]], data: A): List[MtdError] = {
-
-    validationSet match {
-      case Nil => List()
-      case thisLevel :: remainingLevels =>
-        thisLevel(data).flatten match {
-          case x if x.isEmpty  => run(remainingLevels, data)
-          case x if x.nonEmpty => x
-        }
+    result match {
+      case Nil => None
+      case _   => Some(result)
     }
   }
 
-  object Validator {
-
-    def flattenErrors(errors: List[List[MtdError]]): List[MtdError] = {
-      errors.flatten
-        .groupBy(_.message)
-        .map {
-          case (_, errors) =>
-            val baseError = errors.head.copy(paths = Some(Seq.empty[String]))
-
-            errors.fold(baseError)(
-              (error1, error2) => {
-                val paths: Option[Seq[String]] = for {
-                  error1Paths <- error1.paths
-                  error2Paths <- error2.paths
-                } yield {
-                  error1Paths ++ error2Paths
-                }
-                error1.copy(paths = paths)
-              }
-            )
-        }
-        .toList
+  def wrapErrors(errors: List[MtdError])(implicit correlationId: String): ErrorWrapper = {
+    errors match {
+      case err :: Nil =>
+        logger.warn(
+          message = "[Validator][validateRequest] " +
+            s"Validation failed with ${err.code} error for the request with correlationId : $correlationId")
+        ErrorWrapper(correlationId, err, None)
+      case errs =>
+        logger.warn(
+          "[Validator][validateRequest] " +
+            s"Validation failed with ${errs.map(_.code).mkString(",")} error for the request with correlationId : $correlationId")
+        ErrorWrapper(correlationId, BadRequestError, Some(errs))
     }
   }
 }

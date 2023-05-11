@@ -44,7 +44,7 @@ class SubmitEndOfPeriodStatementControllerSpec
     val controller = new SubmitEndOfPeriodStatementController(
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,
-      requestParser = mockSubmitEndOfPeriodStatementParser,
+      parser = mockSubmitEndOfPeriodStatementParser,
       nrsProxyService = mockNrsProxyService,
       service = mockSubmitEndOfPeriodStatementService,
       cc = cc,

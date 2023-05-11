@@ -21,6 +21,7 @@ import api.services.{ EnrolmentsAuthService, MtdIdLookupService }
 import play.api.libs.json.JsValue
 import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents }
 import utils.IdGenerator
+import v2.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
 import v2.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v2.models.request.SubmitEndOfPeriodStatementRawData
 import v2.services._
@@ -34,7 +35,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
                                                      val idGenerator: IdGenerator,
                                                      nrsProxyService: NrsProxyService,
                                                      service: SubmitEndOfPeriodStatementService,
-                                                     requestParser: SubmitEndOfPeriodStatementParser,
+                                                     parser: SubmitEndOfPeriodStatementParser,
+                                                     validator: SubmitEndOfPeriodStatementValidator,
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc) {
 
@@ -49,7 +51,8 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
 
       val requestHandler =
         RequestHandler
-          .withParser(requestParser)
+          .withValidator(validator)
+          .withParser(parser)
           .withService { parsedRequest =>
             nrsProxyService.submit(nino, parsedRequest.submitEndOfPeriod)
             service.submit(parsedRequest)

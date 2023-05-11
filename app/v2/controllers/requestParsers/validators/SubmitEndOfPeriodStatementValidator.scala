@@ -26,34 +26,30 @@ import javax.inject.Singleton
 @Singleton
 class SubmitEndOfPeriodStatementValidator extends Validator[SubmitEndOfPeriodStatementRawData] {
 
-  private val validationSet = List(parameterFormatValidation, enumValidator, bodyFormatValidator, bodyFieldFormatValidation)
+  override def validations: List[SubmitEndOfPeriodStatementRawData => List[MtdError]] =
+    List(parameterFormatValidation, enumValidator, bodyFormatValidator, bodyFieldFormatValidation)
 
-  private def parameterFormatValidation: SubmitEndOfPeriodStatementRawData => List[List[MtdError]] = { data =>
-    List(NinoValidation.validate(data.nino))
+  private def parameterFormatValidation: SubmitEndOfPeriodStatementRawData => List[MtdError] = { data =>
+    NinoValidation.validate(data.nino)
   }
 
-  private def enumValidator: SubmitEndOfPeriodStatementRawData => List[List[MtdError]] = { data =>
-    List(
-      JsonFormatValidation.validate[String](data.body.json \ "typeOfBusiness")(TypeOfBusinessValidation.validate)
-    )
+  private def enumValidator: SubmitEndOfPeriodStatementRawData => List[MtdError] = { data =>
+    JsonFormatValidation.validate[String](data.body.json \ "typeOfBusiness")(TypeOfBusinessValidation.validate)
   }
 
-  private def bodyFieldFormatValidation: SubmitEndOfPeriodStatementRawData => List[List[MtdError]] = { data =>
+  private def bodyFieldFormatValidation: SubmitEndOfPeriodStatementRawData => List[MtdError] = { data =>
     val body = data.body.json.as[SubmitEndOfPeriod]
 
-    List(
-      BusinessIdValidation.validateBusinessId(body.businessId),
-      DateValidation.validateDates(body.accountingPeriod.startDate, body.accountingPeriod.endDate),
+    BusinessIdValidation.validateBusinessId(body.businessId) ++
+      DateValidation.validateDates(body.accountingPeriod.startDate, body.accountingPeriod.endDate) ++
       FinalisedValidation.validateFinalised(body.finalised)
-    )
   }
 
-  private def bodyFormatValidator: SubmitEndOfPeriodStatementRawData => List[List[MtdError]] = { data =>
+  private def bodyFormatValidator: SubmitEndOfPeriodStatementRawData => List[MtdError] = { data =>
     JsonFormatValidation.validate[SubmitEndOfPeriod](data.body.json) match {
       case Nil          => NoValidationErrors
-      case schemaErrors => List(schemaErrors)
+      case schemaErrors => schemaErrors
     }
   }
 
-  override def validate(data: SubmitEndOfPeriodStatementRawData): List[MtdError] = run(validationSet, data)
 }

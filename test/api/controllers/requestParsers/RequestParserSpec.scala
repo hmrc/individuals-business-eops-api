@@ -37,7 +37,7 @@ class RequestParserSpec extends UnitSpec {
     val parser: RequestParser[Raw, Request] = new RequestParser[Raw, Request] {
       val validator: Validator[Raw] = test.validator
 
-      protected def requestFor(data: Raw): Request = Request(Nino(data.nino))
+      protected def parseRequest(data: Raw): Request = Request(Nino(data.nino))
     }
   }
 
