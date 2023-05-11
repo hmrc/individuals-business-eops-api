@@ -17,7 +17,6 @@
 package api.controllers.requestParsers.validators
 
 import api.models.errors.{ BadRequestError, ErrorWrapper, MtdError }
-//import api.models.errors.{ BadRequestError, ErrorWrapper, MtdError, InternalError }
 import api.models.request.RawData
 import utils.Logging
 
