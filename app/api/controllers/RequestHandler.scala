@@ -119,7 +119,7 @@ object RequestHandler {
         writes: Writes[HateoasWrapper[Output]]): RequestHandlerBuilder[InputRaw, Input, Output] =
       withResultCreator(ResultCreator.hateoasWrapping(hateoasFactory, successStatus)((_, _) => data))
 
-    // Scoped as a private delegate so as to keep the logic completely separate from the configuration
+    //Scoped as a private delegate so as to keep the logic completely separate from the configuration
     private object Delegate extends RequestHandler[InputRaw] with Logging with RequestContextImplicits {
 
       implicit class Response(result: Result) {
@@ -156,7 +156,7 @@ object RequestHandler {
         }
 
         result.leftMap { errorWrapper =>
-          doWithContext(ctx.withCorrelationId(ctx.correlationId)) { implicit ctx: RequestContext =>
+          doWithContext(ctx.withCorrelationId(errorWrapper.correlationId)) { implicit ctx: RequestContext =>
             handleFailure(errorWrapper)
           }
         }.merge
