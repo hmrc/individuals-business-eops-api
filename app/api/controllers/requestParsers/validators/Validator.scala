@@ -22,12 +22,12 @@ import utils.Logging
 
 trait Validator[A <: RawData] extends Logging {
 
-  type ValidationLevel[T] = T => List[MtdError]
+  type ValidationLevel[T] = T => Seq[MtdError]
 
-  protected def validations: List[A => List[MtdError]]
+  protected def validations: Seq[A => Seq[MtdError]]
 
-  def validateRequest(rawData: A): Option[List[MtdError]] = {
-    val result = validations.foldLeft(List.empty[MtdError])((errors, validation) => errors ++ validation(rawData))
+  def validateRequest(rawData: A): Option[Seq[MtdError]] = {
+    val result = validations.flatMap(_(rawData))
 
     result match {
       case Nil => None
@@ -35,7 +35,7 @@ trait Validator[A <: RawData] extends Logging {
     }
   }
 
-  def wrapErrors(errors: List[MtdError])(implicit correlationId: String): ErrorWrapper = {
+  def wrapErrors(errors: Seq[MtdError])(implicit correlationId: String): ErrorWrapper = {
     errors match {
       case err :: Nil =>
         logger.warn(

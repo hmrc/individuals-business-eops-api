@@ -26,18 +26,18 @@ import javax.inject.Singleton
 @Singleton
 class SubmitEndOfPeriodStatementValidator extends Validator[SubmitEndOfPeriodStatementRawData] {
 
-  override def validations: List[SubmitEndOfPeriodStatementRawData => List[MtdError]] =
-    List(parameterFormatValidation, enumValidator, bodyFormatValidator, bodyFieldFormatValidation)
+  override def validations: Seq[SubmitEndOfPeriodStatementRawData => Seq[MtdError]] =
+    List(parameterFormatValidation, enumValidation, bodyFormatValidation, bodyFieldFormatValidation)
 
-  private def parameterFormatValidation: SubmitEndOfPeriodStatementRawData => List[MtdError] = { data =>
+  private def parameterFormatValidation: SubmitEndOfPeriodStatementRawData => Seq[MtdError] = { data =>
     NinoValidation.validate(data.nino)
   }
 
-  private def enumValidator: SubmitEndOfPeriodStatementRawData => List[MtdError] = { data =>
+  private def enumValidation: SubmitEndOfPeriodStatementRawData => Seq[MtdError] = { data =>
     JsonFormatValidation.validate[String](data.body.json \ "typeOfBusiness")(TypeOfBusinessValidation.validate)
   }
 
-  private def bodyFieldFormatValidation: SubmitEndOfPeriodStatementRawData => List[MtdError] = { data =>
+  private def bodyFieldFormatValidation: SubmitEndOfPeriodStatementRawData => Seq[MtdError] = { data =>
     val body = data.body.json.as[SubmitEndOfPeriod]
 
     BusinessIdValidation.validateBusinessId(body.businessId) ++
@@ -45,7 +45,7 @@ class SubmitEndOfPeriodStatementValidator extends Validator[SubmitEndOfPeriodSta
       FinalisedValidation.validateFinalised(body.finalised)
   }
 
-  private def bodyFormatValidator: SubmitEndOfPeriodStatementRawData => List[MtdError] = { data =>
+  private def bodyFormatValidation: SubmitEndOfPeriodStatementRawData => Seq[MtdError] = { data =>
     JsonFormatValidation.validate[SubmitEndOfPeriod](data.body.json) match {
       case Nil          => NoValidationErrors
       case schemaErrors => schemaErrors
