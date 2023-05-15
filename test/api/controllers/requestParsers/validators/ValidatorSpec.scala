@@ -19,6 +19,7 @@ package api.controllers.requestParsers.validators
 import api.models.errors.{ BadRequestError, ErrorWrapper, MtdError, NinoFormatError, TaxYearFormatError }
 import api.models.request.RawData
 import org.scalamock.scalatest.MockFactory
+import play.api.http.Status.BAD_REQUEST
 import support.UnitSpec
 
 class ValidatorSpec extends UnitSpec with MockFactory {
@@ -36,20 +37,29 @@ class ValidatorSpec extends UnitSpec with MockFactory {
   }
 
   "validateRequest" should {
-    "return None when the validation returns no errors" in new Test {
+    "return None when there are no validation errors" in new Test {
       override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List())
       validator.validateRequest(rawData) shouldBe None
     }
 
-    "return Some List of errors when the validation returns an error" in new Test {
-      override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError))
-      validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError))
-    }
+    "return Some List of errors" when {
+      "a single validation error occurs" in new Test {
+        override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError))
+        validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError))
+      }
 
-    //    For each validation in validations, if a non-empty List[MtdError] is returned then the subsequent validations should not be run
-    "return Some List of errors for a single validation" in new Test {
-      override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError), _ => List(TaxYearFormatError))
-      validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError))
+      "an error occurs during the first of multiple validations" in new Test {
+        override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError), _ => List(TaxYearFormatError))
+        validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError))
+      }
+
+      "merge errors with the same code but different paths into a single error" in new Test {
+        private val TestError = MtdError("TEST_ERROR", "error message", BAD_REQUEST, Some(Seq("path 1")))
+        override val validations: Seq[TestRawData => Seq[MtdError]] =
+          List(_ => List(NinoFormatError, TestError, TestError.copy(paths = Some(Seq("path 2")))))
+
+        validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError, TestError.copy(paths = Some(Seq("path 1", "path 2")))))
+      }
     }
   }
 

@@ -30,6 +30,21 @@ trait Validator[A <: RawData] extends Logging {
     validations.view
       .map(validation => validation(rawData))
       .find(_.nonEmpty)
+      .map(handleErrors)
+  }
+
+  private def handleErrors(errors: Seq[MtdError]): Seq[MtdError] = {
+    errors
+      .groupBy(_.code)
+      .values
+      .map(mergeErrors)
+      .toList
+  }
+
+  private def mergeErrors(errors: Seq[MtdError]): MtdError = {
+    errors.reduce { (e1, e2) =>
+      e1.copy(paths = Some((e1.paths.toList.flatten ++ e2.paths.toList.flatten).distinct))
+    }
   }
 
   def wrapErrors(errors: Seq[MtdError])(implicit correlationId: String): ErrorWrapper = {
