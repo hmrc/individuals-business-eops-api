@@ -24,6 +24,7 @@ import play.api.mvc.{ AnyContentAsJson, Result }
 import v2.data.SubmitEndOfPeriodStatementData._
 import v2.mocks.requestParsers.MockSubmitEndOfPeriodStatementParser
 import v2.mocks.services._
+import v2.mocks.validators.MockSubmitEndOfPeriodStatementValidator
 import v2.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -32,6 +33,7 @@ import scala.concurrent.Future
 class SubmitEndOfPeriodStatementControllerSpec
     extends ControllerBaseSpec
     with ControllerTestRunner
+    with MockSubmitEndOfPeriodStatementValidator
     with MockSubmitEndOfPeriodStatementParser
     with MockNrsProxyService
     with MockSubmitEndOfPeriodStatementService {
@@ -44,6 +46,7 @@ class SubmitEndOfPeriodStatementControllerSpec
     val controller = new SubmitEndOfPeriodStatementController(
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,
+      validator = mockValidator,
       parser = mockSubmitEndOfPeriodStatementParser,
       nrsProxyService = mockNrsProxyService,
       service = mockSubmitEndOfPeriodStatementService,
@@ -58,9 +61,13 @@ class SubmitEndOfPeriodStatementControllerSpec
   "handleRequest" should {
     "return NO_CONTENT" when {
       "happy path" in new Test {
+        MockSubmitEndOfPeriodStatementValidator
+          .validate(rawData)
+          .returns(None)
+
         MockSubmitEndOfPeriodStatementParser
           .parseRequest(rawData)
-          .returns(Right(requestData))
+          .returns(requestData)
 
         MockNrsProxyService
           .submit(nino, validRequest)
@@ -75,18 +82,29 @@ class SubmitEndOfPeriodStatementControllerSpec
     }
 
     "return the error as per the spec" when {
-      "the parser validation fails" in new Test {
-        MockSubmitEndOfPeriodStatementParser
-          .parseRequest(rawData)
-          .returns(Left(ErrorWrapper(correlationId, NinoFormatError, None)))
+      "the validation fails" in new Test {
+        private val validationErrors = List(NinoFormatError)
+        private val wrappedErrors    = ErrorWrapper(correlationId, NinoFormatError, None)
+
+        MockSubmitEndOfPeriodStatementValidator
+          .validate(rawData)
+          .returns(Some(validationErrors))
+
+        MockSubmitEndOfPeriodStatementValidator
+          .wrapErrors(validationErrors)(correlationId)
+          .returns(wrappedErrors)
 
         runErrorTest(NinoFormatError)
       }
 
       "the service returns an error" in new Test {
+        MockSubmitEndOfPeriodStatementValidator
+          .validate(rawData)
+          .returns(None)
+
         MockSubmitEndOfPeriodStatementParser
           .parseRequest(rawData)
-          .returns(Right(requestData))
+          .returns(requestData)
 
         MockNrsProxyService
           .submit(nino, validRequest)

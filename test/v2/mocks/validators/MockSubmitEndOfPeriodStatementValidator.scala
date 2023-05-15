@@ -16,20 +16,24 @@
 
 package v2.mocks.validators
 
-import api.models.errors.MtdError
-import org.scalamock.handlers.CallHandler1
+import api.models.errors.{ ErrorWrapper, MtdError }
+import org.scalamock.handlers.{ CallHandler, CallHandler1 }
 import org.scalamock.scalatest.MockFactory
 import v2.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
 import v2.models.request.SubmitEndOfPeriodStatementRawData
 
-class MockSubmitEndOfPeriodStatementValidator extends MockFactory {
+trait MockSubmitEndOfPeriodStatementValidator extends MockFactory {
 
   val mockValidator: SubmitEndOfPeriodStatementValidator = mock[SubmitEndOfPeriodStatementValidator]
 
-  object MockValidator {
+  object MockSubmitEndOfPeriodStatementValidator {
 
-    def validate(data: SubmitEndOfPeriodStatementRawData): CallHandler1[SubmitEndOfPeriodStatementRawData, List[MtdError]] = {
-      (mockValidator.validate(_: SubmitEndOfPeriodStatementRawData)).expects(data)
+    def validate(data: SubmitEndOfPeriodStatementRawData): CallHandler1[SubmitEndOfPeriodStatementRawData, Option[Seq[MtdError]]] = {
+      (mockValidator.validateRequest(_: SubmitEndOfPeriodStatementRawData)).expects(data)
+    }
+
+    def wrapErrors(errors: Seq[MtdError])(implicit correlationId: String): CallHandler[ErrorWrapper] = {
+      (mockValidator.wrapErrors(_: Seq[MtdError])(_: String)).expects(errors, correlationId)
     }
   }
 }

@@ -17,47 +17,24 @@
 package v2.controllers.requestParsers
 
 import api.models.domain.Nino
-import api.models.errors.{ BadRequestError, ErrorWrapper, NinoFormatError, TypeOfBusinessFormatError }
 import play.api.mvc.AnyContentAsJson
 import support.UnitSpec
+import v2.models.request.SubmitEndOfPeriodStatementRequest
 import v2.data.SubmitEndOfPeriodStatementData
-import v2.mocks.validators.MockSubmitEndOfPeriodStatementValidator
-import v2.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
+import v2.models.request.SubmitEndOfPeriodStatementRawData
 
 class SubmitEndOfPeriodStatementParserSpec extends UnitSpec {
-  val nino                           = "AA123456B"
-  implicit val correlationId: String = "a1e8057e-fbbc-47a8-a8b4-78d9f015c253"
 
-  val inputData: SubmitEndOfPeriodStatementRawData =
-    SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(SubmitEndOfPeriodStatementData.successJson))
+  private val nino = "AA123456B"
 
-  trait Test extends MockSubmitEndOfPeriodStatementValidator {
-    lazy val parser = new SubmitEndOfPeriodStatementParser(mockValidator)
-  }
+  "parseRequest" should {
+    "return a request object when provided with the raw data" in {
+      val requestParser = new SubmitEndOfPeriodStatementParser()
+      val rawData       = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(SubmitEndOfPeriodStatementData.successJson))
 
-  "parse" should {
-    "return a request object" when {
-      "valid request data is supplied" in new Test {
-        MockValidator.validate(inputData).returns(Nil)
+      val parsedRequest = SubmitEndOfPeriodStatementRequest(Nino(nino), SubmitEndOfPeriodStatementData.validRequest)
 
-        parser.parseRequest(inputData) shouldBe
-          Right(SubmitEndOfPeriodStatementRequest(Nino(nino), SubmitEndOfPeriodStatementData.validRequest))
-      }
-    }
-
-    "return an ErrorWrapper" when {
-      "a single validation error occurs" in new Test {
-        MockValidator.validate(inputData).returns(List(NinoFormatError))
-
-        parser.parseRequest(inputData) shouldBe Left(ErrorWrapper(correlationId, NinoFormatError))
-      }
-
-      "multiple validation errors occur" in new Test {
-        MockValidator.validate(inputData).returns(List(NinoFormatError, TypeOfBusinessFormatError))
-
-        parser.parseRequest(inputData) shouldBe Left(
-          ErrorWrapper(correlationId, BadRequestError, Some(Seq(NinoFormatError, TypeOfBusinessFormatError))))
-      }
+      requestParser.parseRequest(rawData) shouldBe parsedRequest
     }
   }
 }
