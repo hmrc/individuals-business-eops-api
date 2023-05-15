@@ -45,6 +45,12 @@ class ValidatorSpec extends UnitSpec with MockFactory {
       override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError))
       validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError))
     }
+
+    //    For each validation in validations, if a non-empty List[MtdError] is returned then the subsequent validations should not be run
+    "return Some List of errors for a single validation" in new Test {
+      override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError), _ => List(TaxYearFormatError))
+      validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError))
+    }
   }
 
   "wrapErrors" should {

@@ -27,12 +27,9 @@ trait Validator[A <: RawData] extends Logging {
   protected def validations: Seq[A => Seq[MtdError]]
 
   def validateRequest(rawData: A): Option[Seq[MtdError]] = {
-    val result = validations.flatMap(_(rawData))
-
-    result match {
-      case Nil => None
-      case _   => Some(result)
-    }
+    validations.view
+      .map(validation => validation(rawData))
+      .find(_.nonEmpty)
   }
 
   def wrapErrors(errors: Seq[MtdError])(implicit correlationId: String): ErrorWrapper = {
