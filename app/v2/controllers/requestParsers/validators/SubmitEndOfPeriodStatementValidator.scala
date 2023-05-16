@@ -18,7 +18,6 @@ package v2.controllers.requestParsers.validators
 
 import api.controllers.requestParsers.validators.Validator
 import api.controllers.requestParsers.validators.validations._
-import api.models.errors.MtdError
 import v2.models.request.{ SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData }
 
 import javax.inject.Singleton
@@ -26,18 +25,18 @@ import javax.inject.Singleton
 @Singleton
 class SubmitEndOfPeriodStatementValidator extends Validator[SubmitEndOfPeriodStatementRawData] {
 
-  override def validations: Seq[SubmitEndOfPeriodStatementRawData => Seq[MtdError]] =
+  override def validations: Seq[Validation[SubmitEndOfPeriodStatementRawData]] =
     List(parameterFormatValidation, enumValidation, bodyFormatValidation, bodyFieldFormatValidation)
 
-  private def parameterFormatValidation: SubmitEndOfPeriodStatementRawData => Seq[MtdError] = { data =>
+  private def parameterFormatValidation: Validation[SubmitEndOfPeriodStatementRawData] = { data =>
     NinoValidation.validate(data.nino)
   }
 
-  private def enumValidation: SubmitEndOfPeriodStatementRawData => Seq[MtdError] = { data =>
+  private def enumValidation: Validation[SubmitEndOfPeriodStatementRawData] = { data =>
     JsonFormatValidation.validate[String](data.body.json \ "typeOfBusiness")(TypeOfBusinessValidation.validate)
   }
 
-  private def bodyFieldFormatValidation: SubmitEndOfPeriodStatementRawData => Seq[MtdError] = { data =>
+  private def bodyFieldFormatValidation: Validation[SubmitEndOfPeriodStatementRawData] = { data =>
     val body = data.body.json.as[SubmitEndOfPeriod]
 
     BusinessIdValidation.validateBusinessId(body.businessId) ++
@@ -45,7 +44,7 @@ class SubmitEndOfPeriodStatementValidator extends Validator[SubmitEndOfPeriodSta
       FinalisedValidation.validateFinalised(body.finalised)
   }
 
-  private def bodyFormatValidation: SubmitEndOfPeriodStatementRawData => Seq[MtdError] = { data =>
+  private def bodyFormatValidation: Validation[SubmitEndOfPeriodStatementRawData] = { data =>
     JsonFormatValidation.validate[SubmitEndOfPeriod](data.body.json) match {
       case Nil          => NoValidationErrors
       case schemaErrors => schemaErrors

@@ -22,9 +22,9 @@ import utils.Logging
 
 trait Validator[A <: RawData] extends Logging {
 
-  type ValidationLevel[T] = T => Seq[MtdError]
+  type Validation[T <: RawData] = T => Seq[MtdError]
 
-  protected def validations: Seq[A => Seq[MtdError]]
+  protected def validations: Seq[Validation[A]]
 
   def validateRequest(rawData: A): Option[Seq[MtdError]] = {
     validations.view
