@@ -16,128 +16,65 @@
 
 package api.controllers.requestParsers.validators
 
-import api.models.errors.MtdError
+import api.models.errors.{ BadRequestError, ErrorWrapper, MtdError, NinoFormatError, TaxYearFormatError }
 import api.models.request.RawData
 import org.scalamock.scalatest.MockFactory
-import play.api.http.Status._
+import play.api.http.Status.BAD_REQUEST
 import support.UnitSpec
 
 class ValidatorSpec extends UnitSpec with MockFactory {
 
+  case class TestRawData() extends RawData
+
+  private class TestValidator(val validations: Seq[TestRawData => Seq[MtdError]]) extends Validator[TestRawData]
+
   private trait Test {
-    val validator = new TestValidator()
+    val validations: Seq[TestRawData => Seq[MtdError]]
+    val rawData: TestRawData          = TestRawData()
+    lazy val validator: TestValidator = new TestValidator(validations)
+
+    implicit val correlationId: String = "test correlation id"
   }
 
-  "running a validation" should {
-    "return no errors" when {
-      "when all data is correct " in new Test {
-
-        // Set up the mock validations
-        val levelOneValidationOne = new MockFunctionObject("Level: 1    Validation 1")
-        val levelOneValidationTwo = new MockFunctionObject("Level: 1    Validation 2")
-
-        def levelOneValidations: TestRawData => List[List[MtdError]] = (_: TestRawData) => {
-          List(
-            levelOneValidationOne.validate(shouldError = false, None),
-            levelOneValidationTwo.validate(shouldError = false, None)
-          )
-        }
-
-        val validationSet = List(levelOneValidations)
-
-        val inputData: TestRawData = TestRawData("ABCDEF", "12345")
-        val result: List[MtdError] = validator.run(validationSet, inputData)
-        result.isEmpty shouldBe true
-        levelOneValidationOne.called shouldBe 1
-        levelOneValidationTwo.called shouldBe 1
-
-      }
+  "validateRequest" should {
+    "return None when there are no validation errors" in new Test {
+      override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List())
+      validator.validateRequest(rawData) shouldBe None
     }
 
-    "return a list of validation errors on level one" when {
-      "when there are failed validations " in new Test {
-        // Set up the mock validations
-        val levelOneValidationOne = new MockFunctionObject("Level: 1    Validation 1")
-        val levelOneValidationTwo = new MockFunctionObject("Level: 1    Validation 2")
-        val mockError: MtdError   = MtdError("MOCK", "SOME ERROR", IM_A_TEAPOT)
-
-        def levelOneValidations: TestRawData => List[List[MtdError]] = (_: TestRawData) => {
-          List(
-            levelOneValidationOne.validate(shouldError = false, None),
-            levelOneValidationTwo.validate(shouldError = true, Some(mockError))
-          )
-        }
-
-        val validationSet = List(levelOneValidations)
-
-        val inputData: TestRawData = TestRawData("ABCDEF", "12345")
-        val result: List[MtdError] = validator.run(validationSet, inputData)
-        result.isEmpty shouldBe false
-        result.size shouldBe 1
-        result.head shouldBe mockError
-        levelOneValidationOne.called shouldBe 1
-        levelOneValidationTwo.called shouldBe 1
+    "return Some List of errors" when {
+      "a single validation error occurs" in new Test {
+        override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError))
+        validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError))
       }
-    }
 
-    "return a list of validation errors on level two" when {
-      "when there are failed validations only on level 2 " in new Test {
-        // Set up the mock validations
-        val levelOneValidationOne = new MockFunctionObject("Level: 1    Validation 1")
-        val levelOneValidationTwo = new MockFunctionObject("Level: 1    Validation 2")
-        val levelTwoValidationOne = new MockFunctionObject("Level: 2    Validation 1")
-        val levelTwoValidationTwo = new MockFunctionObject("Level: 2    Validation 2")
-        val mockError: MtdError   = MtdError("MOCK", "SOME ERROR ON LEVEL 2", BAD_REQUEST)
+      "an error occurs during the first of multiple validations" in new Test {
+        override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError), _ => List(TaxYearFormatError))
+        validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError))
+      }
 
-        def levelOneValidations: TestRawData => List[List[MtdError]] = (_: TestRawData) => {
-          List(
-            levelOneValidationOne.validate(shouldError = false, None),
-            levelOneValidationTwo.validate(shouldError = false, None)
-          )
-        }
+      "merge errors with the same code but different paths into a single error" in new Test {
+        private val TestError = MtdError("TEST_ERROR", "error message", BAD_REQUEST, Some(Seq("path 1")))
+        override val validations: Seq[TestRawData => Seq[MtdError]] =
+          List(_ => List(NinoFormatError, TestError, TestError.copy(paths = Some(Seq("path 2")))))
 
-        def levelTwoValidations: TestRawData => List[List[MtdError]] = (_: TestRawData) => {
-          List(
-            levelTwoValidationOne.validate(shouldError = false, None),
-            levelTwoValidationTwo.validate(shouldError = true, Some(mockError))
-          )
-        }
-
-        val validationSet = List(levelOneValidations, levelTwoValidations)
-
-        val inputData: TestRawData = TestRawData("ABCDEF", "12345")
-        val result: List[MtdError] = validator.run(validationSet, inputData)
-        result.isEmpty shouldBe false
-        result.size shouldBe 1
-        result.head shouldBe mockError
-        levelOneValidationOne.called shouldBe 1
-        levelOneValidationTwo.called shouldBe 1
-        levelTwoValidationOne.called shouldBe 1
-        levelTwoValidationTwo.called shouldBe 1
+        validator.validateRequest(rawData) shouldBe Some(List(NinoFormatError, TestError.copy(paths = Some(Seq("path 1", "path 2")))))
       }
     }
   }
-}
 
-class MockFunctionObject(name: String) {
-  var called = 0
+  "wrapErrors" should {
+    "return an ErrorWrapper with a single error when there is only one error" in new Test {
+      override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List())
+      validator.wrapErrors(List(NinoFormatError)) shouldBe ErrorWrapper(correlationId, NinoFormatError, None)
+    }
 
-  def validate(shouldError: Boolean, errorToReturn: Option[MtdError]): List[MtdError] = {
-    called = called + 1
-    if (shouldError) List(errorToReturn.get) else List()
-  }
+    "return an ErrorWrapper with a BadRequestError and multiple errors when there are multiple errors" in new Test {
+      override val validations: Seq[TestRawData => Seq[MtdError]] = List(_ => List(NinoFormatError, TaxYearFormatError))
+      val expectedOutcome: ErrorWrapper =
+        ErrorWrapper(correlationId, BadRequestError, Some(List(NinoFormatError, TaxYearFormatError)))
 
-}
-
-private case class TestRawData(fieldOne: String, fieldTwo: String) extends RawData
-
-// Create a Validator based off the trait to be able to test it
-private class TestValidator extends Validator[TestRawData] {
-  override def validate(data: TestRawData): List[MtdError] = {
-    run(List(), data) match {
-      case Nil        => List()
-      case err :: Nil => List(err)
-      case errs       => errs
+      validator.wrapErrors(List(NinoFormatError, TaxYearFormatError)) shouldBe expectedOutcome
     }
   }
 }
