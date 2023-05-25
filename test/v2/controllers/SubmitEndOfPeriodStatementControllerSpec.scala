@@ -68,7 +68,7 @@ class SubmitEndOfPeriodStatementControllerSpec
 
         MockSubmitEndOfPeriodStatementService
           .submitEndOfPeriodStatementService(requestData)
-          .returns(Future.successful(Right(ResponseWrapper(correlationId, Unit))))
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, ()))))
 
         runOkTest(NO_CONTENT)
       }

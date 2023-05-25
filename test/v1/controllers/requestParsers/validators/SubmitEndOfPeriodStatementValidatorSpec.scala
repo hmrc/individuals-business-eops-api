@@ -204,10 +204,10 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
                                                 endDate = "XXXXXX",
                                                 finalised = "false"
                                               )))) shouldBe List(
-          BusinessIdFormatError,
+          RuleNotFinalisedError,
           StartDateFormatError,
           EndDateFormatError,
-          RuleNotFinalisedError
+          BusinessIdFormatError
         )
       }
     }

@@ -42,7 +42,7 @@ object DownstreamTaxYear {
     * @param taxYear the tax year string (2018)
     */
   def toMTDYear(taxYear: String): DownstreamTaxYear =
-    DownstreamTaxYear((taxYear.toInt - 1) + "-" + taxYear.drop(startOfYear))
+    DownstreamTaxYear(s"${taxYear.toInt - 1}-${taxYear.drop(startOfYear)}")
 
   //TODO UPDATE IF NEEDED TO USE 2017-18 FORMAT
   def mostRecentTaxYear(date: LocalDate = LocalDate.now()): DownstreamTaxYear = {

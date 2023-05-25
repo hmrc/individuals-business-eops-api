@@ -95,7 +95,7 @@ class SubmitEndOfPeriodStatementControllerSpec
 
         MockSubmitEndOfPeriodStatementService
           .submitEndOfPeriodStatementService(requestData)
-          .returns(Future.successful(Right(ResponseWrapper(correlationId, Unit))))
+          .returns(Future.successful(Right(ResponseWrapper(correlationId, ()))))
 
         val result: Future[Result] = controller.handleRequest(nino)(fakePutRequest(fullValidJson()))
         status(result) shouldBe NO_CONTENT
@@ -158,7 +158,7 @@ class SubmitEndOfPeriodStatementControllerSpec
             header("X-CorrelationId", result) shouldBe Some(correlationId)
 
             val auditResponse: AuditResponse = AuditResponse(expectedStatus, Some(Seq(AuditError(mtdError.code))), None)
-            MockedAuditService.verifyAuditEvent(event(auditResponse)).once
+            MockedAuditService.verifyAuditEvent(event(auditResponse)).once()
           }
         }
 

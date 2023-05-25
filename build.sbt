@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import sbt.Keys.{baseDirectory, parallelExecution, unmanagedClasspath}
+import sbt.Keys.{ baseDirectory, parallelExecution, unmanagedClasspath }
 import sbt._
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings}
+import uk.gov.hmrc.DefaultBuildSettings.{ addTestReportOption, defaultSettings }
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 import uk.gov.hmrc.SbtAutoBuildPlugin
@@ -32,7 +32,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
     retrieveManaged := true,
     update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    scalaVersion := "2.12.15"
+    scalaVersion := "2.13.8"
   )
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
