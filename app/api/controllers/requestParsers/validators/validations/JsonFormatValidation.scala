@@ -40,7 +40,10 @@ object JsonFormatValidation {
           } else {
             NoValidationErrors
           }
-        case JsError(errors: Seq[(JsPath, Seq[JsonValidationError])]) => handleErrors(errors)
+        case JsError(errors) => {
+          val immutableErrors = errors.map { case (path, errors) => (path, errors.toList) }.toList
+          handleErrors(immutableErrors)
+        }
       }
     }
   }

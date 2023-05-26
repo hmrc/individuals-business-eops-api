@@ -54,7 +54,7 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
 
       "mandatory fields are missing" in new Test {
         validator.validate(SubmitEndOfPeriodStatementRawData(validNino, AnyContentAsJson(Json.parse("""{ "finalised": true }""")))) shouldBe List(
-          RuleIncorrectOrEmptyBodyError.copy(paths = Some(List("/typeOfBusiness", "/businessId", "/accountingPeriod")))
+          RuleIncorrectOrEmptyBodyError.copy(paths = Some(List("/accountingPeriod", "/businessId", "/typeOfBusiness")))
         )
       }
 
