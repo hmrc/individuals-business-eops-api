@@ -17,11 +17,11 @@
 package api.models.domain
 
 case class Nino(nino: String) {
-  private val LengthWithoutSuffix: Int = 8
-  def value: String                    = nino
-  val name                             = "nino"
-  def formatted: String                = value.grouped(2).mkString(" ")
-  def withoutSuffix: String            = value.take(LengthWithoutSuffix)
+  private val LengthWithoutSuffix = 8
+
+  def value: String         = nino
+  def formatted: String     = value.grouped(2).mkString(" ")
+  def withoutSuffix: String = value.take(LengthWithoutSuffix)
 
   override def toString: String = nino
 }

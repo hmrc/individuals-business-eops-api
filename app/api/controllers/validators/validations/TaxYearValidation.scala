@@ -24,7 +24,6 @@ object TaxYearValidation extends Validation {
 
   def apply(taxYear: String): Seq[MtdError] =
     if (taxYear.matches(taxYearFormat)) {
-
       val startTaxYearStart: Int = 2
       val startTaxYearEnd: Int   = 4
 
@@ -34,11 +33,11 @@ object TaxYearValidation extends Validation {
       val start = taxYear.substring(startTaxYearStart, startTaxYearEnd).toInt
       val end   = taxYear.substring(endTaxYearStart, endTaxYearEnd).toInt
 
-      if (end - start == 1) {
+      if (end - start == 1)
         NoValidationErrors
-      } else {
+      else
         List(RuleTaxYearRangeInvalid)
-      }
+
     } else {
       List(TaxYearFormatError)
     }

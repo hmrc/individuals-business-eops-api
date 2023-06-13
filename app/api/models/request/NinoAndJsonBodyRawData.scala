@@ -20,9 +20,8 @@ import play.api.libs.json.JsValue
 import play.api.mvc.AnyContentAsJson
 
 object NinoAndJsonBodyRawData {
-  def apply(nino: String, body: JsValue): NinoAndJsonBodyRawData = {
+  def apply(nino: String, body: JsValue): NinoAndJsonBodyRawData =
     NinoAndJsonBodyRawData(nino, AnyContentAsJson(body))
-  }
 }
 
 case class NinoAndJsonBodyRawData(nino: String, body: AnyContentAsJson) extends RawData

@@ -33,9 +33,6 @@ object Validator {
 
 trait Validator[RAW <: RawData, PARSED] extends Logging {
 
-  // $COVERAGE-OFF$
-  //TODO Add coverage back on when paths have been added to the validator
-
   protected val preparseValidations: PreParseValidationCallers[RAW]
   protected val parserValidation: ParserValidationCaller[RAW, PARSED]
   protected val postparseValidations: PostParseValidationCallers[PARSED]

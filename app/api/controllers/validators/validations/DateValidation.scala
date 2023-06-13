@@ -38,21 +38,25 @@ object DateValidation extends Validation {
 
     (startLocalDate, endLocalDate) match {
       case (Some(startDate), Some(endDate)) =>
-        if (endDate.isBefore(startDate)) {
+        if (endDate.isBefore(startDate))
           List(RuleEndDateBeforeStartDateError)
-        } else {
+        else
           NoValidationErrors
-        }
 
-      case _ => validateStartDate(startLocalDate) ++ validateEndDate(endLocalDate)
+      case _ =>
+        validateStartDate(startLocalDate) ++ validateEndDate(endLocalDate)
     }
   }
 
-  private def validateStartDate(startDate: Option[LocalDate]): Seq[MtdError] = {
-    if (startDate.isDefined) NoValidationErrors else List(StartDateFormatError)
-  }
+  private def validateStartDate(startDate: Option[LocalDate]): Seq[MtdError] =
+    if (startDate.isDefined)
+      NoValidationErrors
+    else
+      List(StartDateFormatError)
 
-  private def validateEndDate(endDate: Option[LocalDate]): Seq[MtdError] = {
-    if (endDate.isDefined) NoValidationErrors else List(EndDateFormatError)
-  }
+  private def validateEndDate(endDate: Option[LocalDate]): Seq[MtdError] =
+    if (endDate.isDefined)
+      NoValidationErrors
+    else
+      List(EndDateFormatError)
 }
