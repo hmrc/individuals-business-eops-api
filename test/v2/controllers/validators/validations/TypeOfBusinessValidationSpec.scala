@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package v2.controllers.requestParsers.validators.validations
+package v2.controllers.validators.validations
 
-import api.controllers.requestParsers.validators.validations.TypeOfBusinessValidation
+import api.controllers.validators.validations.TypeOfBusinessValidation
 import api.models.errors.TypeOfBusinessFormatError
 import support.UnitSpec
 
@@ -26,7 +26,8 @@ class TypeOfBusinessValidationSpec extends UnitSpec {
     "return no errors" when {
       def checkGood(typeOfBusiness: String): Unit =
         s"type of business is $typeOfBusiness" in {
-          TypeOfBusinessValidation.validate(typeOfBusiness) shouldBe empty
+          val result = TypeOfBusinessValidation(typeOfBusiness)
+          result shouldBe empty
         }
 
       Seq("self-employment", "uk-property", "foreign-property").foreach(checkGood)
@@ -34,11 +35,13 @@ class TypeOfBusinessValidationSpec extends UnitSpec {
 
     "return a validation error" when {
       "provided with an empty string" in {
-        TypeOfBusinessValidation.validate("") shouldBe List(TypeOfBusinessFormatError)
+        val result = TypeOfBusinessValidation("")
+        result shouldBe List(TypeOfBusinessFormatError)
       }
 
       "provided with a non-matching string" in {
-        TypeOfBusinessValidation.validate("self-employment-a") shouldBe List(TypeOfBusinessFormatError)
+        val result = TypeOfBusinessValidation("self-employment-a")
+        result shouldBe List(TypeOfBusinessFormatError)
       }
     }
   }

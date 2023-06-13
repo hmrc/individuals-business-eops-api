@@ -18,9 +18,7 @@ package api.models.errors
 
 import play.api.libs.json.{ JsPath, Json, Reads, __ }
 
-case class DownstreamErrorCode(code: String) {
-  def toMtd(httpStatus: Int): MtdError = MtdError(code = code, message = "", httpStatus = httpStatus)
-}
+case class DownstreamErrorCode(code: String)
 
 object DownstreamErrorCode {
   implicit val reads: Reads[DownstreamErrorCode] = Json.reads[DownstreamErrorCode]

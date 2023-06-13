@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.models.request
 
-import api.models.downstream.TypeOfBusiness
-import api.models.errors.{ MtdError, TypeOfBusinessFormatError }
+import play.api.libs.json.JsValue
+import play.api.mvc.AnyContentAsJson
 
-object TypeOfBusinessValidation {
-
-  def validate(value: String): List[MtdError] =
-    if (TypeOfBusiness.parser.isDefinedAt(value)) NoValidationErrors else List(TypeOfBusinessFormatError)
-
+object NinoAndJsonBodyRawData {
+  def apply(nino: String, body: JsValue): NinoAndJsonBodyRawData = {
+    NinoAndJsonBodyRawData(nino, AnyContentAsJson(body))
+  }
 }
+
+case class NinoAndJsonBodyRawData(nino: String, body: AnyContentAsJson) extends RawData

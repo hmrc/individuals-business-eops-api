@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
+import api.controllers.validators.validations.TaxYearValidation
 import api.models.errors.{ RuleTaxYearRangeInvalid, TaxYearFormatError }
 import support.UnitSpec
 import v2.models.utils.JsonErrorValidators
@@ -27,7 +28,7 @@ class TaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
       "when a valid tax year is supplied" in {
 
         val validTaxYear     = "2018-19"
-        val validationResult = TaxYearValidation.validate(validTaxYear)
+        val validationResult = TaxYearValidation(validTaxYear)
         validationResult.isEmpty shouldBe true
 
       }
@@ -37,7 +38,7 @@ class TaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
       "when an invalid tax year format is supplied" in {
 
         val invalidTaxYear   = "2019"
-        val validationResult = TaxYearValidation.validate(invalidTaxYear)
+        val validationResult = TaxYearValidation(invalidTaxYear)
         validationResult.isEmpty shouldBe false
         validationResult.length shouldBe 1
         validationResult.head shouldBe TaxYearFormatError
@@ -48,7 +49,7 @@ class TaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
     "the difference in years is greater than 1 year" in {
 
       val invalidTaxYear   = "2017-19"
-      val validationResult = TaxYearValidation.validate(invalidTaxYear)
+      val validationResult = TaxYearValidation(invalidTaxYear)
       validationResult.isEmpty shouldBe false
       validationResult.length shouldBe 1
       validationResult.head shouldBe RuleTaxYearRangeInvalid
@@ -58,7 +59,7 @@ class TaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
     "the end year is before the start year" in {
 
       val invalidTaxYear   = "2018-17"
-      val validationResult = TaxYearValidation.validate(invalidTaxYear)
+      val validationResult = TaxYearValidation(invalidTaxYear)
       validationResult.isEmpty shouldBe false
       validationResult.length shouldBe 1
       validationResult.head shouldBe RuleTaxYearRangeInvalid
@@ -68,7 +69,7 @@ class TaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
     "the start and end years are the same" in {
 
       val invalidTaxYear   = "2017-17"
-      val validationResult = TaxYearValidation.validate(invalidTaxYear)
+      val validationResult = TaxYearValidation(invalidTaxYear)
       validationResult.isEmpty shouldBe false
       validationResult.length shouldBe 1
       validationResult.head shouldBe RuleTaxYearRangeInvalid
@@ -78,7 +79,7 @@ class TaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
     "the tax year bad" in {
 
       val invalidTaxYear   = "20177-17"
-      val validationResult = TaxYearValidation.validate(invalidTaxYear)
+      val validationResult = TaxYearValidation(invalidTaxYear)
       validationResult.isEmpty shouldBe false
       validationResult.length shouldBe 1
       validationResult.head shouldBe TaxYearFormatError

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
-import api.models.errors.{ BusinessIdFormatError, MtdError }
+import api.models.downstream.TypeOfBusiness
+import api.models.errors.{ MtdError, TypeOfBusinessFormatError }
 
-object BusinessIdValidation {
+object TypeOfBusinessValidation extends Validation {
 
-  def validateBusinessId(businessId: String): List[MtdError] = {
-    //400 FORMAT_BUSINESS_ID The provided Business ID is invalid
-    if (businessId.matches("^X[A-Z0-9]{1}IS[0-9]{11}$")) NoValidationErrors else List(BusinessIdFormatError)
-  }
+  def apply(value: String): Seq[MtdError] =
+    if (TypeOfBusiness.parser.isDefinedAt(value))
+      NoValidationErrors
+    else
+      List(TypeOfBusinessFormatError)
+
 }

@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
 import api.models.errors.{ EndDateFormatError, MtdError, RuleEndDateBeforeStartDateError, StartDateFormatError }
 
 import java.time.LocalDate
 
-object DateValidation {
+object DateValidation extends Validation {
 
-  def validateStartDate(startDate: Option[LocalDate]): List[MtdError] = {
-    //400 FORMAT_START_DATE The provided Start date is invalid
-    if (startDate.isDefined) NoValidationErrors else List(StartDateFormatError)
-  }
-
-  def validateEndDate(endDate: Option[LocalDate]): List[MtdError] = {
-    //400 FORMAT_END_DATE The provided From date is invalid
-    if (endDate.isDefined) NoValidationErrors else List(EndDateFormatError)
-  }
-
-  def validateDates(startDate: String, endDate: String): List[MtdError] = {
+  def apply(startDate: String, endDate: String): Seq[MtdError] = {
 
     val startLocalDate: Option[LocalDate] = try {
       Some(LocalDate.parse(startDate))
@@ -56,5 +46,13 @@ object DateValidation {
 
       case _ => validateStartDate(startLocalDate) ++ validateEndDate(endLocalDate)
     }
+  }
+
+  private def validateStartDate(startDate: Option[LocalDate]): Seq[MtdError] = {
+    if (startDate.isDefined) NoValidationErrors else List(StartDateFormatError)
+  }
+
+  private def validateEndDate(endDate: Option[LocalDate]): Seq[MtdError] = {
+    if (endDate.isDefined) NoValidationErrors else List(EndDateFormatError)
   }
 }

@@ -14,41 +14,39 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
 import api.models.errors.{ MtdError, RuleIncorrectOrEmptyBodyError }
 import play.api.Logger
 import play.api.libs.json._
 
-object JsonFormatValidation {
+object JsonFormatValidation extends Validation {
 
-  def validate[T: Reads](jsLookupResult: JsLookupResult)(validation: T => List[MtdError]): List[MtdError] = {
+  def validate[T: Reads](jsLookupResult: JsLookupResult)(validation: T => Seq[MtdError]): Seq[MtdError] =
     jsLookupResult.validate[T] match {
       case JsSuccess(value, _) => validation(value)
-      case _: JsError          => Nil
+      case _: JsError          => NoValidationErrors
     }
-  }
 
-  def validate[A: OFormat](data: JsValue): List[MtdError] = {
+  def validate[A: OFormat](data: JsValue): Either[Seq[MtdError], A] =
     if (data == JsObject.empty) {
-      List(RuleIncorrectOrEmptyBodyError)
+      Left(List(RuleIncorrectOrEmptyBodyError))
     } else {
       data.validate[A] match {
         case JsSuccess(body, _) =>
           if (Json.toJson(body) == JsObject.empty) {
-            List(RuleIncorrectOrEmptyBodyError)
+            Left(List(RuleIncorrectOrEmptyBodyError))
           } else {
-            NoValidationErrors
+            Right(body)
           }
         case JsError(errors) => {
           val immutableErrors = errors.map { case (path, errors) => (path, errors.toList) }.toList
-          handleErrors(immutableErrors)
+          Left(handleErrors(immutableErrors))
         }
       }
     }
-  }
 
-  private def handleErrors(errors: Seq[(JsPath, Seq[JsonValidationError])]): List[MtdError] = {
+  private def handleErrors(errors: Seq[(JsPath, Seq[JsonValidationError])]): Seq[MtdError] = {
     val failures = errors.map {
       case (path: JsPath, Seq(JsonValidationError(Seq("error.path.missing"))))                              => MissingMandatoryField(path)
       case (path: JsPath, Seq(JsonValidationError(Seq(error: String)))) if error.contains("error.expected") => WrongFieldType(path)
