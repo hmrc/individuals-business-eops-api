@@ -29,23 +29,19 @@ import javax.inject.Singleton
 @Singleton
 class SubmitEndOfPeriodStatementValidator extends Validator[NinoAndJsonBodyRawData, SubmitEndOfPeriodStatementRequest] {
 
-  protected val preparseValidations: PreParseValidationCallers[NinoAndJsonBodyRawData] =
+  protected val preParserValidations: PreParseValidationCallers[NinoAndJsonBodyRawData] =
     List(
-      parameterFormatValidation,
+      data => NinoValidation(data.nino),
       enumValidator
     )
 
   protected val parserValidation: ParserValidationCaller[NinoAndJsonBodyRawData, SubmitEndOfPeriodStatementRequest] =
     bodyFormatValidator
 
-  protected val postparseValidations =
+  protected val postParserValidations =
     List(
       bodyFieldFormatValidation
     )
-
-  private def parameterFormatValidation: PreParseValidationCaller[NinoAndJsonBodyRawData] = { data =>
-    NinoValidation(data.nino)
-  }
 
   private def enumValidator: PreParseValidationCaller[NinoAndJsonBodyRawData] = { data =>
     JsonFormatValidation.validate[String](data.body.json \ "typeOfBusiness")(TypeOfBusinessValidation(_))

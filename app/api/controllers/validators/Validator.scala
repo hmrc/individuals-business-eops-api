@@ -33,9 +33,9 @@ object Validator {
 
 trait Validator[RAW <: RawData, PARSED] extends Logging {
 
-  protected val preparseValidations: PreParseValidationCallers[RAW]
+  protected val preParserValidations: PreParseValidationCallers[RAW]
   protected val parserValidation: ParserValidationCaller[RAW, PARSED]
-  protected val postparseValidations: PostParseValidationCallers[PARSED]
+  protected val postParserValidations: PostParseValidationCallers[PARSED]
 
   def parseAndValidateRequest(data: RAW)(implicit correlationId: String): Either[ErrorWrapper, PARSED] = {
     val result = parseAndValidate(data)
@@ -52,7 +52,7 @@ trait Validator[RAW <: RawData, PARSED] extends Logging {
   }
 
   private def runPreParseValidations(data: RAW): Either[Seq[MtdError], RAW] = {
-    val errors = preparseValidations.flatMap(_(data))
+    val errors = preParserValidations.flatMap(_(data))
     errors match {
       case _ if errors.nonEmpty => Left(errors)
       case _                    => Right(data)
@@ -64,7 +64,7 @@ trait Validator[RAW <: RawData, PARSED] extends Logging {
   }
 
   private def runPostParseValidations(parsed: PARSED): Either[Seq[MtdError], PARSED] = {
-    val errors = postparseValidations.flatMap(_(parsed))
+    val errors = postParserValidations.flatMap(_(parsed))
     errors match {
       case _ if errors.nonEmpty => Left(errors)
       case _                    => Right(parsed)

@@ -20,7 +20,7 @@ import api.controllers.{ AuthorisedController, EndpointLogContext, RequestContex
 import api.models.request.NinoAndJsonBodyRawData
 import api.services.{ EnrolmentsAuthService, MtdIdLookupService }
 import play.api.libs.json.JsValue
-import play.api.mvc.{ Action, ControllerComponents }
+import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents }
 import utils.IdGenerator
 import v2.controllers.validators.SubmitEndOfPeriodStatementValidator
 import v2.services._
@@ -45,7 +45,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     authorisedAction(nino).async(parse.json) { implicit request =>
       implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
 
-      val rawData = NinoAndJsonBodyRawData(nino, request.body)
+      val rawData = NinoAndJsonBodyRawData(nino, AnyContentAsJson(request.body))
 
       val requestHandler =
         RequestHandler

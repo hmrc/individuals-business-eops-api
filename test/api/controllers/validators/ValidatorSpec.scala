@@ -166,7 +166,7 @@ private case class TestRawData(fieldOne: String, fieldTwo: String) extends RawDa
 private case class TestParsedRequest(fieldOne: String, fieldTwo: String)
 
 private class TestValidator(
-    override protected val preparseValidations: PreParseValidationCallers[TestRawData],
-    override protected val parserValidation: ParserValidationCaller[TestRawData, TestParsedRequest],
-    override protected val postparseValidations: PostParseValidationCallers[TestParsedRequest]
+                             override protected val preParserValidations: PreParseValidationCallers[TestRawData],
+                             override protected val parserValidation: ParserValidationCaller[TestRawData, TestParsedRequest],
+                             override protected val postParserValidations: PostParseValidationCallers[TestParsedRequest]
 ) extends Validator[TestRawData, TestParsedRequest]
