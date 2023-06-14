@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
 import api.models.errors.{ MtdError, RuleTaxYearNotSupportedError, TaxYearFormatError }
 import v2.models.request.DownstreamTaxYear
 
-object MinTaxYearValidation {
+object MinTaxYearValidation extends Validation {
 
   // @param taxYear In format YYYY-YY
-  def validate(taxYear: String, minTaxYear: Int): List[MtdError] = {
+  def apply(taxYear: String, minTaxYear: Int): Seq[MtdError] =
     try {
       val downstreamTaxYear = Integer.parseInt(DownstreamTaxYear.toYearYYYY(taxYear).value)
 
-      if (downstreamTaxYear >= minTaxYear) NoValidationErrors else List(RuleTaxYearNotSupportedError)
+      if (downstreamTaxYear >= minTaxYear)
+        NoValidationErrors
+      else
+        List(RuleTaxYearNotSupportedError)
     } catch {
       case _: NumberFormatException => List(TaxYearFormatError)
     }
-  }
 }

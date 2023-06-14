@@ -17,12 +17,12 @@
 package v2.controllers
 
 import api.controllers.{ AuthorisedController, EndpointLogContext, RequestContext, RequestHandler }
+import api.models.request.NinoAndJsonBodyRawData
 import api.services.{ EnrolmentsAuthService, MtdIdLookupService }
 import play.api.libs.json.JsValue
 import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents }
 import utils.IdGenerator
-import v2.controllers.requestParsers.SubmitEndOfPeriodStatementParser
-import v2.models.request.SubmitEndOfPeriodStatementRawData
+import v2.controllers.validators.SubmitEndOfPeriodStatementValidator
 import v2.services._
 
 import javax.inject._
@@ -34,7 +34,7 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
                                                      val idGenerator: IdGenerator,
                                                      nrsProxyService: NrsProxyService,
                                                      service: SubmitEndOfPeriodStatementService,
-                                                     requestParser: SubmitEndOfPeriodStatementParser,
+                                                     validator: SubmitEndOfPeriodStatementValidator,
                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc) {
 
@@ -45,11 +45,11 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     authorisedAction(nino).async(parse.json) { implicit request =>
       implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
 
-      val rawData = SubmitEndOfPeriodStatementRawData(nino, AnyContentAsJson(request.body))
+      val rawData = NinoAndJsonBodyRawData(nino, AnyContentAsJson(request.body))
 
       val requestHandler =
         RequestHandler
-          .withParser(requestParser)
+          .withValidator(validator)
           .withService { parsedRequest =>
             nrsProxyService.submit(nino, parsedRequest.submitEndOfPeriod)
             service.submit(parsedRequest)

@@ -19,5 +19,5 @@ package v2.models.request
 import api.models.domain.{ Nino, TaxYear }
 
 case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod) {
-  val taxYear: TaxYear = TaxYear.fromIso(submitEndOfPeriod.accountingPeriod.endDate)
+  lazy val taxYear: TaxYear = TaxYear.fromIso(submitEndOfPeriod.accountingPeriod.endDate)
 }

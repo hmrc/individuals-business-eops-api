@@ -17,8 +17,6 @@
 package v1.models.domain
 
 case class Nino(nino: String) {
-  require(Nino.isValid(nino), s"$nino is not a valid nino.")
-
   private val LengthWithoutSuffix: Int = 8
   def value: String                    = nino
   val name                             = "nino"

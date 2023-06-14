@@ -16,20 +16,31 @@
 
 package v2.mocks.validators
 
-import api.models.errors.MtdError
-import org.scalamock.handlers.CallHandler1
+import api.models.errors.{ ErrorWrapper, MtdError }
+import api.models.request.NinoAndJsonBodyRawData
+import org.scalamock.handlers.{ CallHandler, CallHandler1 }
 import org.scalamock.scalatest.MockFactory
-import v2.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
-import v2.models.request.SubmitEndOfPeriodStatementRawData
+import v2.controllers.validators.SubmitEndOfPeriodStatementValidator
+import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-class MockSubmitEndOfPeriodStatementValidator extends MockFactory {
+trait MockSubmitEndOfPeriodStatementValidator extends MockFactory {
 
-  val mockValidator: SubmitEndOfPeriodStatementValidator = mock[SubmitEndOfPeriodStatementValidator]
+  val mockSubmitEndOfPeriodStatementValidator: SubmitEndOfPeriodStatementValidator = mock[SubmitEndOfPeriodStatementValidator]
 
-  object MockValidator {
+  object MockedSubmitEndOfPeriodStatementValidator {
 
-    def validate(data: SubmitEndOfPeriodStatementRawData): CallHandler1[SubmitEndOfPeriodStatementRawData, List[MtdError]] = {
-      (mockValidator.validate(_: SubmitEndOfPeriodStatementRawData)).expects(data)
+    def parseAndValidateRequest(data: NinoAndJsonBodyRawData): CallHandler[Either[ErrorWrapper, SubmitEndOfPeriodStatementRequest]] = {
+      (mockSubmitEndOfPeriodStatementValidator
+        .parseAndValidateRequest(_: NinoAndJsonBodyRawData)(_: String))
+        .expects(data, *)
+    }
+
+    def parseAndValidate(
+        data: NinoAndJsonBodyRawData): CallHandler1[NinoAndJsonBodyRawData, Either[Seq[MtdError], SubmitEndOfPeriodStatementRequest]] = {
+
+      (mockSubmitEndOfPeriodStatementValidator
+        .parseAndValidate(_: NinoAndJsonBodyRawData))
+        .expects(data)
     }
   }
 }

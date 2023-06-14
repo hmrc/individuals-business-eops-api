@@ -16,7 +16,7 @@
 
 package v1.controllers.requestParsers.validators
 
-import api.controllers.requestParsers.validators.validations.NoValidationErrors
+import api.controllers.validators.validations.NoValidationErrors
 import play.api.libs.json.{ JsLookupResult, JsValue }
 import v1.controllers.requestParsers.validators.validations.BusinessIdValidation._
 import v1.controllers.requestParsers.validators.validations.DateValidation._

@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators
+package api.controllers.validators.validations
 
-package object validations {
-  val NoValidationErrors = List()
+import api.models.errors.{ FinalisedFormatError, MtdError }
+
+object FinalisedValidation extends Validation {
+
+  def apply(finalised: Boolean): Seq[MtdError] =
+    if (finalised)
+      NoValidationErrors
+    else
+      List(FinalisedFormatError)
 }

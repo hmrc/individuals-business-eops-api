@@ -16,7 +16,7 @@
 
 package api.controllers
 
-import api.controllers.requestParsers.RequestParser
+import api.controllers.validators.Validator
 import api.hateoas.HateoasLinksFactory
 import api.mocks.MockIdGenerator
 import api.mocks.hateoas.MockHateoasFactory
@@ -85,20 +85,21 @@ class RequestHandlerSpec
   private def service =
     (mockService.service(_: Input.type)(_: RequestContext, _: ExecutionContext)).expects(Input, *, *)
 
-  private val mockParser = mock[RequestParser[InputRaw.type, Input.type]]
+  private val mockValidator = mock[Validator[InputRaw.type, Input.type]]
 
-  private def parseRequest =
-    (mockParser.parseRequest(_: InputRaw.type)(_: String)).expects(InputRaw, *)
+  private def parseAndValidateRequest =
+    (mockValidator.parseAndValidateRequest(_: InputRaw.type)(_: String)).expects(InputRaw, *)
 
   "RequestHandler" when {
     "a request is successful" must {
       "return the correct response" in {
+
         val requestHandler = RequestHandler
-          .withParser(mockParser)
+          .withValidator(mockValidator)
           .withService(mockService.service)
           .withPlainJsonResult(successCode)
 
-        parseRequest returns Right(Input)
+        parseAndValidateRequest returns Right(Input)
         service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
         val result = requestHandler.handleRequest(InputRaw)
@@ -110,11 +111,11 @@ class RequestHandlerSpec
 
       "return no content if required" in {
         val requestHandler = RequestHandler
-          .withParser(mockParser)
+          .withValidator(mockValidator)
           .withService(mockService.service)
           .withNoContentResult()
 
-        parseRequest returns Right(Input)
+        parseAndValidateRequest returns Right(Input)
         service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
         val result = requestHandler.handleRequest(InputRaw)
@@ -126,11 +127,11 @@ class RequestHandlerSpec
 
       "wrap the response with hateoas links if required§" in {
         val requestHandler = RequestHandler
-          .withParser(mockParser)
+          .withValidator(mockValidator)
           .withService(mockService.service)
           .withHateoasResult(mockHateoasFactory)(HData, successCode)
 
-        parseRequest returns Right(Input)
+        parseAndValidateRequest returns Right(Input)
         service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
         MockHateoasFactory.wrap(Output, HData) returns HateoasWrapper(Output, hateoaslinks)
@@ -146,11 +147,11 @@ class RequestHandlerSpec
     "a request fails with validation errors" must {
       "return the errors" in {
         val requestHandler = RequestHandler
-          .withParser(mockParser)
+          .withValidator(mockValidator)
           .withService(mockService.service)
           .withPlainJsonResult(successCode)
 
-        parseRequest returns Left(ErrorWrapper(generatedCorrelationId, NinoFormatError))
+        parseAndValidateRequest returns Left(ErrorWrapper(generatedCorrelationId, NinoFormatError))
 
         val result = requestHandler.handleRequest(InputRaw)
 
@@ -163,11 +164,11 @@ class RequestHandlerSpec
     "a request fails with service errors" must {
       "return the errors" in {
         val requestHandler = RequestHandler
-          .withParser(mockParser)
+          .withValidator(mockValidator)
           .withService(mockService.service)
           .withPlainJsonResult(successCode)
 
-        parseRequest returns Right(Input)
+        parseAndValidateRequest returns Right(Input)
         service returns Future.successful(Left(ErrorWrapper(serviceCorrelationId, NinoFormatError)))
 
         val result = requestHandler.handleRequest(InputRaw)
@@ -196,7 +197,7 @@ class RequestHandlerSpec
       )
 
       val basicRequestHandler = RequestHandler
-        .withParser(mockParser)
+        .withValidator(mockValidator)
         .withService(mockService.service)
         .withPlainJsonResult(successCode)
 
@@ -213,7 +214,7 @@ class RequestHandlerSpec
           "audit without the response" in {
             val requestHandler = basicRequestHandler.withAuditing(auditHandler())
 
-            parseRequest returns Right(Input)
+            parseAndValidateRequest returns Right(Input)
             service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
             val result = requestHandler.handleRequest(InputRaw)
@@ -230,7 +231,7 @@ class RequestHandlerSpec
           "audit with the response" in {
             val requestHandler = basicRequestHandler.withAuditing(auditHandler(includeResponse = true))
 
-            parseRequest returns Right(Input)
+            parseAndValidateRequest returns Right(Input)
             service returns Future.successful(Right(ResponseWrapper(serviceCorrelationId, Output)))
 
             val result = requestHandler.handleRequest(InputRaw)
@@ -248,7 +249,7 @@ class RequestHandlerSpec
         "audit the failure" in {
           val requestHandler = basicRequestHandler.withAuditing(auditHandler())
 
-          parseRequest returns Left(ErrorWrapper(generatedCorrelationId, NinoFormatError))
+          parseAndValidateRequest returns Left(ErrorWrapper(generatedCorrelationId, NinoFormatError))
 
           val result = requestHandler.handleRequest(InputRaw)
 
@@ -264,7 +265,7 @@ class RequestHandlerSpec
         "audit the failure" in {
           val requestHandler = basicRequestHandler.withAuditing(auditHandler())
 
-          parseRequest returns Right(Input)
+          parseAndValidateRequest returns Right(Input)
           service returns Future.successful(Left(ErrorWrapper(serviceCorrelationId, NinoFormatError)))
 
           val result = requestHandler.handleRequest(InputRaw)

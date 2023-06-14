@@ -47,7 +47,6 @@ object APIStatus extends Enumeration {
 }
 
 case class APIVersion(version: String, status: APIStatus, endpointsEnabled: Boolean) {
-
   require(version.nonEmpty, "version is required")
 }
 

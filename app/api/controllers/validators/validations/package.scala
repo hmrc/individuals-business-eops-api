@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package v2.models.request
+package api.controllers.validators
 
-import api.models.request.RawData
-import play.api.mvc.AnyContentAsJson
-
-case class SubmitEndOfPeriodStatementRawData(nino: String, body: AnyContentAsJson) extends RawData
+package object validations {
+  val NoValidationErrors = List()
+}

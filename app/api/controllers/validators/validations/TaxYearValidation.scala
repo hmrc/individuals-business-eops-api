@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
 import api.models.errors.{ MtdError, RuleTaxYearRangeInvalid, TaxYearFormatError }
 
-object TaxYearValidation {
+object TaxYearValidation extends Validation {
 
   val taxYearFormat = "20[1-9][0-9]\\-[1-9][0-9]"
 
-  def validate(taxYear: String): List[MtdError] = {
-
+  def apply(taxYear: String): Seq[MtdError] =
     if (taxYear.matches(taxYearFormat)) {
-
       val startTaxYearStart: Int = 2
       val startTaxYearEnd: Int   = 4
 
@@ -35,13 +33,12 @@ object TaxYearValidation {
       val start = taxYear.substring(startTaxYearStart, startTaxYearEnd).toInt
       val end   = taxYear.substring(endTaxYearStart, endTaxYearEnd).toInt
 
-      if (end - start == 1) {
+      if (end - start == 1)
         NoValidationErrors
-      } else {
+      else
         List(RuleTaxYearRangeInvalid)
-      }
+
     } else {
       List(TaxYearFormatError)
     }
-  }
 }

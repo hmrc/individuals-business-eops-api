@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
-import api.models.errors.{ FinalisedFormatError, MtdError }
-
-object FinalisedValidation {
-
-  def validateFinalised(finalised: Boolean): List[MtdError] =
-    if (finalised) NoValidationErrors else List(FinalisedFormatError)
-}
+trait Validation

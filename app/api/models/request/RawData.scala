@@ -16,4 +16,8 @@
 
 package api.models.request
 
+import play.api.mvc.AnyContentAsJson
+
 trait RawData
+
+case class NinoAndJsonBodyRawData(nino: String, body: AnyContentAsJson) extends RawData

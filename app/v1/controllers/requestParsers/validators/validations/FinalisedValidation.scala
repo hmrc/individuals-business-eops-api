@@ -16,7 +16,7 @@
 
 package v1.controllers.requestParsers.validators.validations
 
-import api.controllers.requestParsers.validators.validations.NoValidationErrors
+import api.controllers.validators.validations.NoValidationErrors
 import play.api.Logger
 import play.api.libs.json.{ JsLookupResult, JsValue }
 import v1.models.errors.{ FinalisedFormatError, MtdError, RuleNotFinalisedError }

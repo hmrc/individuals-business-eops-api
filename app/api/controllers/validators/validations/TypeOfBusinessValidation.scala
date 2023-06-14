@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
 import api.models.downstream.TypeOfBusiness
 import api.models.errors.{ MtdError, TypeOfBusinessFormatError }
 
-object TypeOfBusinessValidation {
+object TypeOfBusinessValidation extends Validation {
 
-  def validate(value: String): List[MtdError] =
-    if (TypeOfBusiness.parser.isDefinedAt(value)) NoValidationErrors else List(TypeOfBusinessFormatError)
+  def apply(value: String): Seq[MtdError] =
+    if (TypeOfBusiness.parser.isDefinedAt(value))
+      NoValidationErrors
+    else
+      List(TypeOfBusinessFormatError)
 
 }

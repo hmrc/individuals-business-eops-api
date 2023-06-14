@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-package api.controllers.requestParsers.validators.validations
+package api.controllers.validators.validations
 
-trait Validation
+import api.models.errors.{ BusinessIdFormatError, MtdError }
+
+object BusinessIdValidation extends Validation {
+
+  def apply(businessId: String): Seq[MtdError] =
+    if (businessId.matches("^X[A-Z0-9]{1}IS[0-9]{11}$"))
+      NoValidationErrors
+    else
+      List(BusinessIdFormatError)
+}
