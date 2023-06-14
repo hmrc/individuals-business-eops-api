@@ -25,6 +25,11 @@ import support.UnitSpec
 
 class ValidatorSpec extends UnitSpec with MockFactory {
 
+  // TODO the "level 1/level 2" tests being done here aren't relevant to this API.
+  //  A ticket is being raised for the Validator changes to be added to an API that includes
+  //  "multi-level" validations in the pre- or post-parser stage, so this test should also be updated then.
+
+
   private trait Test {
     implicit val correlationId: String = "1234"
 
