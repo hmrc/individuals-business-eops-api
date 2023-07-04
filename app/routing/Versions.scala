@@ -35,6 +35,7 @@ object Version {
 
     override def reads(version: JsValue): JsResult[Version] =
       version.validate[String].flatMap {
+        case Version1.name => JsSuccess(Version1)
         case Version2.name => JsSuccess(Version2)
         case _             => JsError("Unrecognised version")
       }
