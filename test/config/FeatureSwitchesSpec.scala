@@ -21,38 +21,22 @@ import support.UnitSpec
 
 class FeatureSwitchesSpec extends UnitSpec {
 
-  "isVersionEnabled()" should {
-    val configuration = Configuration(
-      "version-1.enabled" -> true,
-      "version-2.enabled" -> false
-    )
-    val featureSwitches = FeatureSwitches(configuration)
+  private val configuration = Configuration(
+    "feature-switch.enabled" -> true,
+  )
 
-    "return false" when {
-      "the version is blank" in {
-        featureSwitches.isVersionEnabled("") shouldBe false
-      }
+  private val featureSwitches = FeatureSwitches(configuration)
 
-      "the version is an invalid format" in {
-        featureSwitches.isVersionEnabled("ABCDE-1") shouldBe false
-        featureSwitches.isVersionEnabled("1.") shouldBe false
-        featureSwitches.isVersionEnabled("1.ABC") shouldBe false
-      }
-
-      "the version isn't in the config" in {
-        featureSwitches.isVersionEnabled("3.0") shouldBe false
-      }
-
-      "the version is disabled in the config" in {
-        featureSwitches.isVersionEnabled("2.0") shouldBe false
+  "FeatureSwitches" should {
+    "return true" when {
+      "the feature switch is set to true" in {
+        featureSwitches.featureSwitchConfig.getOptional[Boolean]("feature-switch.enabled") shouldBe Some(true)
       }
     }
-
-    "return true" when {
-      "the version is enabled in the config" in {
-        featureSwitches.isVersionEnabled("1.0") shouldBe true
+    "return false" when {
+      "the feature switch is not present in the config" in {
+        featureSwitches.featureSwitchConfig.getOptional[Boolean]("invalid") shouldBe None
       }
     }
   }
-
 }
