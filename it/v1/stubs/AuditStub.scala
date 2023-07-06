@@ -28,4 +28,5 @@ object AuditStub extends WireMockMethods {
     when(method = POST, uri = auditUri)
       .thenReturn(status = NO_CONTENT)
   }
+
 }

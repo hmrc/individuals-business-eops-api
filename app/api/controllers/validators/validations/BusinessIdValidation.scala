@@ -16,7 +16,7 @@
 
 package api.controllers.validators.validations
 
-import api.models.errors.{ BusinessIdFormatError, MtdError }
+import api.models.errors.{BusinessIdFormatError, MtdError}
 
 object BusinessIdValidation extends Validation {
 
@@ -25,4 +25,5 @@ object BusinessIdValidation extends Validation {
       NoValidationErrors
     else
       List(BusinessIdFormatError)
+
 }

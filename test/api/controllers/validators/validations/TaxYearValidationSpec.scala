@@ -16,8 +16,7 @@
 
 package api.controllers.validators.validations
 
-import api.controllers.validators.validations.TaxYearValidation
-import api.models.errors.{ RuleTaxYearRangeInvalid, TaxYearFormatError }
+import api.models.errors.{RuleTaxYearRangeInvalid, TaxYearFormatError}
 import support.UnitSpec
 import v2.models.utils.JsonErrorValidators
 
@@ -85,4 +84,5 @@ class TaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
       validationResult.head shouldBe TaxYearFormatError
     }
   }
+
 }

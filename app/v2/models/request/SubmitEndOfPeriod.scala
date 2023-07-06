@@ -17,7 +17,7 @@
 package v2.models.request
 
 import api.models.downstream.TypeOfBusiness
-import play.api.libs.json.{ Json, OFormat }
+import play.api.libs.json.{Json, OFormat}
 
 case class SubmitEndOfPeriod(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
 

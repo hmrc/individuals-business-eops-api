@@ -19,7 +19,7 @@ package v1.connectors
 import api.connectors.DownstreamUri.IfsUri
 import config.AppConfig
 import mocks.MockAppConfig
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 import v1.mocks.MockHttpClient
 import v1.models.outcomes.ResponseWrapper
 
@@ -73,7 +73,7 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
           "Environment"   -> "ifs-environment",
           "Authorization" -> "Bearer ifs-token",
           "User-Agent"    -> "individuals-business-eops-api",
-          "CorrelationId" -> correlationId,
+          "CorrelationId" -> correlationId
         )
 
         testHttpMethods(dummyHeaderCarrierConfig, requiredHeaders, otherHeaders, None)
@@ -97,4 +97,5 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
       await(connector.post(body, IfsUri[Result](url))) shouldBe outcome
     }
   }
+
 }

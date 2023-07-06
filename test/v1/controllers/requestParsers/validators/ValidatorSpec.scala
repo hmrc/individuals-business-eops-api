@@ -116,6 +116,7 @@ class ValidatorSpec extends UnitSpec with MockFactory {
       }
     }
   }
+
 }
 
 class MockFunctionObject(name: String) {
@@ -132,6 +133,7 @@ private case class TestRawData(fieldOne: String, fieldTwo: String) extends RawDa
 
 // Create a Validator based off the trait to be able to test it
 private class TestValidator extends Validator[TestRawData] {
+
   override def validate(data: TestRawData): List[MtdError] = {
     run(List(), data) match {
       case Nil        => List()
@@ -139,4 +141,5 @@ private class TestValidator extends Validator[TestRawData] {
       case errs       => errs
     }
   }
+
 }

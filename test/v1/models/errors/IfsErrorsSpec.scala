@@ -39,4 +39,5 @@ class IfsErrorsSpec extends UnitSpec {
       IfsErrors.multiple(errors) shouldBe IfsErrors(List(IfsErrorCode("ERROR 1"), IfsErrorCode("ERROR 2")))
     }
   }
+
 }

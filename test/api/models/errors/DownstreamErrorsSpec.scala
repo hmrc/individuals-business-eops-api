@@ -16,7 +16,7 @@
 
 package api.models.errors
 
-import play.api.libs.json.{ JsError, JsValue, Json }
+import play.api.libs.json.{JsError, JsValue, Json}
 import support.UnitSpec
 
 class DownstreamErrorsSpec extends UnitSpec {
@@ -65,11 +65,12 @@ class DownstreamErrorsSpec extends UnitSpec {
            |}""".stripMargin
       )
 
-      downstreamErrorsJson.as[DownstreamError] shouldBe DownstreamBvrError("CODE",
-                                                                           List(
-                                                                             DownstreamValidationRuleFailure("ID 0", "MESSAGE 0", "ERR"),
-                                                                             DownstreamValidationRuleFailure("ID 1", "MESSAGE 1", "INFO"),
-                                                                           ))
+      downstreamErrorsJson.as[DownstreamError] shouldBe DownstreamBvrError(
+        "CODE",
+        List(
+          DownstreamValidationRuleFailure("ID 0", "MESSAGE 0", "ERR"),
+          DownstreamValidationRuleFailure("ID 1", "MESSAGE 1", "INFO")
+        ))
     }
 
     "fail if unrecognised error format is received" in {
@@ -78,4 +79,5 @@ class DownstreamErrorsSpec extends UnitSpec {
       downstreamErrorsJson.validate[DownstreamError] shouldBe a[JsError]
     }
   }
+
 }

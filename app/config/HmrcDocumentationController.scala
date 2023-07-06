@@ -18,7 +18,7 @@ package config
 
 import controllers.Assets
 import play.api.http.HttpErrorHandler
-import play.api.mvc.{ Action, AnyContent, ControllerComponents }
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 /* TODO: This file exists as a placeholder for uk.gov.hmrc.api.controllers.DocumentationController
@@ -34,4 +34,5 @@ class HmrcDocumentationController(cc: ControllerComponents, assets: Assets, erro
 
   def conf(version: String, file: String): Action[AnyContent] =
     assets.at(s"/public/api/conf/$version", file)
+
 }

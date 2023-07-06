@@ -51,4 +51,5 @@ class VersionRoutingMapSpec extends UnitSpec with GuiceOneAppPerSuite {
       }
     }
   }
+
 }

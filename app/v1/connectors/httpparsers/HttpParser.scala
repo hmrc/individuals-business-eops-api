@@ -21,7 +21,7 @@ import uk.gov.hmrc.http.HttpResponse
 import utils.Logging
 import v1.models.errors._
 
-import scala.util.{ Success, Try }
+import scala.util.{Success, Try}
 
 trait HttpParser extends Logging {
 
@@ -43,6 +43,7 @@ trait HttpParser extends Logging {
         logger.warn(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
         None
     }
+
   }
 
   def retrieveCorrelationId(response: HttpResponse): String = response.header("CorrelationId").getOrElse("")
@@ -62,6 +63,7 @@ trait HttpParser extends Logging {
       "C55501",
       "C55502"
     )
+
   private val bvrErrorReads: Reads[Seq[IfsErrorCode]] = {
     implicit val errorIdReads: Reads[IfsErrorCode] = (__ \ "id").read[String].map(IfsErrorCode(_))
     (__ \ "bvrfailureResponseElement" \ "validationRuleFailures").read[Seq[IfsErrorCode]]
@@ -86,4 +88,5 @@ trait HttpParser extends Logging {
     }
     singleError orElse multipleErrors orElse bvrErrors getOrElse unableToParseJsonError
   }
+
 }

@@ -63,21 +63,24 @@ class DownstreamResponseMappingSupportSpec extends UnitSpec {
     "multiple errors" when {
       "the error codes is in the map provided" must {
         "use the mapping and wrap with main error type of BadRequest" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("ERR2"))))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(
+            ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("ERR2"))))) shouldBe
             ErrorWrapper(correlationId, BadRequestError, Some(Seq(Error1, Error2)))
         }
       }
 
       "the error code is not in the map provided" must {
         "default main error to DownstreamError ignore other errors" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("UNKNOWN"))))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(
+            ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("UNKNOWN"))))) shouldBe
             ErrorWrapper(correlationId, DownstreamError)
         }
       }
 
       "one of the mapped errors is DownstreamError" must {
         "wrap the errors with main error type of DownstreamError" in {
-          mapping.mapDownstreamErrors(errorCodeMap)(ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("DS"))))) shouldBe
+          mapping.mapDownstreamErrors(errorCodeMap)(
+            ResponseWrapper(correlationId, IfsErrors(List(IfsErrorCode("ERR1"), IfsErrorCode("DS"))))) shouldBe
             ErrorWrapper(correlationId, DownstreamError)
         }
       }
@@ -97,4 +100,5 @@ class DownstreamResponseMappingSupportSpec extends UnitSpec {
       }
     }
   }
+
 }

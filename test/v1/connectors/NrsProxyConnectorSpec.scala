@@ -19,7 +19,7 @@ package v1.connectors
 import mocks.MockAppConfig
 import v1.mocks.MockHttpClient
 import v1.models.downstream.TypeOfBusiness.`foreign-property`
-import v1.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
+import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 import scala.concurrent.Future
 
@@ -60,4 +60,5 @@ class NrsProxyConnectorSpec extends ConnectorSpec {
       }
     }
   }
+
 }

@@ -16,7 +16,7 @@
 
 package api.controllers.validators.validations
 
-import api.models.errors.{ MtdError, RuleTaxYearNotSupportedError, TaxYearFormatError }
+import api.models.errors.{MtdError, RuleTaxYearNotSupportedError, TaxYearFormatError}
 import v2.models.request.DownstreamTaxYear
 
 object MinTaxYearValidation extends Validation {
@@ -33,4 +33,5 @@ object MinTaxYearValidation extends Validation {
     } catch {
       case _: NumberFormatException => List(TaxYearFormatError)
     }
+
 }

@@ -16,12 +16,12 @@
 
 package api.connectors.httpparsers
 
-import api.models.errors.{ DownstreamBvrError, DownstreamError, InternalError, OutboundError }
+import api.models.errors.{DownstreamBvrError, DownstreamError, InternalError, OutboundError}
 import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
 import utils.Logging
 
-import scala.util.{ Success, Try }
+import scala.util.{Success, Try}
 
 trait HttpParser extends Logging {
 
@@ -43,6 +43,7 @@ trait HttpParser extends Logging {
         logger.warn(s"[KnownJsonResponse][validateJson] Unable to parse JSON: $error")
         None
     }
+
   }
 
   def retrieveCorrelationId(response: HttpResponse): String = response.header("CorrelationId").getOrElse("")
@@ -68,4 +69,5 @@ trait HttpParser extends Logging {
       }
       .getOrElse(unableToParseJsonError)
   }
+
 }

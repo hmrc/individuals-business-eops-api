@@ -17,10 +17,10 @@
 package definition
 
 import config.ConfidenceLevelConfig
-import definition.APIStatus.{ ALPHA, BETA }
+import definition.APIStatus.{ALPHA, BETA}
 import mocks.MockAppConfig
 import play.api.Configuration
-import routing.{ Version1, Version2 }
+import routing.{Version1, Version2}
 import support.UnitSpec
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import v1.mocks.MockHttpClient
@@ -102,16 +102,16 @@ class ApiDefinitionFactorySpec extends UnitSpec {
       (true, ConfidenceLevel.L250, ConfidenceLevel.L250),
       (true, ConfidenceLevel.L200, ConfidenceLevel.L200),
       (false, ConfidenceLevel.L200, ConfidenceLevel.L50)
-    ).foreach {
-      case (definitionEnabled, configCL, expectedDefinitionCL) =>
-        s"confidence-level-check.definition.enabled is $definitionEnabled and confidence-level = $configCL" should {
-          s"return confidence level $expectedDefinitionCL" in new Test {
-            MockAppConfig.confidenceLevelCheckEnabled returns ConfidenceLevelConfig(confidenceLevel = configCL,
-                                                                                    definitionEnabled = definitionEnabled,
-                                                                                    authValidationEnabled = true)
-            apiDefinitionFactory.confidenceLevel shouldBe expectedDefinitionCL
-          }
+    ).foreach { case (definitionEnabled, configCL, expectedDefinitionCL) =>
+      s"confidence-level-check.definition.enabled is $definitionEnabled and confidence-level = $configCL" should {
+        s"return confidence level $expectedDefinitionCL" in new Test {
+          MockAppConfig.confidenceLevelCheckEnabled returns ConfidenceLevelConfig(
+            confidenceLevel = configCL,
+            definitionEnabled = definitionEnabled,
+            authValidationEnabled = true)
+          apiDefinitionFactory.confidenceLevel shouldBe expectedDefinitionCL
         }
+      }
     }
   }
 
@@ -130,4 +130,5 @@ class ApiDefinitionFactorySpec extends UnitSpec {
       }
     }
   }
+
 }

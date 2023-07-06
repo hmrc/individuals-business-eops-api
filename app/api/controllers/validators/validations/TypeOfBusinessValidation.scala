@@ -17,7 +17,7 @@
 package api.controllers.validators.validations
 
 import api.models.downstream.TypeOfBusiness
-import api.models.errors.{ MtdError, TypeOfBusinessFormatError }
+import api.models.errors.{MtdError, TypeOfBusinessFormatError}
 
 object TypeOfBusinessValidation extends Validation {
 

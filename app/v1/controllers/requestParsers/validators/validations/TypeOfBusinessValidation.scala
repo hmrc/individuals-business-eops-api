@@ -20,7 +20,7 @@ import api.controllers.validators.validations.NoValidationErrors
 import play.api.Logger
 import play.api.libs.json.Json
 import v1.models.downstream.TypeOfBusiness
-import v1.models.errors.{ MtdError, TypeOfBusinessFormatError }
+import v1.models.errors.{MtdError, TypeOfBusinessFormatError}
 
 object TypeOfBusinessValidation {
 
@@ -32,10 +32,12 @@ object TypeOfBusinessValidation {
       Json.parse(s""""$typeOfBusiness"""").asOpt[TypeOfBusiness].isDefined
     }
 
-    //400 FORMAT_TYPE_OF_BUSINESS The provided Type of business is invalid
-    if (validTypeOfBusiness) { NoValidationErrors } else {
+    // 400 FORMAT_TYPE_OF_BUSINESS The provided Type of business is invalid
+    if (validTypeOfBusiness) { NoValidationErrors }
+    else {
       logger.warn(s"$log typeOfBusiness is invalid. typeOfBusiness: $typeOfBusiness")
       List(TypeOfBusinessFormatError)
     }
   }
+
 }

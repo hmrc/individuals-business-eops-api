@@ -20,8 +20,8 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import itData.SubmitEndOfPeriodStatementData._
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{ JsObject, JsValue, Json }
-import play.api.libs.ws.{ WSRequest, WSResponse }
+import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.V1IntegrationBaseSpec
 import v1.models.errors._
@@ -60,6 +60,7 @@ class SubmitEndOfPeriodStatementControllerISpec extends V1IntegrationBaseSpec {
          |  "reason": "$message"
          |}
     """.stripMargin
+
   }
 
   "Calling the submit eops endpoint" should {
@@ -129,7 +130,7 @@ class SubmitEndOfPeriodStatementControllerISpec extends V1IntegrationBaseSpec {
                 StartDateFormatError,
                 EndDateFormatError,
                 TypeOfBusinessFormatError,
-                BusinessIdFormatError,
+                BusinessIdFormatError
               )
               lazy val multipleErrorsJson = Json.toJson(expectedBody).as[JsObject] + ("errors" -> Json.toJson(multipleErrors))
               response.json shouldBe multipleErrorsJson
@@ -163,11 +164,12 @@ class SubmitEndOfPeriodStatementControllerISpec extends V1IntegrationBaseSpec {
               AuditStub.audit()
               AuthStub.authorised()
               MtdIdLookupStub.ninoFound(nino)
-              DownstreamStub.onError(DownstreamStub.POST,
-                                     ifsUri(),
-                                     Map("incomeSourceId" -> incomeSourceId),
-                                     ifsStatus,
-                                     errorBody(ifsCode, ifsMessage))
+              DownstreamStub.onError(
+                DownstreamStub.POST,
+                ifsUri(),
+                Map("incomeSourceId" -> incomeSourceId),
+                ifsStatus,
+                errorBody(ifsCode, ifsMessage))
             }
 
             val response: WSResponse = await(request().post(fullValidJson()))
@@ -176,63 +178,73 @@ class SubmitEndOfPeriodStatementControllerISpec extends V1IntegrationBaseSpec {
           }
         }
 
-        //scalastyle:off
+        // scalastyle:off
         val input: Seq[(Int, String, String, Int, MtdError)] = Seq(
           (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, DownstreamError),
           (BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", BAD_REQUEST, NinoFormatError),
-          (BAD_REQUEST,
-           "INVALID_ACCOUNTINGPERIODSTARTDATE",
-           "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.",
-           BAD_REQUEST,
-           StartDateFormatError),
-          (BAD_REQUEST,
-           "INVALID_ACCOUNTINGPERIODENDDATE",
-           "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.",
-           BAD_REQUEST,
-           EndDateFormatError),
-          (BAD_REQUEST,
-           "INVALID_INCOMESOURCEID",
-           "Submission has not passed validation. Invalid parameter incomeSourceId.",
-           BAD_REQUEST,
-           BusinessIdFormatError),
-          (BAD_REQUEST,
-           "INVALID_INCOMESOURCETYPE",
-           "Submission has not passed validation. Invalid parameter incomeSourceType.",
-           BAD_REQUEST,
-           TypeOfBusinessFormatError),
-          (BAD_REQUEST,
-           "INVALID_CORRELATIONID",
-           "Submission has not passed validation. Invalid header CorrelationId.",
-           INTERNAL_SERVER_ERROR,
-           DownstreamError),
-          (FORBIDDEN,
-           "EARLY_SUBMISSION",
-           "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
-           FORBIDDEN,
-           RuleEarlySubmissionError),
-          (FORBIDDEN,
-           "LATE_SUBMISSION",
-           "The remote endpoint has indicated that the period to finalise has passed.",
-           FORBIDDEN,
-           RuleLateSubmissionError),
-          (FORBIDDEN,
-           "NON_MATCHING_PERIOD",
-           "The remote endpoint has indicated that submission cannot be made with no matching accounting period.",
-           FORBIDDEN,
-           RuleNonMatchingPeriodError),
+          (
+            BAD_REQUEST,
+            "INVALID_ACCOUNTINGPERIODSTARTDATE",
+            "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.",
+            BAD_REQUEST,
+            StartDateFormatError),
+          (
+            BAD_REQUEST,
+            "INVALID_ACCOUNTINGPERIODENDDATE",
+            "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.",
+            BAD_REQUEST,
+            EndDateFormatError),
+          (
+            BAD_REQUEST,
+            "INVALID_INCOMESOURCEID",
+            "Submission has not passed validation. Invalid parameter incomeSourceId.",
+            BAD_REQUEST,
+            BusinessIdFormatError),
+          (
+            BAD_REQUEST,
+            "INVALID_INCOMESOURCETYPE",
+            "Submission has not passed validation. Invalid parameter incomeSourceType.",
+            BAD_REQUEST,
+            TypeOfBusinessFormatError),
+          (
+            BAD_REQUEST,
+            "INVALID_CORRELATIONID",
+            "Submission has not passed validation. Invalid header CorrelationId.",
+            INTERNAL_SERVER_ERROR,
+            DownstreamError),
+          (
+            FORBIDDEN,
+            "EARLY_SUBMISSION",
+            "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
+            FORBIDDEN,
+            RuleEarlySubmissionError),
+          (
+            FORBIDDEN,
+            "LATE_SUBMISSION",
+            "The remote endpoint has indicated that the period to finalise has passed.",
+            FORBIDDEN,
+            RuleLateSubmissionError),
+          (
+            FORBIDDEN,
+            "NON_MATCHING_PERIOD",
+            "The remote endpoint has indicated that submission cannot be made with no matching accounting period.",
+            FORBIDDEN,
+            RuleNonMatchingPeriodError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found.", NOT_FOUND, NotFoundError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists.", NOT_FOUND, NotFoundError),
-          (CONFLICT,
-           "CONFLICT",
-           "The remote endpoint has indicated that the taxation period has already been finalised.",
-           FORBIDDEN,
-           RuleAlreadySubmittedError),
-          (INTERNAL_SERVER_ERROR,
-           "SERVER_ERROR",
-           "IF is currently experiencing problems that require live service intervention.",
-           INTERNAL_SERVER_ERROR,
-           DownstreamError),
-          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, DownstreamError),
+          (
+            CONFLICT,
+            "CONFLICT",
+            "The remote endpoint has indicated that the taxation period has already been finalised.",
+            FORBIDDEN,
+            RuleAlreadySubmittedError),
+          (
+            INTERNAL_SERVER_ERROR,
+            "SERVER_ERROR",
+            "IF is currently experiencing problems that require live service intervention.",
+            INTERNAL_SERVER_ERROR,
+            DownstreamError),
+          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, DownstreamError)
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))
@@ -359,4 +371,5 @@ class SubmitEndOfPeriodStatementControllerISpec extends V1IntegrationBaseSpec {
       }
     }
   }
+
 }

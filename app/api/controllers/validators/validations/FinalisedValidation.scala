@@ -16,7 +16,7 @@
 
 package api.controllers.validators.validations
 
-import api.models.errors.{ FinalisedFormatError, MtdError }
+import api.models.errors.{FinalisedFormatError, MtdError}
 
 object FinalisedValidation extends Validation {
 
@@ -25,4 +25,5 @@ object FinalisedValidation extends Validation {
       NoValidationErrors
     else
       List(FinalisedFormatError)
+
 }

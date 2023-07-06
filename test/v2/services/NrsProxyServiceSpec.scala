@@ -19,7 +19,7 @@ package v2.services
 import api.models.downstream.TypeOfBusiness.`foreign-property`
 import api.services.ServiceSpec
 import v2.mocks.connectors.MockNrsProxyConnector
-import v2.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
+import v2.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 import scala.concurrent.Future
 
@@ -53,4 +53,5 @@ class NrsProxyServiceSpec extends ServiceSpec {
       }
     }
   }
+
 }

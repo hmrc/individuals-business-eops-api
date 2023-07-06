@@ -17,14 +17,14 @@
 package v1.controllers.requestParsers.validators
 
 import api.controllers.validators.validations.NoValidationErrors
-import play.api.libs.json.{ JsLookupResult, JsValue }
+import play.api.libs.json.{JsLookupResult, JsValue}
 import v1.controllers.requestParsers.validators.validations.BusinessIdValidation._
 import v1.controllers.requestParsers.validators.validations.DateValidation._
 import v1.controllers.requestParsers.validators.validations.FinalisedValidation._
 import v1.controllers.requestParsers.validators.validations.TypeOfBusinessValidation._
 import v1.controllers.requestParsers.validators.validations._
 import v1.models.errors._
-import v1.models.request.{ AccountingPeriod, SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData }
+import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData}
 
 import javax.inject.Singleton
 

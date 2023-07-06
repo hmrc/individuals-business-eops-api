@@ -18,8 +18,8 @@ package v1.controllers.requestParsers.validators.validations
 
 import api.controllers.validators.validations.NoValidationErrors
 import play.api.Logger
-import play.api.libs.json.{ JsLookupResult, JsValue }
-import v1.models.errors.{ FinalisedFormatError, MtdError, RuleNotFinalisedError }
+import play.api.libs.json.{JsLookupResult, JsValue}
+import v1.models.errors.{FinalisedFormatError, MtdError, RuleNotFinalisedError}
 
 object FinalisedValidation {
 
@@ -38,13 +38,14 @@ object FinalisedValidation {
   }
 
   def validateFinalised(finalised: Boolean): List[MtdError] = {
-    //400 RULE_NOT_FINALISED Finalised must be set to "true"
+    // 400 RULE_NOT_FINALISED Finalised must be set to "true"
     if (finalised) NoValidationErrors else List(RuleNotFinalisedError)
   }
 
   def finalisedIncorrectFormat(finalised: String): List[MtdError] = {
     logger.warn(s"$log finalised was not of type boolean. finalised: $finalised")
-    //400 FORMAT_FINALISED The provided Finalised value is invalid
+    // 400 FORMAT_FINALISED The provided Finalised value is invalid
     List(FinalisedFormatError)
   }
+
 }

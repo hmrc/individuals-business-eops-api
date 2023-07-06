@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v2.connectors.SubmitEndOfPeriodStatementConnector
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 trait MockSubmitEndOfPeriodStatementConnector extends MockFactory {
 
@@ -37,5 +37,7 @@ trait MockSubmitEndOfPeriodStatementConnector extends MockFactory {
         .submitPeriodStatement(_: SubmitEndOfPeriodStatementRequest)(_: HeaderCarrier, _: ExecutionContext, _: String))
         .expects(submitEndOfPeriodStatementRequest, *, *, *)
     }
+
   }
+
 }

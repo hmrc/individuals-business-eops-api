@@ -19,10 +19,10 @@ package v2.models.request
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-/**
-  * Represents a tax year for Downstream
+/** Represents a tax year for Downstream
   *
-  * @param value the tax year string (2017-18)
+  * @param value
+  *   the tax year string (2017-18)
   */
 case class DownstreamTaxYear(value: String) extends AnyVal {
   override def toString: String = value
@@ -33,18 +33,18 @@ object DownstreamTaxYear {
   val startOfYear      = 2
   val startYearAndDash = 5
 
-  //TODO MOVE TO VALIDATION ONLY
+  // TODO MOVE TO VALIDATION ONLY
   def toYearYYYY(taxYear: String): DownstreamTaxYear = DownstreamTaxYear(taxYear.take(startOfYear) + taxYear.drop(startYearAndDash))
 
-  /**
-    * Converts YYYY year to MTD year YYYY-YY. E.g. 2018 -> 2017-18
+  /** Converts YYYY year to MTD year YYYY-YY. E.g. 2018 -> 2017-18
     *
-    * @param taxYear the tax year string (2018)
+    * @param taxYear
+    *   the tax year string (2018)
     */
   def toMTDYear(taxYear: String): DownstreamTaxYear =
     DownstreamTaxYear(s"${taxYear.toInt - 1}-${taxYear.drop(startOfYear)}")
 
-  //TODO UPDATE IF NEEDED TO USE 2017-18 FORMAT
+  // TODO UPDATE IF NEEDED TO USE 2017-18 FORMAT
   def mostRecentTaxYear(date: LocalDate = LocalDate.now()): DownstreamTaxYear = {
     val limit = LocalDate.parse(s"${date.getYear}-04-05", DateTimeFormatter.ISO_DATE)
     if (date.isBefore(limit)) {
@@ -53,4 +53,5 @@ object DownstreamTaxYear {
       DownstreamTaxYear(s"${date.getYear}")
     }
   }
+
 }

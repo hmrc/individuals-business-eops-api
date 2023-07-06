@@ -16,10 +16,10 @@
 
 package v1.data
 
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsValue, Json}
 import v1.models.downstream.TypeOfBusiness
 import v1.models.downstream.TypeOfBusiness.`foreign-property`
-import v1.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
+import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 object SubmitEndOfPeriodStatementData {
 
@@ -87,4 +87,5 @@ object SubmitEndOfPeriodStatementData {
        |}
      """.stripMargin
   )
+
 }

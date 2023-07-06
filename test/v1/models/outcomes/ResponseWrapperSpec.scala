@@ -38,4 +38,5 @@ class ResponseWrapperSpec extends UnitSpec {
       wrapper.map(a => a) shouldBe ResponseWrapper(correlationId, responseData)
     }
   }
+
 }

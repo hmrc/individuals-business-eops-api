@@ -29,4 +29,5 @@ class IdGeneratorSpec extends UnitSpec {
       }
     }
   }
+
 }

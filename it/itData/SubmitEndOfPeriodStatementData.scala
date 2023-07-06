@@ -16,9 +16,9 @@
 
 package itData
 
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsValue, Json}
 import v1.models.downstream.TypeOfBusiness.`foreign-property`
-import v1.models.request.{ AccountingPeriod, SubmitEndOfPeriod }
+import v1.models.request.{AccountingPeriod, SubmitEndOfPeriod}
 
 object SubmitEndOfPeriodStatementData {
 
@@ -27,13 +27,14 @@ object SubmitEndOfPeriodStatementData {
   val accountingPeriodEndDate   = "2022-04-05"
   val incomeSourceId            = "XAIS12345678910"
 
-  val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(`foreign-property`,
-                                                          "XAIS12345678910",
-                                                          accountingPeriod = AccountingPeriod(
-                                                            "2021-04-06",
-                                                            "2022-04-05"
-                                                          ),
-                                                          finalised = true)
+  val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(
+    `foreign-property`,
+    "XAIS12345678910",
+    accountingPeriod = AccountingPeriod(
+      "2021-04-06",
+      "2022-04-05"
+    ),
+    finalised = true)
 
   def fullValidJson(typeOfBusiness: String = "self-employment",
                     businessId: String = "XAIS12345678910",
@@ -51,4 +52,5 @@ object SubmitEndOfPeriodStatementData {
        |}
        |""".stripMargin
   )
+
 }

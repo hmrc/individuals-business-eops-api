@@ -17,9 +17,9 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{ JsValue, Json, Reads }
+import play.api.libs.json.{JsValue, Json, Reads}
 import support.UnitSpec
-import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
+import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import v1.connectors.DownstreamOutcome
 import v1.models.errors._
 import v1.models.outcomes.ResponseWrapper
@@ -143,7 +143,7 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
 
           httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
         }
-    })
+      })
 
   private def handleInternalErrorsCorrectly[A](httpReads: HttpReads[DownstreamOutcome[A]]): Unit =
     Seq(INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE).foreach(responseCode =>
@@ -159,7 +159,7 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
 
           httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
         }
-    })
+      })
 
   private def handleUnexpectedResponse[A](httpReads: HttpReads[DownstreamOutcome[A]]): Unit =
     "receiving an unexpected response" should {
@@ -176,4 +176,5 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
         httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(DownstreamError)))
       }
     }
+
 }

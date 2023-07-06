@@ -17,7 +17,7 @@
 package api.controllers.validators
 
 import api.controllers.validators.Validator._
-import api.models.errors.{ BadRequestError, ErrorWrapper, MtdError }
+import api.models.errors.{BadRequestError, ErrorWrapper, MtdError}
 import api.models.request.RawData
 import utils.Logging
 
@@ -91,4 +91,5 @@ trait Validator[RAW <: RawData, PARSED] extends Logging {
         Left(ErrorWrapper(correlationId, BadRequestError, Some(errs)))
     }
   }
+
 }

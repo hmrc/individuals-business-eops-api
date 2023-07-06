@@ -116,4 +116,5 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       }
     }
   }
+
 }

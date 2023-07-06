@@ -19,16 +19,16 @@ package v1.connectors
 import api.connectors.DownstreamUri.IfsUri
 import config.AppConfig
 import play.api.libs.json.Writes
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseDownstreamConnector {
   val http: HttpClient
   val appConfig: AppConfig
 
-  private def ifsHeaderCarrier(additionalHeaders: Seq[String] = Seq("Content-Type"))(implicit hc: HeaderCarrier,
-                                                                                     correlationId: String): HeaderCarrier = {
+  private def ifsHeaderCarrier(
+      additionalHeaders: Seq[String] = Seq("Content-Type"))(implicit hc: HeaderCarrier, correlationId: String): HeaderCarrier = {
 
     HeaderCarrier(
       extraHeaders = hc.extraHeaders ++
@@ -43,14 +43,16 @@ trait BaseDownstreamConnector {
     )
   }
 
-  def post[Body: Writes, Resp](body: Body, uri: IfsUri[Resp])(implicit ec: ExecutionContext,
-                                                              hc: HeaderCarrier,
-                                                              httpReads: HttpReads[DownstreamOutcome[Resp]],
-                                                              correlationId: String): Future[DownstreamOutcome[Resp]] = {
+  def post[Body: Writes, Resp](body: Body, uri: IfsUri[Resp])(implicit
+      ec: ExecutionContext,
+      hc: HeaderCarrier,
+      httpReads: HttpReads[DownstreamOutcome[Resp]],
+      correlationId: String): Future[DownstreamOutcome[Resp]] = {
     def doPost(implicit hc: HeaderCarrier): Future[DownstreamOutcome[Resp]] = {
       http.POST(url = s"${appConfig.ifsBaseUrl}/${uri.value}", body)
     }
 
     doPost(ifsHeaderCarrier())
   }
+
 }

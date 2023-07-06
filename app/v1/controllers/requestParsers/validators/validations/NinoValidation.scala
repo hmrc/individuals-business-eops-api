@@ -18,7 +18,7 @@ package v1.controllers.requestParsers.validators.validations
 
 import api.controllers.validators.validations.NoValidationErrors
 import v1.models.domain.Nino
-import v1.models.errors.{ MtdError, NinoFormatError }
+import v1.models.errors.{MtdError, NinoFormatError}
 
 object NinoValidation {
 
@@ -29,4 +29,5 @@ object NinoValidation {
   def validate(nino: String): List[MtdError] = {
     if (Nino.isValid(nino) && nino.matches(ninoRegex)) NoValidationErrors else List(NinoFormatError)
   }
+
 }

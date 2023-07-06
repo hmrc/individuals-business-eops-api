@@ -51,4 +51,5 @@ object DownstreamStub extends WireMockMethods {
     when(method = method, uri = uri, queryParams)
       .thenReturn(status = errorStatus, errorBody)
   }
+
 }

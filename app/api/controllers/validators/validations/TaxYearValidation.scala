@@ -16,7 +16,7 @@
 
 package api.controllers.validators.validations
 
-import api.models.errors.{ MtdError, RuleTaxYearRangeInvalid, TaxYearFormatError }
+import api.models.errors.{MtdError, RuleTaxYearRangeInvalid, TaxYearFormatError}
 
 object TaxYearValidation extends Validation {
 
@@ -41,4 +41,5 @@ object TaxYearValidation extends Validation {
     } else {
       List(TaxYearFormatError)
     }
+
 }

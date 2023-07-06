@@ -22,7 +22,7 @@ import support.UnitSpec
 class FeatureSwitchesSpec extends UnitSpec {
 
   private val configuration = Configuration(
-    "feature-switch.enabled" -> true,
+    "feature-switch.enabled" -> true
   )
 
   private val featureSwitches = FeatureSwitches(configuration)
@@ -39,4 +39,5 @@ class FeatureSwitchesSpec extends UnitSpec {
       }
     }
   }
+
 }

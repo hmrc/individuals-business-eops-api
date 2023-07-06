@@ -23,7 +23,7 @@ import org.scalamock.scalatest.MockFactory
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 import v2.services.SubmitEndOfPeriodStatementService
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 trait MockSubmitEndOfPeriodStatementService extends MockFactory {
 
@@ -37,5 +37,7 @@ trait MockSubmitEndOfPeriodStatementService extends MockFactory {
         .submit(_: SubmitEndOfPeriodStatementRequest)(_: RequestContext, _: ExecutionContext))
         .expects(submitEndOfPeriodStatement, *, *)
     }
+
   }
+
 }

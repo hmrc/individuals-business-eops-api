@@ -16,9 +16,9 @@
 
 package v2.mocks.validators
 
-import api.models.errors.{ ErrorWrapper, MtdError }
+import api.models.errors.{ErrorWrapper, MtdError}
 import api.models.request.NinoAndJsonBodyRawData
-import org.scalamock.handlers.{ CallHandler, CallHandler1 }
+import org.scalamock.handlers.{CallHandler, CallHandler1}
 import org.scalamock.scalatest.MockFactory
 import v2.controllers.validators.SubmitEndOfPeriodStatementValidator
 import v2.models.request.SubmitEndOfPeriodStatementRequest
@@ -42,5 +42,7 @@ trait MockSubmitEndOfPeriodStatementValidator extends MockFactory {
         .parseAndValidate(_: NinoAndJsonBodyRawData))
         .expects(data)
     }
+
   }
+
 }
