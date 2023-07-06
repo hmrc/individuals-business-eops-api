@@ -16,12 +16,12 @@
 
 package v2.controllers
 
-import api.controllers.{ ControllerBaseSpec, ControllerTestRunner }
+import api.controllers.{ControllerBaseSpec, ControllerTestRunner}
 import api.models.domain.Nino
-import api.models.errors.{ ErrorWrapper, NinoFormatError, RuleTaxYearNotSupportedError }
+import api.models.errors.{ErrorWrapper, NinoFormatError, RuleTaxYearNotSupportedError}
 import api.models.outcomes.ResponseWrapper
 import api.models.request.NinoAndJsonBodyRawData
-import play.api.mvc.{ AnyContentAsJson, Result }
+import play.api.mvc.{AnyContentAsJson, Result}
 import v2.data.SubmitEndOfPeriodStatementData._
 import v2.mocks.services._
 import v2.mocks.validators.MockSubmitEndOfPeriodStatementValidator
@@ -101,4 +101,5 @@ class SubmitEndOfPeriodStatementControllerSpec
       }
     }
   }
+
 }

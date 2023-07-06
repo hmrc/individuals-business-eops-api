@@ -22,8 +22,8 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import itData.SubmitEndOfPeriodStatementData._
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{ JsValue, Json }
-import play.api.libs.ws.{ WSRequest, WSResponse }
+import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.V2IntegrationBaseSpec
 import v2.stubs._
@@ -138,7 +138,7 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
           ("AA123456A", fullValidJson(endDate = "error"), BAD_REQUEST, EndDateFormatError),
           ("AA123456A", fullValidJson(finalised = "false"), BAD_REQUEST, FinalisedFormatError),
           ("AA123456A", Json.parse("{}"), BAD_REQUEST, RuleIncorrectOrEmptyBodyError),
-          ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RuleEndDateBeforeStartDateError),
+          ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RuleEndDateBeforeStartDateError)
         )
 
         input.foreach(args => (validationError _).tupled(args))
@@ -213,6 +213,7 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
       buildRequest(mtdUri)
         .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123"))
     }
+
   }
 
   private trait TysIfsTest extends Test {
@@ -227,6 +228,7 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
     def downstreamUri: String =
       s"/income-tax/income-sources/${taxYear.asTysDownstream}/" +
         s"$nino/$incomeSourceId/$incomeSourceType/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration"
+
   }
 
 }

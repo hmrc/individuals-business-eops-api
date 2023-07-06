@@ -17,7 +17,7 @@
 package v2.models.downstream
 
 import api.models.downstream.TypeOfBusiness
-import api.models.downstream.TypeOfBusiness.{ `foreign-property`, `self-employment`, `uk-property` }
+import api.models.downstream.TypeOfBusiness.{`foreign-property`, `self-employment`, `uk-property`}
 import support.UnitSpec
 import utils.enums.EnumJsonSpecSupport
 

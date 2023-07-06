@@ -16,11 +16,11 @@
 
 package api.connectors
 
-import api.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
+import api.connectors.DownstreamUri.{IfsUri, TaxYearSpecificIfsUri}
 import api.models.outcomes.ResponseWrapper
 import config.AppConfig
-import mocks.{ MockAppConfig, MockHttpClient }
-import uk.gov.hmrc.http.{ HttpClient, HttpReads }
+import mocks.{MockAppConfig, MockHttpClient}
+import uk.gov.hmrc.http.{HttpClient, HttpReads}
 
 import scala.concurrent.Future
 
@@ -41,11 +41,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     "post" must {
       "posts with the required ifs headers and returns the result" in new Test with IfsTest {
         MockedHttpClient
-          .post(absoluteUrl,
-                config = dummyHeaderCarrierConfig,
-                body,
-                requiredHeaders = requiredHeaders,
-                excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
+          .post(
+            absoluteUrl,
+            config = dummyHeaderCarrierConfig,
+            body,
+            requiredHeaders = requiredHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
         await(connector.post(body, IfsUri[Result](url))) shouldBe outcome
@@ -55,11 +56,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     "get" must {
       "get with the required headers and return the result" in new Test with IfsTest {
         MockedHttpClient
-          .get(absoluteUrl,
-               config = dummyHeaderCarrierConfig,
-               parameters = qps,
-               requiredHeaders = requiredHeaders,
-               excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
+          .get(
+            absoluteUrl,
+            config = dummyHeaderCarrierConfig,
+            parameters = qps,
+            requiredHeaders = requiredHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
         await(connector.get(IfsUri[Result](url), queryParams = qps)) shouldBe outcome
@@ -69,10 +71,11 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     "delete" must {
       "delete with the required headers and return the result" in new Test with IfsTest {
         MockedHttpClient
-          .delete(absoluteUrl,
-                  config = dummyHeaderCarrierConfig,
-                  requiredHeaders = requiredHeaders,
-                  excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
+          .delete(
+            absoluteUrl,
+            config = dummyHeaderCarrierConfig,
+            requiredHeaders = requiredHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
         await(connector.delete(IfsUri[Result](url))) shouldBe outcome
@@ -82,11 +85,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     "put" must {
       "put with the required headers and return result" in new Test with IfsTest {
         MockedHttpClient
-          .put(absoluteUrl,
-               config = dummyHeaderCarrierConfig,
-               body,
-               requiredHeaders = requiredHeaders,
-               excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
+          .put(
+            absoluteUrl,
+            config = dummyHeaderCarrierConfig,
+            body,
+            requiredHeaders = requiredHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
         await(connector.put(body, IfsUri[Result](url))) shouldBe outcome
@@ -120,11 +124,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     "post" must {
       "posts with the required tysIfs headers and returns the result" in new Test with TysIfsTest {
         MockedHttpClient
-          .post(absoluteUrl,
-                config = dummyHeaderCarrierConfig,
-                body,
-                requiredHeaders = requiredHeaders,
-                excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
+          .post(
+            absoluteUrl,
+            config = dummyHeaderCarrierConfig,
+            body,
+            requiredHeaders = requiredHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
         await(connector.post(body, TaxYearSpecificIfsUri[Result](url))) shouldBe outcome
@@ -134,11 +139,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     "get" must {
       "get with the required headers and return the result" in new Test with TysIfsTest {
         MockedHttpClient
-          .get(absoluteUrl,
-               config = dummyHeaderCarrierConfig,
-               parameters = qps,
-               requiredHeaders = requiredHeaders,
-               excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
+          .get(
+            absoluteUrl,
+            config = dummyHeaderCarrierConfig,
+            parameters = qps,
+            requiredHeaders = requiredHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
         await(connector.get(TaxYearSpecificIfsUri[Result](url), queryParams = qps)) shouldBe outcome
@@ -148,10 +154,11 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     "delete" must {
       "delete with the required headers and return the result" in new Test with TysIfsTest {
         MockedHttpClient
-          .delete(absoluteUrl,
-                  config = dummyHeaderCarrierConfig,
-                  requiredHeaders = requiredHeaders,
-                  excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
+          .delete(
+            absoluteUrl,
+            config = dummyHeaderCarrierConfig,
+            requiredHeaders = requiredHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
         await(connector.delete(TaxYearSpecificIfsUri[Result](url))) shouldBe outcome
@@ -161,11 +168,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
     "put" must {
       "put with the required headers and return result" in new Test with TysIfsTest {
         MockedHttpClient
-          .put(absoluteUrl,
-               config = dummyHeaderCarrierConfig,
-               body,
-               requiredHeaders = requiredHeaders,
-               excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
+          .put(
+            absoluteUrl,
+            config = dummyHeaderCarrierConfig,
+            body,
+            requiredHeaders = requiredHeaders,
+            excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
         await(connector.put(body, TaxYearSpecificIfsUri[Result](url))) shouldBe outcome
@@ -204,4 +212,5 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
 
     val qps: Seq[(String, String)] = Seq("param1" -> "value1")
   }
+
 }

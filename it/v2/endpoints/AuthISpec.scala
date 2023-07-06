@@ -20,10 +20,10 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import itData.SubmitEndOfPeriodStatementData.fullValidJson
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status
-import play.api.libs.ws.{ WSRequest, WSResponse }
+import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.V2IntegrationBaseSpec
-import v2.stubs.{ AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub }
+import v2.stubs.{AuditStub, AuthStub, DownstreamStub, MtdIdLookupStub}
 
 class AuthISpec extends V2IntegrationBaseSpec {
 
@@ -58,6 +58,7 @@ class AuthISpec extends V2IntegrationBaseSpec {
          |  "reason": "$message"
          |}
     """.stripMargin
+
   }
 
   "Calling the submit eops endpoint" when {
@@ -125,4 +126,5 @@ class AuthISpec extends V2IntegrationBaseSpec {
       }
     }
   }
+
 }

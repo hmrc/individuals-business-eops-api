@@ -20,15 +20,15 @@ import controllers.Assets
 import definition.ApiDefinitionFactory
 import play.api.http.HttpErrorHandler
 import play.api.libs.json.Json
-import play.api.mvc.{ Action, AnyContent, ControllerComponents }
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 
 @Singleton
-class DocumentationController @Inject()(selfAssessmentApiDefinition: ApiDefinitionFactory,
-                                        cc: ControllerComponents,
-                                        assets: Assets,
-                                        errorHandler: HttpErrorHandler)
+class DocumentationController @Inject() (selfAssessmentApiDefinition: ApiDefinitionFactory,
+                                         cc: ControllerComponents,
+                                         assets: Assets,
+                                         errorHandler: HttpErrorHandler)
     extends HmrcDocumentationController(cc, assets, errorHandler) {
 
   override def definition(): Action[AnyContent] = Action {
@@ -38,4 +38,5 @@ class DocumentationController @Inject()(selfAssessmentApiDefinition: ApiDefiniti
   def asset(version: String, file: String): Action[AnyContent] = {
     assets.at(s"/public/api/conf/$version", file)
   }
+
 }

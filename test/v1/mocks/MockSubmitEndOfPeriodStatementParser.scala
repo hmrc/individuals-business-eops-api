@@ -31,5 +31,7 @@ class MockSubmitEndOfPeriodStatementParser extends MockFactory {
     def validate(data: SubmitEndOfPeriodStatementRawData): CallHandler1[SubmitEndOfPeriodStatementRawData, List[MtdError]] = {
       (mockValidator.validate(_: SubmitEndOfPeriodStatementRawData)).expects(data)
     }
+
   }
+
 }

@@ -54,4 +54,5 @@ class DownstreamTaxYearSpec extends UnitSpec {
       }
     }
   }
+
 }

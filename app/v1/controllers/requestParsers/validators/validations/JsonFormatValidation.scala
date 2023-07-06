@@ -19,16 +19,17 @@ package v1.controllers.requestParsers.validators.validations
 import api.controllers.validators.validations.NoValidationErrors
 import play.api.Logger
 import play.api.libs.json._
-import v1.models.errors.{ MtdError, RuleIncorrectOrEmptyBodyError }
+import v1.models.errors.{MtdError, RuleIncorrectOrEmptyBodyError}
 
 object JsonFormatValidation {
 
-  //TODO Look into what this is for
+  // TODO Look into what this is for
   // $COVERAGE-OFF$
   val droppedErrors = 5
 
   def validate[A: OFormat](data: JsValue, jsonValidation: Option[JsValue => List[MtdError]] = None): List[MtdError] = {
-    if (data == JsObject.empty) { List(RuleIncorrectOrEmptyBodyError) } else {
+    if (data == JsObject.empty) { List(RuleIncorrectOrEmptyBodyError) }
+    else {
       data.validate[A] match {
         case JsSuccess(body, _) => if (Json.toJson(body) == JsObject.empty) List(RuleIncorrectOrEmptyBodyError) else NoValidationErrors
         case JsError(errors) => {
@@ -39,7 +40,7 @@ object JsonFormatValidation {
     }
   }
 
-  //TODO Add coverage back on when paths have been added to the validator
+  // TODO Add coverage back on when paths have been added to the validator
   private def handleErrors(errors: Seq[(JsPath, Seq[JsonValidationError])]): List[MtdError] = {
     val failures = errors.map {
       case (path: JsPath, Seq(JsonValidationError(Seq("error.path.missing"))))                              => MissingMandatoryField(path)

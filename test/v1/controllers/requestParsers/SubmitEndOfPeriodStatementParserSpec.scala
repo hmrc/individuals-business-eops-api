@@ -21,8 +21,8 @@ import support.UnitSpec
 import v1.data.SubmitEndOfPeriodStatementData
 import v1.mocks.MockSubmitEndOfPeriodStatementParser
 import v1.models.domain.Nino
-import v1.models.errors.{ BadRequestError, ErrorWrapper, NinoFormatError, TypeOfBusinessFormatError }
-import v1.models.request.{ SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
+import v1.models.errors.{BadRequestError, ErrorWrapper, NinoFormatError, TypeOfBusinessFormatError}
+import v1.models.request.{SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
 
 class SubmitEndOfPeriodStatementParserSpec extends UnitSpec {
   val nino                           = "AA123456B"
@@ -60,4 +60,5 @@ class SubmitEndOfPeriodStatementParserSpec extends UnitSpec {
       }
     }
   }
+
 }

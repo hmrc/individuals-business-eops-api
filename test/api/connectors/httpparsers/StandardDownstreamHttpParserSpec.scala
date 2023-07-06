@@ -23,7 +23,7 @@ import api.models.outcomes.ResponseWrapper
 import play.api.http.Status._
 import play.api.libs.json._
 import support.UnitSpec
-import uk.gov.hmrc.http.{ HttpReads, HttpResponse }
+import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
 // WLOG if Reads tested elsewhere
 case class SomeModel(data: String)
@@ -82,9 +82,8 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
   }
 
   private def bvrErrorJson(types: String*) = {
-    val items = types.zipWithIndex.map {
-      case (tpe, i) =>
-        Json.parse(s"""
+    val items = types.zipWithIndex.map { case (tpe, i) =>
+      Json.parse(s"""
           |{
           |   "id": "ID $i", "type":"$tpe", "text":"MESSAGE $i"
           |}
@@ -133,11 +132,12 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
           val httpResponse                  = HttpResponse(responseCode, downstreamErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
 
           httpReads.read(method, url, httpResponse) shouldBe Left(
-            ResponseWrapper(correlationId,
-                            DownstreamBvrError(
-                              "CODE",
-                              List(DownstreamValidationRuleFailure("ID 1", "MESSAGE 1"))
-                            )))
+            ResponseWrapper(
+              correlationId,
+              DownstreamBvrError(
+                "CODE",
+                List(DownstreamValidationRuleFailure("ID 1", "MESSAGE 1"))
+              )))
         }
 
         "return an outbound error if no ERR items are present in a BVR error" in {
@@ -146,7 +146,7 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
 
           httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(InternalError)))
         }
-    })
+      })
 
   private def handleInternalErrorsCorrectly[A](implicit httpReads: HttpReads[DownstreamOutcome[A]]): Unit =
     Seq(INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE).foreach(responseCode =>
@@ -162,4 +162,5 @@ class StandardDownstreamHttpParserSpec extends UnitSpec {
 
       httpReads.read(method, url, httpResponse) shouldBe Left(ResponseWrapper(correlationId, OutboundError(InternalError)))
     }
+
 }

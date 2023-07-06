@@ -16,19 +16,19 @@
 
 package v2.services
 
-import api.controllers.{ EndpointLogContext, RequestContext }
+import api.controllers.{EndpointLogContext, RequestContext}
 import api.models.errors._
 import api.models.outcomes.ResponseWrapper
-import api.services.{ BaseService, ServiceOutcome }
+import api.services.{BaseService, ServiceOutcome}
 import cats.syntax.either._
 import v2.connectors.SubmitEndOfPeriodStatementConnector
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector) extends BaseService {
+class SubmitEndOfPeriodStatementService @Inject() (connector: SubmitEndOfPeriodStatementConnector) extends BaseService {
 
   def submit(request: SubmitEndOfPeriodStatementRequest)(implicit ctx: RequestContext, ec: ExecutionContext): Future[ServiceOutcome[Unit]] = {
     connector
@@ -43,9 +43,10 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
           case item :: Nil =>
             ErrorWrapper(correlationId, error = RuleBusinessValidationFailure(errorId = item.id, message = item.text), errors = None)
           case items =>
-            ErrorWrapper(correlationId,
-                         error = BadRequestError,
-                         errors = Some(items.map(item => RuleBusinessValidationFailure(errorId = item.id, message = item.text))))
+            ErrorWrapper(
+              correlationId,
+              error = BadRequestError,
+              errors = Some(items.map(item => RuleBusinessValidationFailure(errorId = item.id, message = item.text))))
         }
 
       case wrapper => mapDownstreamErrors(downstreamErrorMap)(wrapper)
@@ -86,4 +87,5 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
 
     errors ++ extraTysErrors
   }
+
 }

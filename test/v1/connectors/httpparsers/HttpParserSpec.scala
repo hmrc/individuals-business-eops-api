@@ -17,10 +17,10 @@
 package v1.connectors.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
-import v1.models.errors.{ IfsErrorCode, IfsErrors }
+import v1.models.errors.{IfsErrorCode, IfsErrors}
 
 class HttpParserSpec extends UnitSpec {
 
@@ -118,38 +118,37 @@ class HttpParserSpec extends UnitSpec {
   }
 
   private def handleErrorsCorrectly[A](httpParser: HttpParser): Unit =
-    Seq(BAD_REQUEST, NOT_FOUND, FORBIDDEN, CONFLICT, UNPROCESSABLE_ENTITY).foreach(
-      responseCode =>
-        s"receiving a $responseCode response" should {
-          "be able to parse a single error" in {
-            val httpResponse = HttpResponse(responseCode, singleErrorJson, Map("CorrelationId" -> Seq(correlationId)))
+    Seq(BAD_REQUEST, NOT_FOUND, FORBIDDEN, CONFLICT, UNPROCESSABLE_ENTITY).foreach(responseCode =>
+      s"receiving a $responseCode response" should {
+        "be able to parse a single error" in {
+          val httpResponse = HttpResponse(responseCode, singleErrorJson, Map("CorrelationId" -> Seq(correlationId)))
 
-            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("CODE")))
-          }
+          httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("CODE")))
+        }
 
-          "be able to parse multiple errors" in {
-            val httpResponse = HttpResponse(responseCode, multipleErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
+        "be able to parse multiple errors" in {
+          val httpResponse = HttpResponse(responseCode, multipleErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
 
-            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("CODE 1"), IfsErrorCode("CODE 2")))
-          }
+          httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("CODE 1"), IfsErrorCode("CODE 2")))
+        }
 
-          "be able to parse expected bvr errors" in {
-            val httpResponse = HttpResponse(responseCode, expectedBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
+        "be able to parse expected bvr errors" in {
+          val httpResponse = HttpResponse(responseCode, expectedBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
 
-            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("C55013")))
-          }
+          httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("C55013")))
+        }
 
-          "be able to parse bvr errors but not expected error code" in {
-            val httpResponse = HttpResponse(responseCode, notExpectedBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
+        "be able to parse bvr errors but not expected error code" in {
+          val httpResponse = HttpResponse(responseCode, notExpectedBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
 
-            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("BVR_UNKNOWN_ID")))
-          }
+          httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("BVR_UNKNOWN_ID")))
+        }
 
-          "be able to parse multiple bvr errors but contains unexpected error code" in {
-            val httpResponse = HttpResponse(responseCode, multipleBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
+        "be able to parse multiple bvr errors but contains unexpected error code" in {
+          val httpResponse = HttpResponse(responseCode, multipleBvrErrorsJson, Map("CorrelationId" -> Seq(correlationId)))
 
-            httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("C55013"), IfsErrorCode("BVR_UNKNOWN_ID")))
-          }
-      }
-    )
+          httpParser.parseErrors(httpResponse) shouldBe IfsErrors(List(IfsErrorCode("C55013"), IfsErrorCode("BVR_UNKNOWN_ID")))
+        }
+      })
+
 }

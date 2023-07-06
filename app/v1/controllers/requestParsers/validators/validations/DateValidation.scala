@@ -17,40 +17,42 @@
 package v1.controllers.requestParsers.validators.validations
 
 import api.controllers.validators.validations.NoValidationErrors
-import v1.models.errors.{ EndDateFormatError, MtdError, RangeEndDateBeforeStartDateError, StartDateFormatError }
+import v1.models.errors.{EndDateFormatError, MtdError, RangeEndDateBeforeStartDateError, StartDateFormatError}
 
 import java.time.LocalDate
 
 object DateValidation {
 
   def validateStartDate(startDate: Option[LocalDate]): List[MtdError] = {
-    //400 FORMAT_START_DATE The provided Start date is invalid
+    // 400 FORMAT_START_DATE The provided Start date is invalid
     if (startDate.isDefined) NoValidationErrors else List(StartDateFormatError)
   }
 
   def validateEndDate(endDate: Option[LocalDate]): List[MtdError] = {
-    //400 FORMAT_END_DATE The provided From date is invalid
+    // 400 FORMAT_END_DATE The provided From date is invalid
     if (endDate.isDefined) NoValidationErrors else List(EndDateFormatError)
   }
 
   def validateDates(startDate: String, endDate: String): List[MtdError] = {
 
-    val startLocalDate: Option[LocalDate] = try {
-      Some(LocalDate.parse(startDate))
-    } catch {
-      case _: Exception => None
-    }
+    val startLocalDate: Option[LocalDate] =
+      try {
+        Some(LocalDate.parse(startDate))
+      } catch {
+        case _: Exception => None
+      }
 
-    val endLocalDate: Option[LocalDate] = try {
-      Some(LocalDate.parse(endDate))
-    } catch {
-      case _: Exception => None
-    }
+    val endLocalDate: Option[LocalDate] =
+      try {
+        Some(LocalDate.parse(endDate))
+      } catch {
+        case _: Exception => None
+      }
 
     (startLocalDate, endLocalDate) match {
       case (Some(startDate), Some(endDate)) =>
         if (endDate.isBefore(startDate)) {
-          //400 RANGE_END_DATE_BEFORE_START_DATE The End date must be after the Start date
+          // 400 RANGE_END_DATE_BEFORE_START_DATE The End date must be after the Start date
           List(RangeEndDateBeforeStartDateError)
         } else {
           NoValidationErrors
@@ -59,4 +61,5 @@ object DateValidation {
       case _ => validateStartDate(startLocalDate) ++ validateEndDate(endLocalDate)
     }
   }
+
 }

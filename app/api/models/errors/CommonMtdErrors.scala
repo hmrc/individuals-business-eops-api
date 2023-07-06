@@ -53,6 +53,7 @@ object RuleBusinessValidationFailure {
 
   def apply(message: String, errorId: String): MtdError =
     MtdError(code = code, message = message, errorId = Some(errorId), httpStatus = BAD_REQUEST)
+
 }
 
 object RuleBusinessValidationFailureTys

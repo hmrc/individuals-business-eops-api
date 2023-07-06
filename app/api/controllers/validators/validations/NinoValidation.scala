@@ -17,7 +17,7 @@
 package api.controllers.validators.validations
 
 import api.models.domain.Nino
-import api.models.errors.{ MtdError, NinoFormatError }
+import api.models.errors.{MtdError, NinoFormatError}
 
 object NinoValidation extends Validation {
 
@@ -30,4 +30,5 @@ object NinoValidation extends Validation {
       NoValidationErrors
     else
       List(NinoFormatError)
+
 }

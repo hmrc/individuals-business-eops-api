@@ -16,7 +16,7 @@
 
 package api.controllers.validators.validations
 
-import api.models.errors.{ MtdError, RuleIncorrectOrEmptyBodyError }
+import api.models.errors.{MtdError, RuleIncorrectOrEmptyBodyError}
 import play.api.Logger
 import play.api.libs.json._
 

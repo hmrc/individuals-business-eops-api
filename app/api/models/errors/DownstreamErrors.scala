@@ -16,7 +16,7 @@
 
 package api.models.errors
 
-import play.api.libs.json.{ JsPath, Json, Reads, __ }
+import play.api.libs.json.{JsPath, Json, Reads, __}
 
 case class DownstreamErrorCode(code: String)
 
@@ -27,15 +27,18 @@ object DownstreamErrorCode {
 sealed trait DownstreamError
 
 object DownstreamError {
+
   // Note that we only deserialize for standard and BVR error formats; OutboundError is created programmatically as required
   implicit def reads: Reads[DownstreamError] =
     implicitly[Reads[DownstreamErrors]].map[DownstreamError](identity) orElse
       implicitly[Reads[DownstreamBvrError]].map[DownstreamError](identity)
+
 }
 
 case class DownstreamErrors(errors: List[DownstreamErrorCode]) extends DownstreamError
 
 object DownstreamErrors {
+
   implicit val reads: Reads[DownstreamErrors] = (
     (__ \ "errors").read[List[DownstreamErrorCode]].map(DownstreamErrors(_)) orElse
       (__ \ "failures").read[List[DownstreamErrorCode]].map(DownstreamErrors(_))
@@ -52,8 +55,10 @@ case class DownstreamBvrError(
 ) extends DownstreamError
 
 object DownstreamBvrError {
+
   implicit val reads: Reads[DownstreamBvrError] =
     (JsPath \ "bvrfailureResponseElement").read(Json.reads[DownstreamBvrError])
+
 }
 
 case class DownstreamValidationRuleFailure(id: String, text: String, `type`: String = "ERR")

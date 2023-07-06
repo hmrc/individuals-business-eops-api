@@ -29,7 +29,6 @@ class ValidatorSpec extends UnitSpec with MockFactory {
   //  A ticket is being raised for the Validator changes to be added to an API that includes
   //  "multi-level" validations in the pre- or post-parser stage, so this test should also be updated then.
 
-
   private trait Test {
     implicit val correlationId: String = "1234"
 
@@ -153,6 +152,7 @@ class ValidatorSpec extends UnitSpec with MockFactory {
       }
     }
   }
+
 }
 
 class MockFunctionObject {
@@ -165,13 +165,14 @@ class MockFunctionObject {
     called = called + 1
     maybeError.toList
   }
+
 }
 
 private case class TestRawData(fieldOne: String, fieldTwo: String) extends RawData
 private case class TestParsedRequest(fieldOne: String, fieldTwo: String)
 
 private class TestValidator(
-                             override protected val preParserValidations: PreParseValidationCallers[TestRawData],
-                             override protected val parserValidation: ParserValidationCaller[TestRawData, TestParsedRequest],
-                             override protected val postParserValidations: PostParseValidationCallers[TestParsedRequest]
+    override protected val preParserValidations: PreParseValidationCallers[TestRawData],
+    override protected val parserValidation: ParserValidationCaller[TestRawData, TestParsedRequest],
+    override protected val postParserValidations: PostParseValidationCallers[TestParsedRequest]
 ) extends Validator[TestRawData, TestParsedRequest]

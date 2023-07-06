@@ -16,8 +16,7 @@
 
 package api.controllers.validators.validations
 
-import api.controllers.validators.validations.MinTaxYearValidation
-import api.models.errors.{ RuleTaxYearNotSupportedError, TaxYearFormatError }
+import api.models.errors.{RuleTaxYearNotSupportedError, TaxYearFormatError}
 import support.UnitSpec
 import v2.models.utils.JsonErrorValidators
 
@@ -50,4 +49,5 @@ class MinTaxYearValidationSpec extends UnitSpec with JsonErrorValidators {
       }
     }
   }
+
 }

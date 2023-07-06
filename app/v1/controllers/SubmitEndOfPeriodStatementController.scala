@@ -20,10 +20,10 @@ import cats.data.EitherT
 import cats.implicits._
 import play.api.http.MimeTypes
 import play.api.libs.json._
-import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents, Result }
+import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import utils.{ IdGenerator, Logging }
+import utils.{IdGenerator, Logging}
 import v1.controllers.requestParsers.SubmitEndOfPeriodStatementParser
 import v1.models.audit._
 import v1.models.errors._
@@ -31,17 +31,17 @@ import v1.models.request.SubmitEndOfPeriodStatementRawData
 import v1.services._
 
 import javax.inject._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitEndOfPeriodStatementController @Inject()(val authService: EnrolmentsAuthService,
-                                                     val lookupService: MtdIdLookupService,
-                                                     val idGenerator: IdGenerator,
-                                                     nrsProxyService: NrsProxyService,
-                                                     service: SubmitEndOfPeriodStatementService,
-                                                     requestParser: SubmitEndOfPeriodStatementParser,
-                                                     auditService: AuditService,
-                                                     cc: ControllerComponents)(implicit ec: ExecutionContext)
+class SubmitEndOfPeriodStatementController @Inject() (val authService: EnrolmentsAuthService,
+                                                      val lookupService: MtdIdLookupService,
+                                                      val idGenerator: IdGenerator,
+                                                      nrsProxyService: NrsProxyService,
+                                                      service: SubmitEndOfPeriodStatementService,
+                                                      requestParser: SubmitEndOfPeriodStatementParser,
+                                                      auditService: AuditService,
+                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc)
     with BaseController
     with Logging {
@@ -90,11 +90,12 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
             s"Error response received with CorrelationId: $resCorrelationId")
 
         auditSubmission(
-          GenericAuditDetail(request.userDetails,
-                             nino,
-                             auditRequestJson,
-                             correlationId,
-                             AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
+          GenericAuditDetail(
+            request.userDetails,
+            nino,
+            auditRequestJson,
+            correlationId,
+            AuditResponse(result.header.status, Left(errorWrapper.auditErrors))))
 
         result
       }.merge
@@ -121,4 +122,5 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
     val event = AuditEvent("SubmitEndOfPeriodStatementAuditType", "submit-end-of-period-statement-transaction-type", details)
     auditService.auditEvent(event)
   }
+
 }

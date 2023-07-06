@@ -49,6 +49,7 @@ trait JsonErrorValidators {
       case JsError(jsErrors) => jsErrors.map { case (path, errors) => (path, errors.toList) }.toList
       case JsSuccess(_, _)   => fail("A JSON error was expected")
     }
+
   }
 
   implicit class JsValueOps(json: JsValue) {
@@ -61,6 +62,7 @@ trait JsonErrorValidators {
           valid = x => x
         )
     }
+
   }
 
   def testMandatoryProperty[A: Reads](json: JsValue)(property: String): Unit = {
@@ -130,4 +132,5 @@ trait JsonErrorValidators {
       case _                                          => fail("no errors returned ")
     }
   }
+
 }

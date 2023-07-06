@@ -16,26 +16,27 @@
 
 package v2.connectors
 
-import api.connectors.DownstreamUri.{ IfsUri, TaxYearSpecificIfsUri }
+import api.connectors.DownstreamUri.{IfsUri, TaxYearSpecificIfsUri}
 import api.connectors.httpparsers.StandardDownstreamHttpParser
 import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
-import api.connectors.{ BaseDownstreamConnector, DownstreamOutcome }
+import api.connectors.{BaseDownstreamConnector, DownstreamOutcome}
 import api.models.downstream.TypeOfBusiness
 import config.AppConfig
-import play.api.http.Status.{ ACCEPTED, NO_CONTENT }
+import play.api.http.Status.{ACCEPTED, NO_CONTENT}
 import play.api.libs.json.JsObject
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpClient, HttpReads }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 import v2.models.request.SubmitEndOfPeriodStatementRequest
 
-import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector {
+class SubmitEndOfPeriodStatementConnector @Inject() (val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector {
 
-  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(implicit hc: HeaderCarrier,
-                                                                        ec: ExecutionContext,
-                                                                        correlationId: String): Future[DownstreamOutcome[Unit]] = {
+  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(implicit
+      hc: HeaderCarrier,
+      ec: ExecutionContext,
+      correlationId: String): Future[DownstreamOutcome[Unit]] = {
     import request._
 
     val incomeSourceType          = submitEndOfPeriod.typeOfBusiness
@@ -65,4 +66,5 @@ class SubmitEndOfPeriodStatementConnector @Inject()(val http: HttpClient, val ap
     }
 
   }
+
 }

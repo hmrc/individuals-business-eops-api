@@ -25,18 +25,19 @@ import v1.models.errors._
 import v1.models.request.SubmitEndOfPeriodStatementRequest
 import v1.support.DownstreamResponseMappingSupport
 
-import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodStatementConnector)
+class SubmitEndOfPeriodStatementService @Inject() (connector: SubmitEndOfPeriodStatementConnector)
     extends DownstreamResponseMappingSupport
     with Logging {
 
-  def submit(request: SubmitEndOfPeriodStatementRequest)(implicit hc: HeaderCarrier,
-                                                         ec: ExecutionContext,
-                                                         logContext: EndpointLogContext,
-                                                         correlationId: String): Future[SubmitEndOfPeriodStatementOutcome] = {
+  def submit(request: SubmitEndOfPeriodStatementRequest)(implicit
+      hc: HeaderCarrier,
+      ec: ExecutionContext,
+      logContext: EndpointLogContext,
+      correlationId: String): Future[SubmitEndOfPeriodStatementOutcome] = {
 
     val result = for {
       downstreamResponseWrapper <- EitherT(connector.submitPeriodStatement(request)).leftMap(mapDownstreamErrors(downstreamErrorMap))
@@ -72,4 +73,5 @@ class SubmitEndOfPeriodStatementService @Inject()(connector: SubmitEndOfPeriodSt
     "C55502"                            -> RuleNonFHLPrivateUseAdjustment,
     "BVR_UNKNOWN_ID"                    -> RuleBusinessValidationFailure
   )
+
 }

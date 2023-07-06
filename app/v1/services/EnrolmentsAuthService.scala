@@ -18,7 +18,7 @@ package v1.services
 
 import config.AppConfig
 import play.api.Logger
-import uk.gov.hmrc.auth.core.AffinityGroup.{ Agent, Individual, Organisation }
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -26,14 +26,14 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.models.auth.UserDetails
-import v1.models.errors.{ DownstreamError, UnauthorisedError }
+import v1.models.errors.{DownstreamError, UnauthorisedError}
 import v1.models.outcomes.AuthOutcome
 
-import javax.inject.{ Inject, Singleton }
-import scala.concurrent.{ ExecutionContext, Future }
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EnrolmentsAuthService @Inject()(val connector: AuthConnector, val appConfig: AppConfig) {
+class EnrolmentsAuthService @Inject() (val connector: AuthConnector, val appConfig: AppConfig) {
 
   val logger: Logger = Logger(getClass)
 
@@ -91,4 +91,5 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector, val appConfi
           Future.successful(getAgentReferenceFromEnrolments(enrolments))
         case _ => Future.successful(None)
       }
+
 }

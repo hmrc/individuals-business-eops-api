@@ -21,8 +21,8 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import itData.SubmitEndOfPeriodStatementData._
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.Status._
-import play.api.libs.json.{ JsValue, Json }
-import play.api.libs.ws.{ WSRequest, WSResponse }
+import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.V2IntegrationBaseSpec
 import v2.stubs._
@@ -98,7 +98,7 @@ class SubmitEndOfPeriodStatementControllerISpec extends V2IntegrationBaseSpec {
           ("AA123456A", fullValidJson(endDate = "error"), BAD_REQUEST, EndDateFormatError),
           ("AA123456A", fullValidJson(finalised = "false"), BAD_REQUEST, FinalisedFormatError),
           ("AA123456A", Json.parse("{}"), BAD_REQUEST, RuleIncorrectOrEmptyBodyError),
-          ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RuleEndDateBeforeStartDateError),
+          ("AA123456A", fullValidJson(endDate = "2021-04-05"), BAD_REQUEST, RuleEndDateBeforeStartDateError)
         )
 
         input.foreach(args => (validationError _).tupled(args))
@@ -132,59 +132,69 @@ class SubmitEndOfPeriodStatementControllerISpec extends V2IntegrationBaseSpec {
         val input: Seq[(Int, String, String, Int, MtdError)] = Seq(
           (BAD_REQUEST, "INVALID_IDTYPE", "Submission has not passed validation. Invalid parameter idType.", INTERNAL_SERVER_ERROR, InternalError),
           (BAD_REQUEST, "INVALID_IDVALUE", "Submission has not passed validation. Invalid parameter idValue.", BAD_REQUEST, NinoFormatError),
-          (BAD_REQUEST,
-           "INVALID_ACCOUNTINGPERIODSTARTDATE",
-           "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.",
-           BAD_REQUEST,
-           StartDateFormatError),
-          (BAD_REQUEST,
-           "INVALID_ACCOUNTINGPERIODENDDATE",
-           "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.",
-           BAD_REQUEST,
-           EndDateFormatError),
-          (BAD_REQUEST,
-           "INVALID_INCOMESOURCEID",
-           "Submission has not passed validation. Invalid parameter incomeSourceId.",
-           BAD_REQUEST,
-           BusinessIdFormatError),
-          (BAD_REQUEST,
-           "INVALID_INCOMESOURCETYPE",
-           "Submission has not passed validation. Invalid parameter incomeSourceType.",
-           BAD_REQUEST,
-           TypeOfBusinessFormatError),
-          (BAD_REQUEST,
-           "INVALID_CORRELATIONID",
-           "Submission has not passed validation. Invalid header CorrelationId.",
-           INTERNAL_SERVER_ERROR,
-           InternalError),
-          (BAD_REQUEST,
-           "EARLY_SUBMISSION",
-           "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
-           BAD_REQUEST,
-           RuleEarlySubmissionError),
-          (BAD_REQUEST,
-           "LATE_SUBMISSION",
-           "The remote endpoint has indicated that the period to finalise has passed.",
-           BAD_REQUEST,
-           RuleLateSubmissionError),
-          (BAD_REQUEST,
-           "NON_MATCHING_PERIOD",
-           "The remote endpoint has indicated that submission cannot be made with no matching accounting period.",
-           BAD_REQUEST,
-           RuleNonMatchingPeriodError),
+          (
+            BAD_REQUEST,
+            "INVALID_ACCOUNTINGPERIODSTARTDATE",
+            "Submission has not passed validation. Invalid parameter accountingPeriodStartDate.",
+            BAD_REQUEST,
+            StartDateFormatError),
+          (
+            BAD_REQUEST,
+            "INVALID_ACCOUNTINGPERIODENDDATE",
+            "Submission has not passed validation. Invalid parameter accountingPeriodEndDate.",
+            BAD_REQUEST,
+            EndDateFormatError),
+          (
+            BAD_REQUEST,
+            "INVALID_INCOMESOURCEID",
+            "Submission has not passed validation. Invalid parameter incomeSourceId.",
+            BAD_REQUEST,
+            BusinessIdFormatError),
+          (
+            BAD_REQUEST,
+            "INVALID_INCOMESOURCETYPE",
+            "Submission has not passed validation. Invalid parameter incomeSourceType.",
+            BAD_REQUEST,
+            TypeOfBusinessFormatError),
+          (
+            BAD_REQUEST,
+            "INVALID_CORRELATIONID",
+            "Submission has not passed validation. Invalid header CorrelationId.",
+            INTERNAL_SERVER_ERROR,
+            InternalError),
+          (
+            BAD_REQUEST,
+            "EARLY_SUBMISSION",
+            "The remote endpoint has indicated that an early submission has been made before accounting period end date.",
+            BAD_REQUEST,
+            RuleEarlySubmissionError),
+          (
+            BAD_REQUEST,
+            "LATE_SUBMISSION",
+            "The remote endpoint has indicated that the period to finalise has passed.",
+            BAD_REQUEST,
+            RuleLateSubmissionError),
+          (
+            BAD_REQUEST,
+            "NON_MATCHING_PERIOD",
+            "The remote endpoint has indicated that submission cannot be made with no matching accounting period.",
+            BAD_REQUEST,
+            RuleNonMatchingPeriodError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income source found.", NOT_FOUND, NotFoundError),
           (NOT_FOUND, "NOT_FOUND", "The remote endpoint has indicated that no income submissions exists.", NOT_FOUND, NotFoundError),
-          (CONFLICT,
-           "CONFLICT",
-           "The remote endpoint has indicated that the taxation period has already been finalised.",
-           BAD_REQUEST,
-           RuleAlreadySubmittedError),
-          (INTERNAL_SERVER_ERROR,
-           "SERVER_ERROR",
-           "IF is currently experiencing problems that require live service intervention.",
-           INTERNAL_SERVER_ERROR,
-           InternalError),
-          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, InternalError),
+          (
+            CONFLICT,
+            "CONFLICT",
+            "The remote endpoint has indicated that the taxation period has already been finalised.",
+            BAD_REQUEST,
+            RuleAlreadySubmittedError),
+          (
+            INTERNAL_SERVER_ERROR,
+            "SERVER_ERROR",
+            "IF is currently experiencing problems that require live service intervention.",
+            INTERNAL_SERVER_ERROR,
+            InternalError),
+          (SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.", INTERNAL_SERVER_ERROR, InternalError)
         )
 
         input.foreach(args => (serviceErrorTest _).tupled(args))
@@ -279,5 +289,7 @@ class SubmitEndOfPeriodStatementControllerISpec extends V2IntegrationBaseSpec {
       buildRequest(uri)
         .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123"))
     }
+
   }
+
 }

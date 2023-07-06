@@ -24,4 +24,5 @@ trait V1IntegrationBaseSpec extends IntegrationBaseSpec {
         "feature-switch.version-1.enabled" -> "true",
         "feature-switch.version-2.enabled" -> "false"
       )
+
 }

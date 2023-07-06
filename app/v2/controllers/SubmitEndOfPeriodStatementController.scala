@@ -16,11 +16,11 @@
 
 package v2.controllers
 
-import api.controllers.{ AuthorisedController, EndpointLogContext, RequestContext, RequestHandler }
+import api.controllers.{AuthorisedController, EndpointLogContext, RequestContext, RequestHandler}
 import api.models.request.NinoAndJsonBodyRawData
-import api.services.{ EnrolmentsAuthService, MtdIdLookupService }
+import api.services.{EnrolmentsAuthService, MtdIdLookupService}
 import play.api.libs.json.JsValue
-import play.api.mvc.{ Action, AnyContentAsJson, ControllerComponents }
+import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents}
 import utils.IdGenerator
 import v2.controllers.validators.SubmitEndOfPeriodStatementValidator
 import v2.services._
@@ -29,13 +29,13 @@ import javax.inject._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SubmitEndOfPeriodStatementController @Inject()(val authService: EnrolmentsAuthService,
-                                                     val lookupService: MtdIdLookupService,
-                                                     val idGenerator: IdGenerator,
-                                                     nrsProxyService: NrsProxyService,
-                                                     service: SubmitEndOfPeriodStatementService,
-                                                     validator: SubmitEndOfPeriodStatementValidator,
-                                                     cc: ControllerComponents)(implicit ec: ExecutionContext)
+class SubmitEndOfPeriodStatementController @Inject() (val authService: EnrolmentsAuthService,
+                                                      val lookupService: MtdIdLookupService,
+                                                      val idGenerator: IdGenerator,
+                                                      nrsProxyService: NrsProxyService,
+                                                      service: SubmitEndOfPeriodStatementService,
+                                                      validator: SubmitEndOfPeriodStatementValidator,
+                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends AuthorisedController(cc) {
 
   implicit val endpointLogContext: EndpointLogContext =
@@ -57,4 +57,5 @@ class SubmitEndOfPeriodStatementController @Inject()(val authService: Enrolments
 
       requestHandler.handleRequest(rawData)
     }
+
 }

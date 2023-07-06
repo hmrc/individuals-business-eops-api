@@ -58,13 +58,14 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
     )
 
   private val requestWithInvalidBodyFields: NinoAndJsonBodyRawData =
-    NinoAndJsonBodyRawData(validNino,
-                           AnyContentAsJson(
-                             jsonRequestBody(
-                               businessId = "invalid-business-id",
-                               startDate = "2023-07-07",
-                               endDate = "2022-07-07"
-                             )))
+    NinoAndJsonBodyRawData(
+      validNino,
+      AnyContentAsJson(
+        jsonRequestBody(
+          businessId = "invalid-business-id",
+          startDate = "2023-07-07",
+          endDate = "2022-07-07"
+        )))
 
   class Test extends MockAppConfig {
     implicit val correlationId: String = "1234"
@@ -97,26 +98,28 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
           validator.parseAndValidateRequest(requestWithInvalidNinoAndBodyFields)
 
         result shouldBe Left(
-          ErrorWrapper(correlationId,
-                       BadRequestError,
-                       Some(
-                         List(
-                           NinoFormatError,
-                           TypeOfBusinessFormatError
-                         ))))
+          ErrorWrapper(
+            correlationId,
+            BadRequestError,
+            Some(
+              List(
+                NinoFormatError,
+                TypeOfBusinessFormatError
+              ))))
       }
       "the request has multiple errors caught during postParse" in new Test {
         val result: Either[ErrorWrapper, SubmitEndOfPeriodStatementRequest] =
           validator.parseAndValidateRequest(requestWithInvalidBodyFields)
 
         result shouldBe Left(
-          ErrorWrapper(correlationId,
-                       BadRequestError,
-                       Some(
-                         List(
-                           BusinessIdFormatError,
-                           RuleEndDateBeforeStartDateError
-                         ))))
+          ErrorWrapper(
+            correlationId,
+            BadRequestError,
+            Some(
+              List(
+                BusinessIdFormatError,
+                RuleEndDateBeforeStartDateError
+              ))))
       }
     }
   }
@@ -209,12 +212,13 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
       "an invalid start date with end date is supplied" in new Test {
         val result: Either[Seq[MtdError], SubmitEndOfPeriodStatementRequest] =
           validator.parseAndValidate(
-            NinoAndJsonBodyRawData(validNino,
-                                   AnyContentAsJson(
-                                     jsonRequestBody(
-                                       startDate = "2020-10-10",
-                                       endDate = "2020-10-09"
-                                     ))))
+            NinoAndJsonBodyRawData(
+              validNino,
+              AnyContentAsJson(
+                jsonRequestBody(
+                  startDate = "2020-10-10",
+                  endDate = "2020-10-09"
+                ))))
 
         result shouldBe Left(
           List(
@@ -225,15 +229,16 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
       "multiple fields are invalid" in new Test {
         val result: Either[Seq[MtdError], SubmitEndOfPeriodStatementRequest] =
           validator.parseAndValidate(
-            NinoAndJsonBodyRawData(validNino,
-                                   AnyContentAsJson(
-                                     jsonRequestBody(
-                                       typeOfBusiness = "uk-property",
-                                       businessId = "XXXXXX",
-                                       startDate = "XXXXXX",
-                                       endDate = "XXXXXX",
-                                       finalised = "false"
-                                     ))))
+            NinoAndJsonBodyRawData(
+              validNino,
+              AnyContentAsJson(
+                jsonRequestBody(
+                  typeOfBusiness = "uk-property",
+                  businessId = "XXXXXX",
+                  startDate = "XXXXXX",
+                  endDate = "XXXXXX",
+                  finalised = "false"
+                ))))
 
         result shouldBe Left(
           List(
@@ -245,4 +250,5 @@ class SubmitEndOfPeriodStatementValidatorSpec extends UnitSpec {
       }
     }
   }
+
 }

@@ -24,9 +24,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import v1.models.auth.UserDetails
 import v1.models.errors._
-import v1.services.{ EnrolmentsAuthService, MtdIdLookupService }
+import v1.services.{EnrolmentsAuthService, MtdIdLookupService}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 case class UserRequest[A](userDetails: UserDetails, request: Request[A]) extends WrappedRequest[A](request)
 
@@ -36,7 +36,7 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
   val lookupService: MtdIdLookupService
 
   // $COVERAGE-OFF$
-  //TODO Add coverage back on when another api with a body is added
+  // TODO Add coverage back on when another api with a body is added
   def authorisedAction(nino: String): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
 
     override def parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
@@ -48,8 +48,8 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
         .withIdentifier("MTDITID", mtdId)
         .withDelegatedAuthRule("mtd-it-auth")
 
-    def invokeBlockWithAuthCheck[A](mtdId: String, request: Request[A], block: UserRequest[A] => Future[Result])(
-        implicit headerCarrier: HeaderCarrier): Future[Result] = {
+    def invokeBlockWithAuthCheck[A](mtdId: String, request: Request[A], block: UserRequest[A] => Future[Result])(implicit
+        headerCarrier: HeaderCarrier): Future[Result] = {
       authService.authorised(predicate(mtdId)).flatMap[Result] {
         case Right(userDetails)      => block(UserRequest(userDetails.copy(mtdId = mtdId), request))
         case Left(UnauthorisedError) => Future.successful(Forbidden(Json.toJson(UnauthorisedError)))
@@ -69,5 +69,7 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
         case Left(_)                       => Future.successful(InternalServerError(Json.toJson(DownstreamError)))
       }
     }
+
   }
+
 }

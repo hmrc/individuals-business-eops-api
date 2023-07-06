@@ -16,9 +16,9 @@
 
 package v2.data
 
-import api.models.audit.{ AuditError, AuditResponse }
-import play.api.http.Status.{ BAD_REQUEST, OK }
-import play.api.libs.json.{ JsValue, Json }
+import api.models.audit.{AuditError, AuditResponse}
+import play.api.http.Status.{BAD_REQUEST, OK}
+import play.api.libs.json.{JsValue, Json}
 
 object AuditData {
 
@@ -58,4 +58,5 @@ object AuditData {
        |}
     """.stripMargin
   )
+
 }

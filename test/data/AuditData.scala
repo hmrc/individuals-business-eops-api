@@ -16,9 +16,9 @@
 
 package data
 
-import play.api.http.Status.{ BAD_REQUEST, OK }
-import play.api.libs.json.{ JsValue, Json }
-import v1.models.audit.{ AuditError, AuditResponse }
+import play.api.http.Status.{BAD_REQUEST, OK}
+import play.api.libs.json.{JsValue, Json}
+import v1.models.audit.{AuditError, AuditResponse}
 
 object AuditData {
 

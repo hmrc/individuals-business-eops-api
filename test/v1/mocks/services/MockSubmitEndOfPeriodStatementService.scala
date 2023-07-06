@@ -21,9 +21,9 @@ import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v1.controllers.EndpointLogContext
 import v1.models.request.SubmitEndOfPeriodStatementRequest
-import v1.services.{ SubmitEndOfPeriodStatementOutcome, SubmitEndOfPeriodStatementService }
+import v1.services.{SubmitEndOfPeriodStatementOutcome, SubmitEndOfPeriodStatementService}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 trait MockSubmitEndOfPeriodStatementService extends MockFactory {
 
@@ -37,5 +37,7 @@ trait MockSubmitEndOfPeriodStatementService extends MockFactory {
         .submit(_: SubmitEndOfPeriodStatementRequest)(_: HeaderCarrier, _: ExecutionContext, _: EndpointLogContext, _: String))
         .expects(submitEndOfPeriodStatement, *, *, *, *)
     }
+
   }
+
 }

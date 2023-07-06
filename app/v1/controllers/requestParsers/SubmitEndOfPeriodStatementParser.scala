@@ -18,14 +18,15 @@ package v1.controllers.requestParsers
 
 import v1.controllers.requestParsers.validators.SubmitEndOfPeriodStatementValidator
 import v1.models.domain.Nino
-import v1.models.request.{ SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest }
+import v1.models.request.{SubmitEndOfPeriod, SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest}
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 
 @Singleton
-class SubmitEndOfPeriodStatementParser @Inject()(val validator: SubmitEndOfPeriodStatementValidator)
+class SubmitEndOfPeriodStatementParser @Inject() (val validator: SubmitEndOfPeriodStatementValidator)
     extends RequestParser[SubmitEndOfPeriodStatementRawData, SubmitEndOfPeriodStatementRequest] {
 
   override protected def requestFor(data: SubmitEndOfPeriodStatementRawData): SubmitEndOfPeriodStatementRequest =
     SubmitEndOfPeriodStatementRequest(Nino(data.nino), data.body.json.as[SubmitEndOfPeriod])
+
 }

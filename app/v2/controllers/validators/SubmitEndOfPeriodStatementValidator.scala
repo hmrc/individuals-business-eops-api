@@ -22,7 +22,7 @@ import api.controllers.validators.validations._
 import api.models.domain.Nino
 import api.models.errors.MtdError
 import api.models.request.NinoAndJsonBodyRawData
-import v2.models.request.{ SubmitEndOfPeriod, SubmitEndOfPeriodStatementRequest }
+import v2.models.request.{SubmitEndOfPeriod, SubmitEndOfPeriodStatementRequest}
 
 import javax.inject.Singleton
 
@@ -60,4 +60,5 @@ class SubmitEndOfPeriodStatementValidator extends Validator[NinoAndJsonBodyRawDa
       DateValidation(accountingPeriod.startDate, accountingPeriod.endDate) ++
       FinalisedValidation(finalised)
   }
+
 }

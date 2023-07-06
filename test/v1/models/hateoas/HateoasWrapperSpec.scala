@@ -16,7 +16,7 @@
 
 package v1.models.hateoas
 
-import play.api.libs.json.{ Json, OWrites }
+import play.api.libs.json.{Json, OWrites}
 import support.UnitSpec
 import v1.models.hateoas.Method.GET
 
@@ -58,4 +58,5 @@ class HateoasWrapperSpec extends UnitSpec {
     """.stripMargin)
     }
   }
+
 }

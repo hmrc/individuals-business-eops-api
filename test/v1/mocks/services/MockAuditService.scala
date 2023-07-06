@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import v1.models.audit.AuditEvent
 import v1.services.AuditService
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 trait MockAuditService extends MockFactory {
 
@@ -38,5 +38,7 @@ trait MockAuditService extends MockFactory {
         .verify(event, *, *, *)
         .returning(Future.successful(AuditResult.Success))
     }
+
   }
+
 }

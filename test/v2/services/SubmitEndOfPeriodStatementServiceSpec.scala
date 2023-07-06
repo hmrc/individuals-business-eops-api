@@ -90,7 +90,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
           ("INVALID_QUERY_PARAMETERS", InternalError),
           ("PERIOD_MISMATCH", RuleNonMatchingPeriodError),
           ("BVR_FAILURE", RuleBusinessValidationFailureTys),
-          ("TAX_YEAR_NOT_SUPPORTED", RuleTaxYearNotSupportedError),
+          ("TAX_YEAR_NOT_SUPPORTED", RuleTaxYearNotSupportedError)
         )
 
         (errors ++ extraTysErrors).foreach(args => (simpleServiceError _).tupled(args))
@@ -103,18 +103,19 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
 
         "multiple BVR_FAILURE_EXISTS errors occur" in
           fullServiceErrorTest(
-            DownstreamBvrError("BVR_FAILURE_EXISTS",
-                               List(
-                                 DownstreamValidationRuleFailure("C55001", "Custom message1"),
-                                 DownstreamValidationRuleFailure("C55002", "Custom message2")
-                               )),
+            DownstreamBvrError(
+              "BVR_FAILURE_EXISTS",
+              List(
+                DownstreamValidationRuleFailure("C55001", "Custom message1"),
+                DownstreamValidationRuleFailure("C55002", "Custom message2")
+              )),
             ErrorWrapper(
               correlationId,
               BadRequestError,
               Some(
                 Seq(
                   RuleBusinessValidationFailure(message = "Custom message1", errorId = "C55001"),
-                  RuleBusinessValidationFailure(message = "Custom message2", errorId = "C55002"),
+                  RuleBusinessValidationFailure(message = "Custom message2", errorId = "C55002")
                 ))
             )
           )
@@ -127,4 +128,5 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
       }
     }
   }
+
 }

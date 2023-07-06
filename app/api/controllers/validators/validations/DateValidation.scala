@@ -16,7 +16,7 @@
 
 package api.controllers.validators.validations
 
-import api.models.errors.{ EndDateFormatError, MtdError, RuleEndDateBeforeStartDateError, StartDateFormatError }
+import api.models.errors.{EndDateFormatError, MtdError, RuleEndDateBeforeStartDateError, StartDateFormatError}
 
 import java.time.LocalDate
 
@@ -24,17 +24,19 @@ object DateValidation extends Validation {
 
   def apply(startDate: String, endDate: String): Seq[MtdError] = {
 
-    val startLocalDate: Option[LocalDate] = try {
-      Some(LocalDate.parse(startDate))
-    } catch {
-      case _: Exception => None
-    }
+    val startLocalDate: Option[LocalDate] =
+      try {
+        Some(LocalDate.parse(startDate))
+      } catch {
+        case _: Exception => None
+      }
 
-    val endLocalDate: Option[LocalDate] = try {
-      Some(LocalDate.parse(endDate))
-    } catch {
-      case _: Exception => None
-    }
+    val endLocalDate: Option[LocalDate] =
+      try {
+        Some(LocalDate.parse(endDate))
+      } catch {
+        case _: Exception => None
+      }
 
     (startLocalDate, endLocalDate) match {
       case (Some(startDate), Some(endDate)) =>
@@ -59,4 +61,5 @@ object DateValidation extends Validation {
       NoValidationErrors
     else
       List(EndDateFormatError)
+
 }

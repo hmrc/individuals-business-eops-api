@@ -16,10 +16,10 @@
 
 package v2.connectors
 
-import api.connectors.{ ConnectorSpec, DownstreamOutcome }
-import api.models.domain.{ Nino, TaxYear }
+import api.connectors.{ConnectorSpec, DownstreamOutcome}
+import api.models.domain.{Nino, TaxYear}
 import api.models.downstream.TypeOfBusiness
-import api.models.errors.{ DownstreamErrorCode, DownstreamErrors }
+import api.models.errors.{DownstreamErrorCode, DownstreamErrors}
 import api.models.outcomes.ResponseWrapper
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.JsObject
@@ -57,16 +57,17 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       willPost(
         url = s"$baseUrl/income-tax/income-sources/nino/$nino/$incomeSourceType/" +
           s"$accountingPeriodStartDate/$accountingPeriodEndDate/declaration?incomeSourceId=$incomeSourceId",
-        body = JsObject.empty,
+        body = JsObject.empty
       ).returns(Future.successful(outcome))
     }
 
     protected def stubTysHttpResponse(outcome: DownstreamOutcome[Unit]): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
       willPostEmpty(
         url = s"$baseUrl/income-tax/income-sources/${taxYear.asTysDownstream}/" +
-          s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration",
+          s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration"
       ).returns(Future.successful(outcome))
     }
+
   }
 
   "Submit end of period statement" when {
@@ -139,4 +140,5 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       }
     }
   }
+
 }

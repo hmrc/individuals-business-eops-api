@@ -105,4 +105,5 @@ class DownstreamResponseMappingSupportSpec extends UnitSpec {
       }
     }
   }
+
 }
