@@ -170,7 +170,7 @@ class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockApp
   }
 
   "Routing requests for supported version but not enabled" when {
-    implicit val acceptHeader: Some[String] = Some("application/vnd.hmrc.3.0+json")
+    implicit val acceptHeader: Some[String] = Some("application/vnd.hmrc.4.0+json")
 
     "the version has a route for the resource" must {
       "return 404 Not Found" in new Test {

@@ -1,0 +1,121 @@
+components:
+  examples:
+
+    # 400
+
+    formatNino:
+      description: |
+        The format of the supplied NINO field is not valid.
+      value:
+        code: FORMAT_NINO
+        message: The provided NINO is invalid
+
+    formatStartDate:
+      description: |
+        The format of the supplied accounting period start date is invalid
+      value:
+        code: FORMAT_START_DATE
+        message: The provided Start date is invalid
+
+    formatEndDate:
+      description: |
+        The format of the supplied accounting period end date is invalid
+      value:
+        code: FORMAT_END_DATE
+        message: The provided End date is invalid
+
+    formatTypeOfBusiness:
+      description: |
+        The format of the supplied type of business is not valid.
+      value:
+        code: FORMAT_TYPE_OF_BUSINESS
+        message: The provided type of business is invalid
+
+    formatBusinessId:
+      description: |
+        The format of the business ID is not valid.
+      value:
+        code: FORMAT_BUSINESS_ID
+        message: The supplied business ID is invalid
+
+    formatFinalised:
+      description: |
+        The format of the supplied Finalised field is not valid.
+      value:
+        code: FORMAT_FINALISED
+        message: Finalised must be set to "true"
+
+    ruleIncorrectOrEmptyBodySubmitted:
+      description: |
+        An empty or non-matching body was submitted.
+      value:
+        code: RULE_INCORRECT_OR_EMPTY_BODY_SUBMITTED
+        message: An empty or non-matching body was submitted
+
+    ruleEndDateBeforeStartDate:
+      description: |
+        The End date is before the Start date.
+      value:
+        code: RANGE_END_DATE_BEFORE_START_DATE
+        message: The End date must be after the Start date
+
+    ruleAlreadySubmitted:
+      description: |
+        The user has previously submitted an End of Period Statement for this business' accounting period.
+      value:
+        code: RULE_ALREADY_SUBMITTED
+        message: An End of Period Statement already exists for this business' accounting period
+
+    ruleEarlySubmission:
+      description: |
+        The user has tried to make their End of Period Statement declaration before the accounting period has ended.
+      value:
+        code: RULE_EARLY_SUBMISSION
+        message: An End Of Period Statement cannot be submitted before the end of the accounting period
+
+    ruleLateSubmission:
+      description: |
+        The user has tried to make their End of Period Statement declaration too late.
+      value:
+        code: RULE_LATE_SUBMISSION
+        message: The period to finalise has passed
+
+    ruleNonMatchingPeriod:
+      description: |
+        An End of Period Statement without a matching accounting period cannot be submitted.
+      value:
+        code: RULE_NON_MATCHING_PERIOD
+        message: An End of Period Statement without a matching accounting period cannot be submitted
+
+    ruleBusinessValidationFailure:
+      description: |
+        There are business validation rule failures.
+      value:
+        code: RULE_BUSINESS_VALIDATION_FAILURE
+        message: UK Property - UK Property - Property Income Allowance claimed cannot exceed turnover. Please amend and resubmit
+
+    ruleTaxYearNotSupported:
+      description: |
+        The specified tax year is not supported. Either the tax year specified is before the minimum tax year value, or it is after the maximum tax year value.
+      value:
+        code: RULE_TAX_YEAR_NOT_SUPPORTED
+        message: The tax year specified does not lie within the supported range
+
+    # 403
+
+    clientOrAgentNotAuthorised:
+      description: |
+        The client and/or agent is not authorised. This is normally because: the client is not subscribed to MTD, the agent is not subscribed to Agent Services, or the client has not authorised the agent to act on their behalf.
+      value:
+        code: CLIENT_OR_AGENT_NOT_AUTHORISED
+        message: |
+          The client and/or agent is not authorised
+
+    # 404
+
+    notFound:
+      description: |
+        Matching resource not found.
+      value:
+        code: MATCHING_RESOURCE_NOT_FOUND
+        message: Matching resource not found

@@ -18,7 +18,7 @@ package definition
 
 import config.AppConfig
 import play.api.Logger
-import routing.{Version, Version1, Version2}
+import routing.{Version, Version1, Version2, Version3}
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 import javax.inject.{Inject, Singleton}
@@ -60,7 +60,8 @@ class ApiDefinitionFactory @Inject() (appConfig: AppConfig) {
         categories = Seq("INCOME_TAX_MTD"),
         versions = Seq(
           APIVersion(version = Version1, status = buildAPIStatus(Version1), endpointsEnabled = appConfig.endpointsEnabled(Version1)),
-          APIVersion(version = Version2, status = buildAPIStatus(Version2), endpointsEnabled = appConfig.endpointsEnabled(Version2))
+          APIVersion(version = Version2, status = buildAPIStatus(Version2), endpointsEnabled = appConfig.endpointsEnabled(Version2)),
+          APIVersion(version = Version3, status = buildAPIStatus(Version3), endpointsEnabled = appConfig.endpointsEnabled(Version3))
         ),
         requiresTrust = None
       )
