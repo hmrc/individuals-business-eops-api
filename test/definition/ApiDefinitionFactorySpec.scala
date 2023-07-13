@@ -20,7 +20,7 @@ import config.ConfidenceLevelConfig
 import definition.APIStatus.{ALPHA, BETA}
 import mocks.MockAppConfig
 import play.api.Configuration
-import routing.{Version1, Version2}
+import routing.{Version1, Version2, Version3}
 import support.UnitSpec
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import v1.mocks.MockHttpClient
@@ -48,9 +48,11 @@ class ApiDefinitionFactorySpec extends UnitSpec {
       def testDefinitionWithConfidence(confidenceLevelConfig: ConfidenceLevelConfig): Unit = new Test {
         MockAppConfig.featureSwitches.returns(Configuration.empty).anyNumberOfTimes()
         MockAppConfig.apiStatus(Version1).returns("BETA")
-        MockAppConfig.apiStatus(Version2).returns("ALPHA")
+        MockAppConfig.apiStatus(Version2).returns("BETA")
+        MockAppConfig.apiStatus(Version3).returns("BETA")
         MockAppConfig.endpointsEnabled(Version1).returns(true).anyNumberOfTimes()
         MockAppConfig.endpointsEnabled(Version2).returns(true).anyNumberOfTimes()
+        MockAppConfig.endpointsEnabled(Version3).returns(true).anyNumberOfTimes()
         MockAppConfig.confidenceLevelCheckEnabled.returns(confidenceLevelConfig).anyNumberOfTimes()
 
         val readScope: String                = "read:self-assessment"
@@ -86,7 +88,12 @@ class ApiDefinitionFactorySpec extends UnitSpec {
                 ),
                 APIVersion(
                   version = Version2,
-                  status = ALPHA,
+                  status = BETA,
+                  endpointsEnabled = true
+                ),
+                APIVersion(
+                  version = Version3,
+                  status = BETA,
                   endpointsEnabled = true
                 )
               ),
