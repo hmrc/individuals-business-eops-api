@@ -20,6 +20,7 @@ import io.swagger.v3.parser.OpenAPIV3Parser
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WSResponse
+import routing.{Version1, Version2, Version3}
 import support.IntegrationBaseSpec
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 
@@ -85,19 +86,21 @@ class DocumentationControllerISpec extends IntegrationBaseSpec {
   }
 
   "an OAS documentation request" must {
-    "return the documentation that passes OAS V3 parser" in {
-      val response: WSResponse = await(buildRequest("/api/conf/1.0/application.yaml").get())
-      response.status shouldBe Status.OK
+    Seq(Version1, Version2, Version3).foreach { version =>
+      s"return the documentation for $version" in {
+        val response: WSResponse = await(buildRequest(s"/api/conf/${version.name}/application.yaml").get())
+        response.status shouldBe Status.OK
 
-      val contents     = response.body[String]
-      val parserResult = Try(new OpenAPIV3Parser().readContents(contents))
-      parserResult.isSuccess shouldBe true
+        val contents     = response.body[String]
+        val parserResult = Try(new OpenAPIV3Parser().readContents(contents))
+        parserResult.isSuccess shouldBe true
 
-      val openAPI = Option(parserResult.get.getOpenAPI)
-      openAPI.isEmpty shouldBe false
-      openAPI.get.getOpenapi shouldBe "3.0.3"
-      openAPI.get.getInfo.getTitle shouldBe "Individuals Business End of Period Statement (MTD)"
-      openAPI.get.getInfo.getVersion shouldBe "1.0"
+        val openAPI = Option(parserResult.get.getOpenAPI)
+        openAPI.isEmpty shouldBe false
+        openAPI.get.getOpenapi shouldBe "3.0.3"
+        openAPI.get.getInfo.getTitle shouldBe "Individuals Business End of Period Statement (MTD)"
+        openAPI.get.getInfo.getVersion shouldBe version.toString
+      }
     }
   }
 
