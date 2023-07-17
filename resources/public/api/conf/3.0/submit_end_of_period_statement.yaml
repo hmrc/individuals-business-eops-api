@@ -149,6 +149,14 @@ post:
             <p>Simulates the scenario where the tax year is not supported.</p>
           </td>
         </tr>
+        <tr>
+          <td>
+            <p>BUSINESS_INCOME_PERIOD_RESTRICTION</p>
+          </td>
+          <td>
+            <p>Simulates the scenario where the customer has ITSA status 'Annual' or a latent business income source and the submission period is between 6 April to 5 April.</p>
+          </td>
+        </tr>
       </tbody>
     </table>
 
@@ -217,6 +225,8 @@ post:
               $ref: './common/errors.yaml#/components/examples/ruleBusinessValidationFailure'
             RULE_TAX_YEAR_NOT_SUPPORTED:
               $ref: './common/errors.yaml#/components/examples/ruleTaxYearNotSupported'
+            RULE_BUSINESS_INCOME_PERIOD_RESTRICTION:
+              $ref: './common/errors.yaml#/components/examples/ruleBusinessIncomePeriodRestriction'
 
     "403":
       description: Forbidden

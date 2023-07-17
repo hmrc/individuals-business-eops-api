@@ -101,6 +101,13 @@ components:
         code: RULE_TAX_YEAR_NOT_SUPPORTED
         message: The tax year specified does not lie within the supported range
 
+    ruleBusinessIncomePeriodRestriction:
+      description: |
+        For customers with ITSA status 'Annual' or a latent business income source, submission period has to be 6 April to 5 April.
+      value:
+        code: RULE_BUSINESS_INCOME_PERIOD_RESTRICTION
+        message: For customers with ITSA status 'Annual' or a latent business income source, submission period has to be 6 April to 5 April
+
     # 403
 
     clientOrAgentNotAuthorised:
