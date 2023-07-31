@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package v1.services
+package api.models.request
 
-import uk.gov.hmrc.http.HeaderCarrier
-import v1.connectors.NrsProxyConnector
-import v1.models.request.SubmitEndOfPeriod
+import play.api.libs.json.{Json, OFormat}
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+case class AccountingPeriod(startDate: String, endDate: String)
 
-@Singleton
-class NrsProxyService @Inject() (val connector: NrsProxyConnector) {
-
-  def submit(nino: String, body: SubmitEndOfPeriod)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-
-    connector.submit(nino, body)
-  }
-
+object AccountingPeriod {
+  implicit val format: OFormat[AccountingPeriod] = Json.format[AccountingPeriod]
 }

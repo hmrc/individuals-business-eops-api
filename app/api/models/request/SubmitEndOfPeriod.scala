@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package v1.models.audit
+package api.models.request
 
-import play.api.libs.json.{JsValue, Json, OWrites}
+import play.api.libs.json.{Json, OFormat}
+import api.models.downstream.TypeOfBusiness
 
-case class AuditResponse(httpStatus: Int, errors: Option[Seq[AuditError]], body: Option[JsValue])
+case class SubmitEndOfPeriod(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
 
-object AuditResponse {
-  implicit val writes: OWrites[AuditResponse] = Json.writes[AuditResponse]
-
-  def apply(httpStatus: Int, response: Either[Seq[AuditError], Option[JsValue]]): AuditResponse =
-    response match {
-      case Right(body) => AuditResponse(httpStatus, None, body)
-      case Left(errs)  => AuditResponse(httpStatus, Some(errs), None)
-    }
-
+object SubmitEndOfPeriod {
+  implicit val format: OFormat[SubmitEndOfPeriod] = Json.format[SubmitEndOfPeriod]
 }
