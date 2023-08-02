@@ -17,13 +17,13 @@
 package definition
 
 import config.ConfidenceLevelConfig
-import definition.APIStatus.{ALPHA, BETA}
+import definition.APIStatus.BETA
 import mocks.MockAppConfig
 import play.api.Configuration
-import routing.{Version1, Version2, Version3}
+import routing.{Version2, Version3}
 import support.UnitSpec
 import uk.gov.hmrc.auth.core.ConfidenceLevel
-import v1.mocks.MockHttpClient
+import api.mocks.MockHttpClient
 
 class ApiDefinitionFactorySpec extends UnitSpec {
 
@@ -47,10 +47,8 @@ class ApiDefinitionFactorySpec extends UnitSpec {
 
       def testDefinitionWithConfidence(confidenceLevelConfig: ConfidenceLevelConfig): Unit = new Test {
         MockAppConfig.featureSwitches.returns(Configuration.empty).anyNumberOfTimes()
-        MockAppConfig.apiStatus(Version1).returns("BETA")
         MockAppConfig.apiStatus(Version2).returns("BETA")
         MockAppConfig.apiStatus(Version3).returns("BETA")
-        MockAppConfig.endpointsEnabled(Version1).returns(true).anyNumberOfTimes()
         MockAppConfig.endpointsEnabled(Version2).returns(true).anyNumberOfTimes()
         MockAppConfig.endpointsEnabled(Version3).returns(true).anyNumberOfTimes()
         MockAppConfig.confidenceLevelCheckEnabled.returns(confidenceLevelConfig).anyNumberOfTimes()
@@ -81,11 +79,6 @@ class ApiDefinitionFactorySpec extends UnitSpec {
               context = "mtd/template",
               categories = Seq("INCOME_TAX_MTD"),
               versions = Seq(
-                APIVersion(
-                  version = Version1,
-                  status = BETA,
-                  endpointsEnabled = true
-                ),
                 APIVersion(
                   version = Version2,
                   status = BETA,
@@ -118,22 +111,6 @@ class ApiDefinitionFactorySpec extends UnitSpec {
             authValidationEnabled = true)
           apiDefinitionFactory.confidenceLevel shouldBe expectedDefinitionCL
         }
-      }
-    }
-  }
-
-  "buildAPIStatus" when {
-    "the 'apiStatus' parameter is present and valid" should {
-      "return the correct status" in new Test {
-        MockAppConfig.apiStatus(Version1) returns "BETA"
-        apiDefinitionFactory.buildAPIStatus(Version1) shouldBe BETA
-      }
-    }
-
-    "the 'apiStatus' parameter is present and invalid" should {
-      "default to alpha" in new Test {
-        MockAppConfig.apiStatus(Version1) returns "ALPHO"
-        apiDefinitionFactory.buildAPIStatus(Version1) shouldBe ALPHA
       }
     }
   }
