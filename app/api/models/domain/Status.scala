@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package api.controllers
+package api.models.domain
 
-import api.hateoas.Link
-import api.hateoas.Method.GET
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Format
+import utils.enums.Enums
 
-trait ControllerSpecHateoasSupport {
+sealed trait Status {}
 
-  val hateoaslinks: Seq[Link] = Seq(Link(href = "/foo/bar", method = GET, rel = "test-relationship"))
+//noinspection ScalaStyle
+object Status {
 
-  val hateoaslinksJson: JsObject = Json
-    .parse("""
-        |{
-        |  "links": [{
-        |    "href": "/foo/bar",
-        |    "method": "GET",
-        |    "rel": "test-relationship"
-        |  }]
-        |}""".stripMargin)
-    .as[JsObject]
+  case object `valid` extends Status
 
+  case object `invalid` extends Status
+
+  case object `superseded` extends Status
+
+  implicit val format: Format[Status] = Enums.format[Status]
 }

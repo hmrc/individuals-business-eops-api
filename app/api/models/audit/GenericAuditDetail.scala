@@ -20,9 +20,11 @@ import api.controllers.{AuditHandler, RequestContext}
 import api.models.auth.UserDetails
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, JsValue, OWrites}
+import routing.Version
 
 case class GenericAuditDetail(userType: String,
                               agentReferenceNumber: Option[String],
+                              versionNumber: String,
                               params: Map[String, String],
                               requestBody: Option[JsValue],
                               `X-CorrelationId`: String,
@@ -33,6 +35,7 @@ object GenericAuditDetail {
   implicit val writes: OWrites[GenericAuditDetail] = (
     (JsPath \ "userType").write[String] and
       (JsPath \ "agentReferenceNumber").writeNullable[String] and
+      (JsPath \ "versionNumber").write[String] and
       JsPath.write[Map[String, String]] and
       (JsPath \ "request").writeNullable[JsValue] and
       (JsPath \ "X-CorrelationId").write[String] and
@@ -40,6 +43,7 @@ object GenericAuditDetail {
   )(unlift(GenericAuditDetail.unapply))
 
   def apply(userDetails: UserDetails,
+            apiVersion: String,
             params: Map[String, String],
             requestBody: Option[JsValue],
             `X-CorrelationId`: String,
@@ -48,6 +52,7 @@ object GenericAuditDetail {
     GenericAuditDetail(
       userType = userDetails.userType,
       agentReferenceNumber = userDetails.agentReferenceNumber,
+      versionNumber = apiVersion,
       params = params,
       requestBody = requestBody,
       `X-CorrelationId` = `X-CorrelationId`,
@@ -55,13 +60,14 @@ object GenericAuditDetail {
     )
   }
 
-  def auditDetailCreator(params: Map[String, String]): AuditHandler.AuditDetailCreator[GenericAuditDetail] =
+  def auditDetailCreator(apiVersion: Version, params: Map[String, String]): AuditHandler.AuditDetailCreator[GenericAuditDetail] =
     new AuditHandler.AuditDetailCreator[GenericAuditDetail] {
 
       def createAuditDetail(userDetails: UserDetails, requestBody: Option[JsValue], auditResponse: AuditResponse)(implicit
           ctx: RequestContext): GenericAuditDetail =
         GenericAuditDetail(
           userDetails = userDetails,
+          apiVersion = apiVersion.name,
           params = params,
           requestBody = requestBody,
           `X-CorrelationId` = ctx.correlationId,

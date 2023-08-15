@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package api.controllers
+package api.controllers.validators.resolvers
 
-import api.hateoas.Link
-import api.hateoas.Method.GET
-import play.api.libs.json.{JsObject, Json}
+import api.models.errors.MtdError
+import cats.data.Validated
+import play.api.libs.json._
 
-trait ControllerSpecHateoasSupport {
+class ResolveJsonObject[T](implicit val reads: Reads[T]) extends Resolver[JsValue, T] with JsonObjectResolving[T] {
 
-  val hateoaslinks: Seq[Link] = Seq(Link(href = "/foo/bar", method = GET, rel = "test-relationship"))
-
-  val hateoaslinksJson: JsObject = Json
-    .parse("""
-        |{
-        |  "links": [{
-        |    "href": "/foo/bar",
-        |    "method": "GET",
-        |    "rel": "test-relationship"
-        |  }]
-        |}""".stripMargin)
-    .as[JsObject]
+  def apply(data: JsValue, error: Option[MtdError], path: Option[String]): Validated[Seq[MtdError], T] =
+    validate(data).leftMap(errs => withErrors(error, errs, path))
 
 }

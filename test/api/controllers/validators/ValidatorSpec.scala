@@ -16,163 +16,112 @@
 
 package api.controllers.validators
 
-import api.controllers.validators.Validator._
+import api.controllers.validators.resolvers.{ResolveJsonObject, ResolveNino, ResolveTaxYear}
+import api.models.domain.{Nino, TaxYear}
 import api.models.errors._
-import api.models.request.RawData
+import cats.data.Validated
+import cats.data.Validated.Invalid
+import cats.implicits._
 import org.scalamock.scalatest.MockFactory
-import play.api.http.Status._
+import play.api.http.Status.BAD_REQUEST
+import play.api.libs.json.{JsValue, Json, Reads}
 import support.UnitSpec
 
 class ValidatorSpec extends UnitSpec with MockFactory {
 
-  // TODO the "level 1/level 2" tests being done here aren't relevant to this API.
-  //  A ticket is being raised for the Validator changes to be added to an API that includes
-  //  "multi-level" validations in the pre- or post-parser stage, so this test should also be updated then.
+  private implicit val correlationId: String = "1234"
 
-  private trait Test {
-    implicit val correlationId: String = "1234"
+  private val validNino    = Nino("AA123456A")
+  private val validTaxYear = TaxYear.fromMtd("2023-24")
 
-    val validRaw: TestRawData     = TestRawData("ABCDEF", "12345")
-    val parsed: TestParsedRequest = TestParsedRequest("ABCDEF", "12345")
+  private val validBody = Json.parse("""
+                                       | {
+                                       |   "value1": "value 1",
+                                       |   "value2": true
+                                       | }
+                                       |""".stripMargin)
 
-    lazy val preParseValidations: PreParseValidationCallers[TestRawData]              = Nil
-    lazy val parserValidation: ParserValidationCaller[TestRawData, TestParsedRequest] = _ => Right(parsed)
-    lazy val postParseValidations: PostParseValidationCallers[TestParsedRequest]      = Nil
+  private val parsedRequestBody = TestParsedRequestBody("value 1", value2 = true)
+  private val parsedRequest     = TestParsedRequest(validNino, validTaxYear, parsedRequestBody)
 
-    val validator = new TestValidator(preParseValidations, parserValidation, postParseValidations)
+  case class TestParsedRequest(nino: Nino, taxYear: TaxYear, body: TestParsedRequestBody)
+  case class TestParsedRequestBody(value1: String, value2: Boolean)
+  implicit val testParsedRequestBodyReads: Reads[TestParsedRequestBody] = Json.reads[TestParsedRequestBody]
+
+  /** The main/outermost validator.
+    */
+  private class TestValidator(nino: String = "AA123456A", taxYear: String = "2023-24", jsonBody: JsValue = validBody)
+      extends Validator[TestParsedRequest] {
+
+    private val jsonResolver = new ResolveJsonObject[TestParsedRequestBody]
+
+    def validate: Validated[Seq[MtdError], TestParsedRequest] =
+      (
+        ResolveNino(nino),
+        ResolveTaxYear(taxYear),
+        jsonResolver(jsonBody, RuleIncorrectOrEmptyBodyError)
+      ).mapN(TestParsedRequest) andThen TestRulesValidator.validateBusinessRules
+
   }
 
-  "validator.parseAndValidateRequest()" should {
+  /** Perform additional business-rules validation on the correctly parsed request.
+    */
+  private object TestRulesValidator extends RulesValidator[TestParsedRequest] {
 
-    "return the parsed domain object with no errors" when {
-      "all data is correct" in new Test {
-        val result: Either[ErrorWrapper, TestParsedRequest] = validator.parseAndValidateRequest(validRaw)
-        result shouldBe Right(parsed)
-      }
+    def validateBusinessRules(parsed: TestParsedRequest): Validated[Seq[MtdError], TestParsedRequest] = {
+      val resolvedValue1 = if (parsed.body.value1 == "value 1") valid else Invalid(List(RuleValue1Invalid))
+      val resolvedValue2 = if (parsed.body.value2) valid else Invalid(List(RuleValue2Invalid))
+
+      combine(
+        resolvedValue1,
+        resolvedValue2
+      ).onSuccess(parsed)
     }
 
-    "return a single error" when {
-      "just one validation error is found" in new Test {
-        override lazy val parserValidation: ParserValidationCaller[TestRawData, TestParsedRequest] =
-          _ => Left(List(NinoFormatError))
-
-        val result: Either[ErrorWrapper, TestParsedRequest] = validator.parseAndValidateRequest(validRaw)
-        result shouldBe Left(ErrorWrapper(correlationId, NinoFormatError, None))
-      }
-    }
-
-    "return multiple errors" when {
-      "both the param and body are invalid" in new Test {
-
-        override lazy val preParseValidations: PreParseValidationCallers[TestRawData] =
-          List(
-            _ => List(NinoFormatError),
-            _ => List(RuleIncorrectOrEmptyBodyError)
-          )
-
-        val result: Either[ErrorWrapper, TestParsedRequest] = validator.parseAndValidateRequest(validRaw)
-        result shouldBe Left(ErrorWrapper(correlationId, BadRequestError, Some(List(NinoFormatError, RuleIncorrectOrEmptyBodyError))))
-      }
-    }
   }
 
-  "validator.parseAndValidate()" should {
+  private object RuleValue1Invalid extends MtdError("RULE_VALUE_1_INVALID", "value1 can only be 'value 1'", BAD_REQUEST)
+  private object RuleValue2Invalid extends MtdError("RULE_VALUE_2_INVALID", "value2 can only be true", BAD_REQUEST)
 
-    "return the parsed domain object with no errors" when {
-      "all data is correct" in new Test {
-        val levelOneValidationOne = new MockFunctionObject
-        val levelOneValidationTwo = new MockFunctionObject
+  "validateAndWrapResult()" should {
 
-        def levelOneValidations: PostParseValidationCaller[TestParsedRequest] =
-          _ =>
-            levelOneValidationOne.noErrors() ++
-              levelOneValidationTwo.noErrors()
-
-        override lazy val postParseValidations = List(levelOneValidations)
-
-        val result: Either[Seq[MtdError], TestParsedRequest] = validator.parseAndValidate(validRaw)
-        result shouldBe Right(parsed)
-        levelOneValidationOne.called shouldBe 1
-        levelOneValidationTwo.called shouldBe 1
+    "return the parsed domain object" when {
+      "given valid input" in {
+        val validator = new TestValidator()
+        val result    = validator.validateAndWrapResult()
+        result shouldBe Right(parsedRequest)
       }
     }
 
-    "return a list of validation errors on level one" when {
-      "there are failed validations" in new Test {
-
-        val levelOneValidationOne = new MockFunctionObject
-        val levelOneValidationTwo = new MockFunctionObject
-
-        override lazy val postParseValidations = List(levelOneValidations)
-
-        val mockError: MtdError = MtdError("MOCK", "SOME ERROR", CONFLICT)
-
-        def levelOneValidations: PostParseValidationCaller[TestParsedRequest] =
-          _ =>
-            levelOneValidationOne.noErrors() ++
-              levelOneValidationTwo.error(mockError)
-
-        val result: Either[Seq[MtdError], TestParsedRequest] = validator.parseAndValidate(validRaw)
-        result shouldBe Left(List(mockError))
-
-        levelOneValidationOne.called shouldBe 1
-        levelOneValidationTwo.called shouldBe 1
+    "return an error from the request params" when {
+      "given a single invalid request param" in {
+        val validator = new TestValidator(nino = "not-a-nino")
+        val result    = validator.validateAndWrapResult()
+        result shouldBe Left(ErrorWrapper(correlationId, NinoFormatError))
       }
+
+      "given two invalid request params" in {
+        val validator = new TestValidator(nino = "not-a-nino", taxYear = "not-a-tax-year")
+        val result    = validator.validateAndWrapResult()
+        result shouldBe Left(ErrorWrapper(correlationId, BadRequestError, Some(List(NinoFormatError, TaxYearFormatError))))
+      }
+
     }
 
-    "return a list of validation errors on level two" when {
-      "there are failed validations only on level two" in new Test {
-        val levelOneValidationOne = new MockFunctionObject
-        val levelOneValidationTwo = new MockFunctionObject
+    "return an error from the Json body" when {
+      "given a request with valid params and an invalid body" in {
+        val jsonRequestBody = Json.parse("""
+                                           | {
+                                           |   "value1": "value 1",
+                                           |   "value2": "not-a-boolean"
+                                           | }
+                                           |""".stripMargin)
 
-        val levelTwoValidationOne = new MockFunctionObject
-        val levelTwoValidationTwo = new MockFunctionObject
-
-        val mockError: MtdError = MtdError("MOCK", "SOME ERROR ON LEVEL 2", BAD_REQUEST)
-
-        def levelOneValidations: PostParseValidationCaller[TestParsedRequest] =
-          _ =>
-            levelOneValidationOne.noErrors() ++
-              levelOneValidationTwo.noErrors()
-
-        def levelTwoValidations: PostParseValidationCaller[TestParsedRequest] =
-          _ =>
-            levelTwoValidationOne.noErrors() ++
-              levelTwoValidationTwo.error(mockError)
-
-        override lazy val postParseValidations = List(levelOneValidations, levelTwoValidations)
-
-        val result: Either[Seq[MtdError], TestParsedRequest] = validator.parseAndValidate(validRaw)
-        result shouldBe Left(List(mockError))
-
-        levelOneValidationOne.called shouldBe 1
-        levelOneValidationTwo.called shouldBe 1
-        levelTwoValidationOne.called shouldBe 1
-        levelTwoValidationTwo.called shouldBe 1
+        val validator = new TestValidator(jsonBody = jsonRequestBody)
+        val result    = validator.validateAndWrapResult()
+        result shouldBe Left(ErrorWrapper(correlationId, RuleIncorrectOrEmptyBodyError))
       }
     }
   }
 
 }
-
-class MockFunctionObject {
-  var called = 0
-
-  def noErrors(): Seq[MtdError]             = validate(maybeError = None)
-  def error(error: MtdError): Seq[MtdError] = validate(maybeError = Some(error))
-
-  private def validate(maybeError: Option[MtdError]): Seq[MtdError] = {
-    called = called + 1
-    maybeError.toList
-  }
-
-}
-
-private case class TestRawData(fieldOne: String, fieldTwo: String) extends RawData
-private case class TestParsedRequest(fieldOne: String, fieldTwo: String)
-
-private class TestValidator(
-    override protected val preParserValidations: PreParseValidationCallers[TestRawData],
-    override protected val parserValidation: ParserValidationCaller[TestRawData, TestParsedRequest],
-    override protected val postParserValidations: PostParseValidationCallers[TestParsedRequest]
-) extends Validator[TestRawData, TestParsedRequest]

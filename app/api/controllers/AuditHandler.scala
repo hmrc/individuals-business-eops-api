@@ -22,6 +22,7 @@ import api.models.errors.ErrorWrapper
 import api.services.AuditService
 import cats.syntax.either._
 import play.api.libs.json.{JsValue, Writes}
+import routing.Version
 
 import scala.Function.const
 import scala.concurrent.ExecutionContext
@@ -43,6 +44,7 @@ object AuditHandler {
   def apply(auditService: AuditService,
             auditType: String,
             transactionName: String,
+            apiVersion: Version,
             params: Map[String, String],
             requestBody: Option[JsValue] = None,
             includeResponse: Boolean = false): AuditHandler =
@@ -50,7 +52,7 @@ object AuditHandler {
       auditService = auditService,
       auditType = auditType,
       transactionName = transactionName,
-      auditDetailCreator = GenericAuditDetail.auditDetailCreator(params),
+      auditDetailCreator = GenericAuditDetail.auditDetailCreator(apiVersion, params),
       requestBody = requestBody,
       responseBodyMap = if (includeResponse) identity else const(None)
     )

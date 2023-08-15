@@ -16,80 +16,51 @@
 
 package api.controllers.validators
 
-import api.controllers.validators.Validator._
 import api.models.errors.{BadRequestError, ErrorWrapper, MtdError}
-import api.models.request.RawData
+import cats.data.Validated
+import cats.data.Validated.{Invalid, Valid}
 import utils.Logging
 
-object Validator {
-  type PreParseValidationCaller[A <: RawData]  = A => Seq[MtdError]
-  type PreParseValidationCallers[A <: RawData] = Seq[PreParseValidationCaller[A]]
+trait Validator[PARSED] extends Logging {
 
-  type ParserValidationCaller[A <: RawData, PARSED] = A => Either[Seq[MtdError], PARSED]
+  def validate: Validated[Seq[MtdError], PARSED]
 
-  type PostParseValidationCaller[PARSED]  = PARSED => Seq[MtdError]
-  type PostParseValidationCallers[PARSED] = Seq[PostParseValidationCaller[PARSED]]
-}
-
-trait Validator[RAW <: RawData, PARSED] extends Logging {
-
-  protected val preParserValidations: PreParseValidationCallers[RAW]
-  protected val parserValidation: ParserValidationCaller[RAW, PARSED]
-  protected val postParserValidations: PostParseValidationCallers[PARSED]
-
-  def parseAndValidateRequest(data: RAW)(implicit correlationId: String): Either[ErrorWrapper, PARSED] = {
-    val result = parseAndValidate(data)
-    wrap(result)
-  }
-
-  def parseAndValidate(data: RAW): Either[Seq[MtdError], PARSED] = {
-    for {
-      _      <- runPreParseValidations(data)
-      parsed <- runParserValidation(data)
-      _      <- runPostParseValidations(parsed)
-
-    } yield parsed
-  }
-
-  private def runPreParseValidations(data: RAW): Either[Seq[MtdError], RAW] = {
-    val errors = preParserValidations.flatMap(_(data))
-    errors match {
-      case _ if errors.nonEmpty => Left(errors)
-      case _                    => Right(data)
-    }
-  }
-
-  private def runParserValidation(data: RAW): Either[Seq[MtdError], PARSED] = {
-    parserValidation(data)
-  }
-
-  private def runPostParseValidations(parsed: PARSED): Either[Seq[MtdError], PARSED] = {
-    val errors = postParserValidations.flatMap(_(parsed))
-    errors match {
-      case _ if errors.nonEmpty => Left(errors)
-      case _                    => Right(parsed)
-    }
-  }
-
-  private def wrap(result: Either[Seq[MtdError], PARSED])(implicit correlationId: String): Either[ErrorWrapper, PARSED] = {
-    result match {
-      case Right(parsed) =>
-        logger.info(
-          "[RequestParser][parseRequest] " +
-            s"Validation successful for the request with CorrelationId: $correlationId")
+  def validateAndWrapResult()(implicit correlationId: String): Either[ErrorWrapper, PARSED] = {
+    validate match {
+      case Valid(parsed) =>
+        logger.info(s"Validation successful for the request with CorrelationId: $correlationId")
         Right(parsed)
 
-      case Left(err :: Nil) =>
-        logger.warn(
-          "[RequestParser][parseRequest] " +
-            s"Validation failed with ${err.code} error for the request with CorrelationId: $correlationId")
-        Left(ErrorWrapper(correlationId, err, None))
-      case Left(errs) =>
-        logger.warn(
-          "[RequestParser][parseRequest] " +
-            s"Validation failed with ${errs.map(_.code).mkString(",")} error for the request with CorrelationId: $correlationId")
-        Left(ErrorWrapper(correlationId, BadRequestError, Some(errs)))
+      case Invalid(errs) =>
+        combineErrors(errs) match {
+          case err :: Nil =>
+            logger.warn(s"Validation failed with ${err.code} error for the request with CorrelationId: $correlationId")
+            Left(ErrorWrapper(correlationId, err, None))
+
+          case errs =>
+            logger.warn(s"Validation failed with ${errs.map(_.code).mkString(",")} error for the request with CorrelationId: $correlationId")
+            Left(ErrorWrapper(correlationId, BadRequestError, Some(errs)))
+        }
     }
+  }
+
+  private def combineErrors(errors: Seq[MtdError]): Seq[MtdError] = {
+    errors
+      .groupBy(_.message)
+      .map { case (_, errors) =>
+        val baseError = errors.head.copy(paths = Some(Seq.empty[String]))
+
+        errors.fold(baseError)((error1, error2) => {
+          val paths: Option[Seq[String]] = for {
+            error1Paths <- error1.paths
+            error2Paths <- error2.paths
+          } yield {
+            error1Paths ++ error2Paths
+          }
+          error1.copy(paths = paths)
+        })
+      }
+      .toList
   }
 
 }
