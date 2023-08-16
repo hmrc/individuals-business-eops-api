@@ -20,21 +20,21 @@ import api.controllers.RequestContext
 import api.services.ServiceOutcome
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import v3.models.request.SubmitEndOfPeriodStatementRequest
+import v3.models.request.SubmitEndOfPeriodStatementRequestData
 import v3.services.SubmitEndOfPeriodStatementService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockSubmitEndOfPeriodStatementService extends MockFactory {
+trait MockSubmitEndOfPeriodRequestBodyRequestBodyStatementService extends MockFactory {
 
   val mockSubmitEndOfPeriodStatementService: SubmitEndOfPeriodStatementService = mock[SubmitEndOfPeriodStatementService]
 
   object MockSubmitEndOfPeriodStatementService {
 
     def submitEndOfPeriodStatementService(
-        submitEndOfPeriodStatement: SubmitEndOfPeriodStatementRequest): CallHandler[Future[ServiceOutcome[Unit]]] = {
+        submitEndOfPeriodStatement: SubmitEndOfPeriodStatementRequestData): CallHandler[Future[ServiceOutcome[Unit]]] = {
       (mockSubmitEndOfPeriodStatementService
-        .submit(_: SubmitEndOfPeriodStatementRequest)(_: RequestContext, _: ExecutionContext))
+        .submit(_: SubmitEndOfPeriodStatementRequestData)(_: RequestContext, _: ExecutionContext))
         .expects(submitEndOfPeriodStatement, *, *)
     }
 

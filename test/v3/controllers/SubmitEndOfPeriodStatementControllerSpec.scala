@@ -22,10 +22,10 @@ import api.models.errors.{ErrorWrapper, NinoFormatError, RuleTaxYearNotSupported
 import api.models.outcomes.ResponseWrapper
 import api.models.request.NinoAndJsonBodyRawData
 import play.api.mvc.{AnyContentAsJson, Result}
+import v3.controllers.validators.MockSubmitEndOfPeriodStatementValidator
 import v3.data.SubmitEndOfPeriodStatementData._
 import v3.mocks.services._
-import v3.mocks.validators.MockSubmitEndOfPeriodStatementValidator
-import v3.models.request.SubmitEndOfPeriodStatementRequest
+import v3.models.request.SubmitEndOfPeriodStatementRequestData
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,10 +35,10 @@ class SubmitEndOfPeriodStatementControllerSpec
     with ControllerTestRunner
     with MockSubmitEndOfPeriodStatementValidator
     with MockNrsProxyService
-    with MockSubmitEndOfPeriodStatementService {
+    with MockSubmitEndOfPeriodRequestBodyRequestBodyStatementService {
 
   private val rawData     = NinoAndJsonBodyRawData(nino, AnyContentAsJson(jsonRequestBody()))
-  private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
+  private val requestData = SubmitEndOfPeriodStatementRequestData(Nino(nino), validRequest)
 
   trait Test extends ControllerTest {
 

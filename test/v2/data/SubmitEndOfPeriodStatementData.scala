@@ -19,7 +19,7 @@ package v2.data
 import api.models.downstream.TypeOfBusiness
 import api.models.downstream.TypeOfBusiness.`foreign-property`
 import play.api.libs.json.{JsValue, Json}
-import v2.models.request.{AccountingPeriod, SubmitEndOfPeriod}
+import v2.models.request.{AccountingPeriod, SubmitEndOfPeriodRequestBody}
 
 object SubmitEndOfPeriodStatementData {
 
@@ -31,7 +31,7 @@ object SubmitEndOfPeriodStatementData {
   val accountingPeriodStartDateTys: String = "2023-04-06"
   val accountingPeriodEndDateTys: String   = "2024-04-05"
 
-  val validRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(
+  val validRequest: SubmitEndOfPeriodRequestBody = SubmitEndOfPeriodRequestBody(
     typeOfBusiness = `foreign-property`,
     businessId = "XAIS12345678910",
     accountingPeriod = AccountingPeriod(
@@ -41,7 +41,7 @@ object SubmitEndOfPeriodStatementData {
     finalised = true
   )
 
-  val validTysRequest: SubmitEndOfPeriod = SubmitEndOfPeriod(
+  val validTysRequest: SubmitEndOfPeriodRequestBody = SubmitEndOfPeriodRequestBody(
     typeOfBusiness = `foreign-property`,
     businessId = "XAIS12345678910",
     accountingPeriod = AccountingPeriod(

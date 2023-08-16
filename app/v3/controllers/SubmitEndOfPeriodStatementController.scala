@@ -17,12 +17,13 @@
 package v3.controllers
 
 import api.controllers.{AuthorisedController, EndpointLogContext, RequestContext, RequestHandler}
-import api.models.request.NinoAndJsonBodyRawData
 import api.services.{EnrolmentsAuthService, MtdIdLookupService}
+import config.AppConfig
 import play.api.libs.json.JsValue
-import play.api.mvc.{Action, AnyContentAsJson, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents}
+import routing.{Version, Version3}
 import utils.IdGenerator
-import v3.controllers.validators.SubmitEndOfPeriodStatementValidator
+import v3.controllers.validators.SubmitEndOfPeriodStatementValidatorFactory
 import v3.services._
 
 import javax.inject._
@@ -34,8 +35,8 @@ class SubmitEndOfPeriodStatementController @Inject() (val authService: Enrolment
                                                       val idGenerator: IdGenerator,
                                                       nrsProxyService: NrsProxyService,
                                                       service: SubmitEndOfPeriodStatementService,
-                                                      validator: SubmitEndOfPeriodStatementValidator,
-                                                      cc: ControllerComponents)(implicit ec: ExecutionContext)
+                                                      validatorFactory: SubmitEndOfPeriodStatementValidatorFactory,
+                                                      cc: ControllerComponents)(implicit ec: ExecutionContext, appConfig: AppConfig)
     extends AuthorisedController(cc) {
 
   implicit val endpointLogContext: EndpointLogContext =
@@ -44,18 +45,19 @@ class SubmitEndOfPeriodStatementController @Inject() (val authService: Enrolment
   def handleRequest(nino: String): Action[JsValue] =
     authorisedAction(nino).async(parse.json) { implicit request =>
       implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
+      implicit val version: Version    = Version.from(request, orElse = Version3)
 
-      val rawData = NinoAndJsonBodyRawData(nino, AnyContentAsJson(request.body))
+      val validator = validatorFactory.validator(nino, request.body)
 
       val requestHandler =
         RequestHandler
           .withValidator(validator)
           .withService { parsedRequest =>
-            nrsProxyService.submit(nino, parsedRequest.submitEndOfPeriod)
+            nrsProxyService.submit(nino, parsedRequest.body)
             service.submit(parsedRequest)
           }
 
-      requestHandler.handleRequest(rawData)
+      requestHandler.handleRequest()
     }
 
 }

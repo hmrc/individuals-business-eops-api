@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-package v3.services
+package v2.models.request
 
-import uk.gov.hmrc.http.HeaderCarrier
-import v3.connectors.NrsProxyConnector
-import v3.models.request.SubmitEndOfPeriodRequestBody
+import api.models.domain.{Nino, TaxYear}
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
-
-@Singleton
-class NrsProxyService @Inject() (val connector: NrsProxyConnector) {
-
-  def submit(nino: String, body: SubmitEndOfPeriodRequestBody)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-
-    connector.submit(nino, body)
-  }
-
+case class SubmitEndOfPeriodStatementRequestData(nino: Nino, body: SubmitEndOfPeriodRequestBody) {
+  lazy val taxYear: TaxYear = TaxYear.fromIso(body.accountingPeriod.endDate)
 }

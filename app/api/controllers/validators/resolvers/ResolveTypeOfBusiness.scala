@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package v3.models.request
+package api.controllers.validators.resolvers
 
 import api.models.downstream.TypeOfBusiness
-import play.api.libs.json.{Json, OFormat}
+import api.models.errors.{MtdError, TypeOfBusinessFormatError}
+import cats.data.Validated
+import cats.data.Validated.{Invalid, Valid}
 
-case class SubmitEndOfPeriod(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
+object ResolveTypeOfBusiness extends Resolver[String, String] {
 
-object SubmitEndOfPeriod {
-  implicit val format: OFormat[SubmitEndOfPeriod] = Json.format[SubmitEndOfPeriod]
+  def apply(value: String, unusedError: Option[MtdError], path: Option[String]): Validated[Seq[MtdError], String] = {
+    if (TypeOfBusiness.parser.isDefinedAt(value)) {
+      Valid(value)
+    } else {
+      Invalid(List(TypeOfBusinessFormatError.maybeWithExtraPath(path)))
+    }
+  }
+
 }

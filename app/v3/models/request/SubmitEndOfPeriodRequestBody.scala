@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package v2.models.request
+package v3.models.request
 
-import api.models.domain.{Nino, TaxYear}
+import api.models.downstream.TypeOfBusiness
+import play.api.libs.json.{Json, OFormat}
 
-case class SubmitEndOfPeriodStatementRequest(nino: Nino, submitEndOfPeriod: SubmitEndOfPeriod) {
-  lazy val taxYear: TaxYear = TaxYear.fromIso(submitEndOfPeriod.accountingPeriod.endDate)
+case class SubmitEndOfPeriodRequestBody(typeOfBusiness: TypeOfBusiness, businessId: String, accountingPeriod: AccountingPeriod, finalised: Boolean)
+
+object SubmitEndOfPeriodRequestBody {
+  implicit val format: OFormat[SubmitEndOfPeriodRequestBody] = Json.format[SubmitEndOfPeriodRequestBody]
 }

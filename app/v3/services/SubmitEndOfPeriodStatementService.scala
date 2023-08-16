@@ -22,7 +22,7 @@ import api.models.outcomes.ResponseWrapper
 import api.services.{BaseService, ServiceOutcome}
 import cats.syntax.either._
 import v3.connectors.SubmitEndOfPeriodStatementConnector
-import v3.models.request.SubmitEndOfPeriodStatementRequest
+import v3.models.request.SubmitEndOfPeriodStatementRequestData
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubmitEndOfPeriodStatementService @Inject() (connector: SubmitEndOfPeriodStatementConnector) extends BaseService {
 
-  def submit(request: SubmitEndOfPeriodStatementRequest)(implicit ctx: RequestContext, ec: ExecutionContext): Future[ServiceOutcome[Unit]] = {
+  def submit(request: SubmitEndOfPeriodStatementRequestData)(implicit ctx: RequestContext, ec: ExecutionContext): Future[ServiceOutcome[Unit]] = {
     connector
       .submitPeriodStatement(request)
       .map(_.leftMap(errorOrBvrMap))

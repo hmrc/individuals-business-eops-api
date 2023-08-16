@@ -25,7 +25,7 @@ import config.AppConfig
 import play.api.http.Status.{ACCEPTED, NO_CONTENT}
 import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
-import v2.models.request.SubmitEndOfPeriodStatementRequest
+import v2.models.request.SubmitEndOfPeriodStatementRequestData
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,16 +33,16 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubmitEndOfPeriodStatementConnector @Inject() (val http: HttpClient, val appConfig: AppConfig) extends BaseDownstreamConnector {
 
-  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequest)(implicit
+  def submitPeriodStatement(request: SubmitEndOfPeriodStatementRequestData)(implicit
       hc: HeaderCarrier,
       ec: ExecutionContext,
       correlationId: String): Future[DownstreamOutcome[Unit]] = {
     import request._
 
-    val incomeSourceType          = submitEndOfPeriod.typeOfBusiness
-    val accountingPeriodStartDate = submitEndOfPeriod.accountingPeriod.startDate
-    val accountingPeriodEndDate   = submitEndOfPeriod.accountingPeriod.endDate
-    val incomeSourceId            = submitEndOfPeriod.businessId
+    val incomeSourceType          = body.typeOfBusiness
+    val accountingPeriodStartDate = body.accountingPeriod.startDate
+    val accountingPeriodEndDate   = body.accountingPeriod.endDate
+    val incomeSourceId            = body.businessId
 
     if (taxYear.useTaxYearSpecificApi) {
       implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] =
