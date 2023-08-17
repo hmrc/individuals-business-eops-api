@@ -46,7 +46,7 @@ object SubmitEndOfPeriodStatementRulesValidator extends RulesValidator[SubmitEnd
 
   private def validateFinalised(finalised: Boolean): Validated[Seq[MtdError], Unit] = {
     if (finalised) {
-      Valid(finalised)
+      Valid(())
     } else {
       Invalid(List(FinalisedFormatError))
     }

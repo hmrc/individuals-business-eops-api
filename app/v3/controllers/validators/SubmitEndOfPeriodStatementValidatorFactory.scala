@@ -25,12 +25,12 @@ import play.api.libs.json.JsValue
 import v3.controllers.validators.SubmitEndOfPeriodStatementRulesValidator.validateBusinessRules
 import v3.models.request.{SubmitEndOfPeriodRequestBody, SubmitEndOfPeriodStatementRequestData}
 
-import scala.annotation.nowarn
+import javax.inject.Singleton
 
+@Singleton
 class SubmitEndOfPeriodStatementValidatorFactory {
 
-  @nowarn("cat=lint-byname-implicit")
-  private val resolveJson = new ResolveNonEmptyJsonObject[SubmitEndOfPeriodRequestBody]()
+  private val resolveJson = new ResolveJsonObject[SubmitEndOfPeriodRequestBody]()
 
   def validator(nino: String, body: JsValue): Validator[SubmitEndOfPeriodStatementRequestData] =
     new Validator[SubmitEndOfPeriodStatementRequestData] {

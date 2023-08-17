@@ -25,7 +25,7 @@ import v3.services.SubmitEndOfPeriodStatementService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockSubmitEndOfPeriodRequestBodyRequestBodyStatementService extends MockFactory {
+trait MockSubmitEndOfPeriodStatementService extends MockFactory {
 
   val mockSubmitEndOfPeriodStatementService: SubmitEndOfPeriodStatementService = mock[SubmitEndOfPeriodStatementService]
 
