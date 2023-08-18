@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package api.controllers.validators.resolvers
+package api.models.domain
 
-import api.models.downstream.TypeOfBusiness
-import api.models.errors.{MtdError, TypeOfBusinessFormatError}
-import cats.data.Validated
-import cats.data.Validated.{Invalid, Valid}
+import play.api.libs.json.Json
+import support.UnitSpec
 
-object ResolveTypeOfBusiness extends Resolver[String, String] {
+class EmptyJsonBodySpec extends UnitSpec {
 
-  def apply(value: String, unusedError: Option[MtdError], path: Option[String]): Validated[Seq[MtdError], String] = {
-    if (TypeOfBusiness.parser.isDefinedAt(value)) {
-      Valid(value)
-    } else {
-      Invalid(List(TypeOfBusinessFormatError.maybeWithExtraPath(path)))
+  "EmptyJsonBody.writes" should {
+    "return an empty JSON body" when {
+      "called" in {
+        val json = EmptyJsonBody
+        Json.toJson(json)(EmptyJsonBody.writes) shouldBe Json.obj()
+      }
     }
   }
 

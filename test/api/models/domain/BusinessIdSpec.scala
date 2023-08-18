@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package api.controllers.validators.validations
+package api.models.domain
 
-import api.models.errors.{FinalisedFormatError, MtdError}
+import support.UnitSpec
 
-object FinalisedValidation extends Validation {
+class BusinessIdSpec extends UnitSpec {
 
-  def apply(finalised: Boolean): Seq[MtdError] =
-    if (finalised)
-      NoValidationErrors
-    else
-      List(FinalisedFormatError)
+  "toString" should {
+    "return the BusinessId value" in {
+      val businessId = BusinessId("some id")
+      businessId.toString shouldBe "some id"
+    }
+  }
 
 }

@@ -16,19 +16,15 @@
 
 package api.models.domain
 
-import play.api.libs.json.Format
-import utils.enums.Enums
+import support.UnitSpec
 
-sealed trait Status {}
+class CalculationIdSpec extends UnitSpec {
 
-//noinspection ScalaStyle
-object Status {
+  "toString" should {
+    "return the CalculationId value" in {
+      val calculationId = CalculationId("some id")
+      calculationId.toString shouldBe "some id"
+    }
+  }
 
-  case object `valid` extends Status
-
-  case object `invalid` extends Status
-
-  case object `superseded` extends Status
-
-  implicit val format: Format[Status] = Enums.format[Status]
 }

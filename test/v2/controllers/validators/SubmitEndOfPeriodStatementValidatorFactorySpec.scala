@@ -163,10 +163,10 @@ class SubmitEndOfPeriodStatementValidatorFactorySpec extends UnitSpec {
             BadRequestError,
             Some(
               List(
-                BusinessIdFormatError,
                 StartDateFormatError,
+                FinalisedFormatError,
                 EndDateFormatError,
-                FinalisedFormatError
+                BusinessIdFormatError
               ))
           ))
       }

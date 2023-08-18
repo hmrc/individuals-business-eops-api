@@ -19,7 +19,7 @@ package v3.controllers.validators
 import api.controllers.validators.Validator
 import api.controllers.validators.resolvers._
 import api.models.downstream.TypeOfBusiness
-import api.models.errors.{FinalisedFormatError, MtdError, RuleIncorrectOrEmptyBodyError, TypeOfBusinessFormatError}
+import api.models.errors.{FinalisedFormatError, MtdError, TypeOfBusinessFormatError}
 import cats.data.Validated
 import cats.data.Validated._
 import cats.implicits._
@@ -54,7 +54,7 @@ class SubmitEndOfPeriodStatementValidatorFactory {
             Left(List(TypeOfBusinessFormatError))
 
           case _: JsError =>
-            Left(List(RuleIncorrectOrEmptyBodyError))
+            Right(())
         }
 
         Validated.fromEither(either)
@@ -64,7 +64,7 @@ class SubmitEndOfPeriodStatementValidatorFactory {
 
   private def validateMore(parsed: SubmitEndOfPeriodStatementRequestData): Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] = {
     import parsed.body._
-    (
+    List(
       ResolveBusinessId(businessId),
       ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
       validateFinalised(finalised)
