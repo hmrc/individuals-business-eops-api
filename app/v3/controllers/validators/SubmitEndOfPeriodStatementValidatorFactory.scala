@@ -18,11 +18,12 @@ package v3.controllers.validators
 
 import api.controllers.validators.Validator
 import api.controllers.validators.resolvers._
-import api.models.errors.MtdError
+import api.models.downstream.TypeOfBusiness
+import api.models.errors.{FinalisedFormatError, MtdError, RuleIncorrectOrEmptyBodyError, TypeOfBusinessFormatError}
 import cats.data.Validated
+import cats.data.Validated._
 import cats.implicits._
-import play.api.libs.json.JsValue
-import v3.controllers.validators.SubmitEndOfPeriodStatementRulesValidator.validateBusinessRules
+import play.api.libs.json._
 import v3.models.request.{SubmitEndOfPeriodRequestBody, SubmitEndOfPeriodStatementRequestData}
 
 import javax.inject.Singleton
@@ -36,11 +37,49 @@ class SubmitEndOfPeriodStatementValidatorFactory {
     new Validator[SubmitEndOfPeriodStatementRequestData] {
 
       def validate: Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] =
-        (
-          ResolveNino(nino),
-          resolveJson(body)
-        ).mapN(SubmitEndOfPeriodStatementRequestData) andThen validateBusinessRules
+        validateTypeOfBusiness andThen { _ =>
+          (
+            ResolveNino(nino),
+            resolveJson(body)
+          )
+            .mapN(SubmitEndOfPeriodStatementRequestData) andThen validateMore
+        }
+
+      private def validateTypeOfBusiness: Validated[Seq[MtdError], Unit] = {
+        val either = (body \ "typeOfBusiness").validate[String] match {
+          case JsSuccess(typeOfBusiness, _) if TypeOfBusiness.parser.isDefinedAt(typeOfBusiness) =>
+            Right(())
+
+          case JsSuccess(_, _) =>
+            Left(List(TypeOfBusinessFormatError))
+
+          case _: JsError =>
+            Left(List(RuleIncorrectOrEmptyBodyError))
+        }
+
+        Validated.fromEither(either)
+      }
 
     }
+
+  private def validateMore(parsed: SubmitEndOfPeriodStatementRequestData): Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] = {
+    import parsed.body._
+    (
+      ResolveBusinessId(businessId),
+      ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
+      validateFinalised(finalised)
+    )
+      .traverse(identity)
+      .map(_ => parsed)
+
+  }
+
+  private def validateFinalised(finalised: Boolean): Validated[Seq[MtdError], Unit] = {
+    if (finalised) {
+      Valid(())
+    } else {
+      Invalid(List(FinalisedFormatError))
+    }
+  }
 
 }
