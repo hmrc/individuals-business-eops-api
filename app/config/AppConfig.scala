@@ -60,7 +60,6 @@ trait AppConfig {
   def apiGatewayContext: String
   def confidenceLevelConfig: ConfidenceLevelConfig
   def apiStatus(version: Version): String
-  def isApiDeprecated(version: Version): Boolean = apiStatus(version) == "DEPRECATED"
   def featureSwitches: Configuration
   def endpointsEnabled(version: Version): Boolean
 

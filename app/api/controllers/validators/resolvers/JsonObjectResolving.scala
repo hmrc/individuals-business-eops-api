@@ -33,10 +33,9 @@ trait JsonObjectResolving[T] extends Logging {
       case jsObj: JsObject =>
         jsObj.validate[T] match {
           case JsSuccess(parsed, _) => Valid(parsed)
-          case JsError(errors) => {
+          case JsError(errors) =>
             val immutableErrors = errors.map { case (path, errors) => (path, errors.toList) }.toList
             Invalid(handleErrors(immutableErrors))
-          }
         }
 
       case _ =>
@@ -61,7 +60,7 @@ trait JsonObjectResolving[T] extends Logging {
       .groupBy(_.getClass)
       .values
       .map(failure => s"${failure.head.failureReason}: " + s"${failure.map(_.fromJsPath)}")
-      .toString()
+      .toString
       .dropRight(1)
       .drop(5)
 

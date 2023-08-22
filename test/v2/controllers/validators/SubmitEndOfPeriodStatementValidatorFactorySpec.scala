@@ -129,7 +129,7 @@ class SubmitEndOfPeriodStatementValidatorFactorySpec extends UnitSpec {
         )
       }
 
-      "an invalid start date before end date is supplied" in {
+      "an invalid end date before start date is supplied" in {
         val result: Either[ErrorWrapper, SubmitEndOfPeriodStatementRequestData] =
           validator(
             validNino,

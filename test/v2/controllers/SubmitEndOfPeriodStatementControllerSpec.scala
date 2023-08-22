@@ -22,7 +22,6 @@ import api.models.errors.{ErrorWrapper, NinoFormatError, RuleTaxYearNotSupported
 import api.models.outcomes.ResponseWrapper
 import mocks.MockAppConfig
 import play.api.mvc.Result
-import routing.Version2
 import v2.controllers.validators.MockSubmitEndOfPeriodStatementValidatorFactory
 import v2.data.SubmitEndOfPeriodStatementData.{jsonRequestBody, validRequest}
 import v2.mocks.services._
@@ -96,8 +95,6 @@ class SubmitEndOfPeriodStatementControllerSpec
     )
 
     protected def callController(): Future[Result] = controller.handleRequest(nino)(fakeRequest.withBody(jsonRequestBody()))
-
-    MockAppConfig.isApiDeprecated(Version2) returns false
 
   }
 

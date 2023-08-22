@@ -47,39 +47,34 @@ class SubmitEndOfPeriodStatementValidatorFactory {
 
       private def validateTypeOfBusiness: Validated[Seq[MtdError], Unit] = {
         val either = (body \ "typeOfBusiness").validate[String] match {
-          case JsSuccess(typeOfBusiness, _) if TypeOfBusiness.parser.isDefinedAt(typeOfBusiness) =>
-            Right(())
-
-          case JsSuccess(_, _) =>
-            Left(List(TypeOfBusinessFormatError))
-
-          case _: JsError =>
-            Right(())
+          case JsSuccess(typeOfBusiness, _) if TypeOfBusiness.parser.isDefinedAt(typeOfBusiness) => Right(())
+          case JsSuccess(_, _)                                                                   => Left(List(TypeOfBusinessFormatError))
+          case _: JsError                                                                        => Right(())
         }
 
         Validated.fromEither(either)
       }
 
+      private def validateMore(parsed: SubmitEndOfPeriodStatementRequestData): Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] = {
+        import parsed.body._
+        List(
+          ResolveBusinessId(businessId),
+          ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
+          validateFinalised(finalised)
+        )
+          .traverse(identity)
+          .map(_ => parsed)
+
+      }
+
+      private def validateFinalised(finalised: Boolean): Validated[Seq[MtdError], Unit] = {
+        if (finalised) {
+          Valid(())
+        } else {
+          Invalid(List(FinalisedFormatError))
+        }
+      }
+
     }
-
-  private def validateMore(parsed: SubmitEndOfPeriodStatementRequestData): Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] = {
-    import parsed.body._
-    List(
-      ResolveBusinessId(businessId),
-      ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
-      validateFinalised(finalised)
-    )
-      .traverse(identity)
-      .map(_ => parsed)
-
-  }
-
-  private def validateFinalised(finalised: Boolean): Validated[Seq[MtdError], Unit] = {
-    if (finalised) {
-      Valid(())
-    } else {
-      Invalid(List(FinalisedFormatError))
-    }
-  }
 
 }
