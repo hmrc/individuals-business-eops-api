@@ -21,7 +21,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v3.connectors.SubmitEndOfPeriodStatementConnector
-import v3.models.request.SubmitEndOfPeriodStatementRequest
+import v3.models.request.SubmitEndOfPeriodStatementRequestData
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,9 +32,9 @@ trait MockSubmitEndOfPeriodStatementConnector extends MockFactory {
   object MockSubmitEndOfPeriodStatementConnector {
 
     def submitEndOfPeriodStatement(
-        submitEndOfPeriodStatementRequest: SubmitEndOfPeriodStatementRequest): CallHandler[Future[DownstreamOutcome[Unit]]] = {
+        submitEndOfPeriodStatementRequest: SubmitEndOfPeriodStatementRequestData): CallHandler[Future[DownstreamOutcome[Unit]]] = {
       (connector
-        .submitPeriodStatement(_: SubmitEndOfPeriodStatementRequest)(_: HeaderCarrier, _: ExecutionContext, _: String))
+        .submitPeriodStatement(_: SubmitEndOfPeriodStatementRequestData)(_: HeaderCarrier, _: ExecutionContext, _: String))
         .expects(submitEndOfPeriodStatementRequest, *, *, *)
     }
 

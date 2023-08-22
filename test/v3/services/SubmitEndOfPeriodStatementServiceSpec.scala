@@ -22,7 +22,7 @@ import api.models.outcomes.ResponseWrapper
 import api.services.ServiceSpec
 import v3.data.SubmitEndOfPeriodStatementData.validRequest
 import v3.mocks.connectors.MockSubmitEndOfPeriodStatementConnector
-import v3.models.request.SubmitEndOfPeriodStatementRequest
+import v3.models.request.SubmitEndOfPeriodStatementRequestData
 
 import scala.concurrent.Future
 
@@ -34,7 +34,7 @@ class SubmitEndOfPeriodStatementServiceSpec extends ServiceSpec {
     val service = new SubmitEndOfPeriodStatementService(connector)
   }
 
-  val requestData: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
+  val requestData: SubmitEndOfPeriodStatementRequestData = SubmitEndOfPeriodStatementRequestData(Nino(nino), validRequest)
 
   "service" when {
     "service call successful" must {

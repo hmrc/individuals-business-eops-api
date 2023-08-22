@@ -18,7 +18,7 @@ package v3.services
 
 import uk.gov.hmrc.http.HeaderCarrier
 import v3.connectors.NrsProxyConnector
-import v3.models.request.SubmitEndOfPeriod
+import v3.models.request.SubmitEndOfPeriodRequestBody
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class NrsProxyService @Inject() (val connector: NrsProxyConnector) {
 
-  def submit(nino: String, body: SubmitEndOfPeriod)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def submit(nino: String, body: SubmitEndOfPeriodRequestBody)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
 
     connector.submit(nino, body)
   }

@@ -20,12 +20,12 @@ import api.controllers.{ControllerBaseSpec, ControllerTestRunner}
 import api.models.domain.Nino
 import api.models.errors.{ErrorWrapper, NinoFormatError, RuleTaxYearNotSupportedError}
 import api.models.outcomes.ResponseWrapper
-import api.models.request.NinoAndJsonBodyRawData
-import play.api.mvc.{AnyContentAsJson, Result}
-import v2.data.SubmitEndOfPeriodStatementData._
+import mocks.MockAppConfig
+import play.api.mvc.Result
+import v2.controllers.validators.MockSubmitEndOfPeriodStatementValidatorFactory
+import v2.data.SubmitEndOfPeriodStatementData.{jsonRequestBody, validRequest}
 import v2.mocks.services._
-import v2.mocks.validators.MockSubmitEndOfPeriodStatementValidator
-import v2.models.request.SubmitEndOfPeriodStatementRequest
+import v2.models.request.{SubmitEndOfPeriodRequestBody, SubmitEndOfPeriodStatementRequestData}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,35 +33,19 @@ import scala.concurrent.Future
 class SubmitEndOfPeriodStatementControllerSpec
     extends ControllerBaseSpec
     with ControllerTestRunner
-    with MockSubmitEndOfPeriodStatementValidator
+    with MockSubmitEndOfPeriodStatementValidatorFactory
     with MockNrsProxyService
-    with MockSubmitEndOfPeriodStatementService {
+    with MockSubmitEndOfPeriodStatementService
+    with MockAppConfig {
 
-  private val rawData     = NinoAndJsonBodyRawData(nino, AnyContentAsJson(jsonRequestBody()))
-  private val requestData = SubmitEndOfPeriodStatementRequest(Nino(nino), validRequest)
+  private val requestBody: SubmitEndOfPeriodRequestBody = jsonRequestBody(typeOfBusiness = "foreign-property").as[SubmitEndOfPeriodRequestBody]
 
-  trait Test extends ControllerTest {
-
-    val controller = new SubmitEndOfPeriodStatementController(
-      authService = mockEnrolmentsAuthService,
-      lookupService = mockMtdIdLookupService,
-      validator = mockSubmitEndOfPeriodStatementValidator,
-      nrsProxyService = mockNrsProxyService,
-      service = mockSubmitEndOfPeriodStatementService,
-      cc = cc,
-      idGenerator = mockIdGenerator
-    )
-
-    protected def callController(): Future[Result] = controller.handleRequest(nino)(fakeRequest.withBody(jsonRequestBody()))
-
-  }
+  private val requestData: SubmitEndOfPeriodStatementRequestData = SubmitEndOfPeriodStatementRequestData(Nino(nino), requestBody)
 
   "handleRequest" should {
     "return NO_CONTENT" when {
       "happy path" in new Test {
-        MockedSubmitEndOfPeriodStatementValidator
-          .parseAndValidateRequest(rawData)
-          .returns(Right(requestData))
+        willUseValidator(returningSuccess(requestData))
 
         MockNrsProxyService
           .submit(nino, validRequest)
@@ -77,17 +61,13 @@ class SubmitEndOfPeriodStatementControllerSpec
 
     "return the error as per the spec" when {
       "the parser validation fails" in new Test {
-        MockedSubmitEndOfPeriodStatementValidator
-          .parseAndValidateRequest(rawData)
-          .returns(Left(ErrorWrapper(correlationId, NinoFormatError, None)))
+        willUseValidator(returning(NinoFormatError))
 
         runErrorTest(NinoFormatError)
       }
 
       "the service returns an error" in new Test {
-        MockedSubmitEndOfPeriodStatementValidator
-          .parseAndValidateRequest(rawData)
-          .returns(Right(requestData))
+        willUseValidator(returningSuccess(requestData))
 
         MockNrsProxyService
           .submit(nino, validRequest)
@@ -100,6 +80,22 @@ class SubmitEndOfPeriodStatementControllerSpec
         runErrorTest(RuleTaxYearNotSupportedError)
       }
     }
+  }
+
+  trait Test extends ControllerTest {
+
+    val controller = new SubmitEndOfPeriodStatementController(
+      authService = mockEnrolmentsAuthService,
+      lookupService = mockMtdIdLookupService,
+      validatorFactory = mockSubmitEndOfPeriodStatementValidatorFactory,
+      nrsProxyService = mockNrsProxyService,
+      service = mockSubmitEndOfPeriodStatementService,
+      cc = cc,
+      idGenerator = mockIdGenerator
+    )
+
+    protected def callController(): Future[Result] = controller.handleRequest(nino)(fakeRequest.withBody(jsonRequestBody()))
+
   }
 
 }

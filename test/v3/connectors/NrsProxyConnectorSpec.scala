@@ -19,7 +19,7 @@ package v3.connectors
 import api.connectors.ConnectorSpec
 import api.models.downstream.TypeOfBusiness.`foreign-property`
 import mocks.{MockAppConfig, MockHttpClient}
-import v3.models.request.{AccountingPeriod, SubmitEndOfPeriod}
+import v3.models.request.{AccountingPeriod, SubmitEndOfPeriodRequestBody}
 
 import scala.concurrent.Future
 
@@ -27,7 +27,7 @@ class NrsProxyConnectorSpec extends ConnectorSpec {
 
   val nino: String = "AA123456A"
 
-  val submitEndOfPeriodRequestBody: SubmitEndOfPeriod = SubmitEndOfPeriod(
+  val submitEndOfPeriodRequestBody: SubmitEndOfPeriodRequestBody = SubmitEndOfPeriodRequestBody(
     typeOfBusiness = `foreign-property`,
     businessId = "XAIS12345678910",
     accountingPeriod = AccountingPeriod(startDate = "2021-04-06", endDate = "2022-04-05"),

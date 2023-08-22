@@ -16,38 +16,22 @@
 
 package api.models.errors
 
+import play.api.http.Status.BAD_REQUEST
 import play.api.libs.json.Json
 import support.UnitSpec
 
 class MtdErrorSpec extends UnitSpec {
 
-  "MtdError" when {
-
-    "written to JSON" should {
-      "produce the expected JsObject" in {
-        NinoFormatError.asJson shouldBe Json.parse(
-          """
-            |{
-            |   "code": "FORMAT_NINO",
-            |   "message": "The provided NINO is invalid"
-            |}
-      """.stripMargin
-        )
-      }
-    }
-
-    "written to JSON with and errorId" should {
-      "produce the expected JsObject" in {
-        RuleBusinessValidationFailure("Some message", "someId").asJson shouldBe Json.parse(
-          """
-            |{
-            |   "code": "RULE_BUSINESS_VALIDATION_FAILURE",
-            |   "message": "Some message",
-            |   "errorId": "someId"
-            |}
-      """.stripMargin
-        )
-      }
+  "writes" should {
+    "generate the correct JSON" in {
+      Json.toJson(MtdError("CODE", "some message", BAD_REQUEST)) shouldBe Json.parse(
+        """
+          |{
+          |   "code": "CODE",
+          |   "message": "some message"
+          |}
+        """.stripMargin
+      )
     }
   }
 

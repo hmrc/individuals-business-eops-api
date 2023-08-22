@@ -24,7 +24,7 @@ import api.models.outcomes.ResponseWrapper
 import org.scalamock.handlers.CallHandler
 import play.api.libs.json.JsObject
 import v3.data.SubmitEndOfPeriodStatementData._
-import v3.models.request.SubmitEndOfPeriodStatementRequest
+import v3.models.request.SubmitEndOfPeriodStatementRequestData
 
 import scala.concurrent.Future
 
@@ -43,12 +43,12 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       appConfig = mockAppConfig
     )
 
-    val request: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(
+    val request: SubmitEndOfPeriodStatementRequestData = SubmitEndOfPeriodStatementRequestData(
       nino = Nino(nino),
       validRequest
     )
 
-    val tysRequest: SubmitEndOfPeriodStatementRequest = SubmitEndOfPeriodStatementRequest(
+    val tysRequest: SubmitEndOfPeriodStatementRequestData = SubmitEndOfPeriodStatementRequestData(
       nino = Nino(nino),
       validTysRequest
     )

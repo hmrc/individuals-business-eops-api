@@ -18,14 +18,25 @@ package api.models.errors
 
 import play.api.http.Status._
 
-object TypeOfBusinessFormatError       extends MtdError("FORMAT_TYPE_OF_BUSINESS", "The provided type of business is invalid", BAD_REQUEST)
-object BusinessIdFormatError           extends MtdError("FORMAT_BUSINESS_ID", "The provided Business ID is invalid", BAD_REQUEST)
-object StartDateFormatError            extends MtdError("FORMAT_START_DATE", "The provided Start date is invalid", BAD_REQUEST)
-object EndDateFormatError              extends MtdError("FORMAT_END_DATE", "The provided End date is invalid", BAD_REQUEST)
-object RuleEndDateBeforeStartDateError extends MtdError("RULE_END_DATE_BEFORE_START_DATE", "The End date must be after the Start date", BAD_REQUEST)
-object NinoFormatError                 extends MtdError("FORMAT_NINO", "The provided NINO is invalid", BAD_REQUEST)
-object TaxYearFormatError              extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid", BAD_REQUEST)
-object FinalisedFormatError            extends MtdError("FORMAT_FINALISED", "Finalised must be set to `true`", BAD_REQUEST)
+object TypeOfBusinessFormatError extends MtdError("FORMAT_TYPE_OF_BUSINESS", "The provided type of business is invalid", BAD_REQUEST)
+object BusinessIdFormatError     extends MtdError("FORMAT_BUSINESS_ID", "The provided Business ID is invalid", BAD_REQUEST)
+object StartDateFormatError      extends MtdError("FORMAT_START_DATE", "The provided Start date is invalid", BAD_REQUEST)
+object EndDateFormatError        extends MtdError("FORMAT_END_DATE", "The provided End date is invalid", BAD_REQUEST)
+object NinoFormatError           extends MtdError("FORMAT_NINO", "The provided NINO is invalid", BAD_REQUEST)
+object TaxYearFormatError        extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid", BAD_REQUEST)
+object FinalisedFormatError      extends MtdError("FORMAT_FINALISED", "Finalised must be set to `true`", BAD_REQUEST)
+object CalculationIdFormatError  extends MtdError("FORMAT_CALCULATION_ID", "The provided calculation ID is invalid", BAD_REQUEST)
+object CountryCodeFormatError    extends MtdError("FORMAT_COUNTRY_CODE", "The provided Country code is invalid", BAD_REQUEST)
+
+object ValueFormatError extends MtdError("FORMAT_VALUE", "The value must be between 0 and 99999999999.99", BAD_REQUEST) {
+
+  def forPathAndRange(path: String, min: String, max: String): MtdError =
+    ValueFormatError.copy(paths = Some(Seq(path)), message = s"The value must be between $min and $max")
+
+}
+
+object InvalidTaxYearParameterError
+    extends MtdError(code = "INVALID_TAX_YEAR_PARAMETER", message = "A tax year before 2023-24 was supplied", BAD_REQUEST)
 
 // Rule Errors
 object RuleTaxYearRangeInvalid
@@ -58,6 +69,10 @@ object RuleBusinessValidationFailure {
 
 object RuleBusinessValidationFailureTys
     extends MtdError("RULE_BUSINESS_VALIDATION_FAILURE", "There are business validation rule failures.", BAD_REQUEST)
+
+object RuleEndDateBeforeStartDateError extends MtdError("RULE_END_DATE_BEFORE_START_DATE", "The End date must be after the Start date", BAD_REQUEST)
+
+object RuleCountryCodeError extends MtdError("RULE_COUNTRY_CODE", "The country code is not a valid ISO 3166-1 alpha-3 country code", BAD_REQUEST)
 
 //Standard Errors
 object NotFoundError           extends MtdError("MATCHING_RESOURCE_NOT_FOUND", "Matching resource not found", NOT_FOUND)

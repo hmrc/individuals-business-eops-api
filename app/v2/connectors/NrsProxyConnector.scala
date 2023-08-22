@@ -18,7 +18,7 @@ package v2.connectors
 
 import config.AppConfig
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
-import v2.models.request.SubmitEndOfPeriod
+import v2.models.request.SubmitEndOfPeriodRequestBody
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,11 +26,11 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class NrsProxyConnector @Inject() (http: HttpClient, appConfig: AppConfig) {
 
-  def submit[T](nino: String, body: SubmitEndOfPeriod)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def submit[T](nino: String, body: SubmitEndOfPeriodRequestBody)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     implicit val readsEmpty: HttpReads[Unit] = (_: String, _: String, _: HttpResponse) => ()
 
     val url = s"${appConfig.mtdNrsProxyBaseUrl}/mtd-api-nrs-proxy/$nino/itsa-eops"
-    http.POST[SubmitEndOfPeriod, Unit](url, body)
+    http.POST[SubmitEndOfPeriodRequestBody, Unit](url, body)
   }
 
 }

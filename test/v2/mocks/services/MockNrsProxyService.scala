@@ -19,7 +19,7 @@ package v2.mocks.services
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.models.request.SubmitEndOfPeriod
+import v2.models.request.SubmitEndOfPeriodRequestBody
 import v2.services.NrsProxyService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,9 +30,9 @@ trait MockNrsProxyService extends MockFactory {
 
   object MockNrsProxyService {
 
-    def submit(nino: String, body: SubmitEndOfPeriod): CallHandler[Future[Unit]] = {
+    def submit(nino: String, body: SubmitEndOfPeriodRequestBody): CallHandler[Future[Unit]] = {
       (mockNrsProxyService
-        .submit(_: String, _: SubmitEndOfPeriod)(_: HeaderCarrier, _: ExecutionContext))
+        .submit(_: String, _: SubmitEndOfPeriodRequestBody)(_: HeaderCarrier, _: ExecutionContext))
         .expects(nino, *, *, *)
     }
 
