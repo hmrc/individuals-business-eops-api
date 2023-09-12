@@ -41,11 +41,7 @@ class SubmitEndOfPeriodStatementValidatorFactorySpec extends UnitSpec with MockA
 
   private val parsedValidSubmitEndOfPeriodBody = validSubmitEngOfPeriodJson.as[SubmitEndOfPeriodRequestBody]
 
-  val validatorFactory: SubmitEndOfPeriodStatementValidatorFactory = {
-    MockAppConfig.minimumFromDate returns 1900
-    MockAppConfig.maximumToDate returns 2100
-    new SubmitEndOfPeriodStatementValidatorFactory(mockAppConfig)
-  }
+  val validatorFactory: SubmitEndOfPeriodStatementValidatorFactory = new SubmitEndOfPeriodStatementValidatorFactory(mockAppConfig)
 
   private def validator(nino: String, body: JsValue) = validatorFactory.validator(nino, body)
 

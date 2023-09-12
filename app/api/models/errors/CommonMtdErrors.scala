@@ -20,8 +20,8 @@ import play.api.http.Status._
 
 object TypeOfBusinessFormatError extends MtdError("FORMAT_TYPE_OF_BUSINESS", "The provided type of business is invalid", BAD_REQUEST)
 object BusinessIdFormatError     extends MtdError("FORMAT_BUSINESS_ID", "The provided Business ID is invalid", BAD_REQUEST)
-object StartDateFormatError      extends MtdError("FORMAT_START_DATE", "The provided Start date is invalid", BAD_REQUEST)
-object EndDateFormatError        extends MtdError("FORMAT_END_DATE", "The provided End date is invalid", BAD_REQUEST)
+object StartDateFormatError      extends MtdError("FORMAT_START_DATE", "The provided Start date is invalid or before 1900", BAD_REQUEST)
+object EndDateFormatError        extends MtdError("FORMAT_END_DATE", "The provided End date is invalid or after 2100", BAD_REQUEST)
 object NinoFormatError           extends MtdError("FORMAT_NINO", "The provided NINO is invalid", BAD_REQUEST)
 object TaxYearFormatError        extends MtdError("FORMAT_TAX_YEAR", "The provided tax year is invalid", BAD_REQUEST)
 object FinalisedFormatError      extends MtdError("FORMAT_FINALISED", "Finalised must be set to `true`", BAD_REQUEST)

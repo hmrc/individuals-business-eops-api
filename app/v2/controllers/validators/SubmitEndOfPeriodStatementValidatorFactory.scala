@@ -33,10 +33,6 @@ import javax.inject.{Inject, Singleton}
 class SubmitEndOfPeriodStatementValidatorFactory @Inject() (appConfig: AppConfig) {
 
   private val resolveJson = new ResolveJsonObject[SubmitEndOfPeriodRequestBody]()
-  private lazy val minFromDate = appConfig.minimumFromDate
-  private lazy val maxToDate   = appConfig.maximumToDate
-  private lazy val resolveDateRange = ResolveDateRange(minFromDate, maxToDate)
-
   def validator(nino: String, body: JsValue): Validator[SubmitEndOfPeriodStatementRequestData] =
     new Validator[SubmitEndOfPeriodStatementRequestData] {
 
@@ -63,7 +59,7 @@ class SubmitEndOfPeriodStatementValidatorFactory @Inject() (appConfig: AppConfig
         import parsed.body._
         List(
           ResolveBusinessId(businessId),
-          resolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
+          ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
           validateFinalised(finalised)
         )
           .traverse(identity)

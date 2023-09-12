@@ -61,9 +61,6 @@ trait MockAppConfig extends MockFactory {
     // NRS Config
     def mtdNrsProxyBaseUrl: CallHandler[String] = (() => mockAppConfig.mtdNrsProxyBaseUrl).expects()
 
-    //Date validation ranges
-    def minimumFromDate: CallHandler[Int] = (() => mockAppConfig.minimumFromDate).expects().anyNumberOfTimes()
-    def maximumToDate:  CallHandler[Int] = (() => mockAppConfig.maximumToDate).expects().anyNumberOfTimes()
   }
 
 }

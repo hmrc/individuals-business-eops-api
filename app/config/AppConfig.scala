@@ -66,9 +66,6 @@ trait AppConfig {
   // NRS Config
   def mtdNrsProxyBaseUrl: String
 
-  //Date validation range
-  def minimumFromDate: Int
-  def maximumToDate:  Int
 }
 
 @Singleton
@@ -105,9 +102,6 @@ class AppConfigImpl @Inject() (config: ServicesConfig, configuration: Configurat
   // NRS Config
   val mtdNrsProxyBaseUrl: String = config.baseUrl("mtd-api-nrs-proxy")
 
-  //Date validation range
-  val minimumFromDate: Int   = config.getInt("date-ranges.minimum-from-date")
-  val maximumToDate: Int     = config.getInt("date-ranges.maximum-to-date")
 }
 
 case class ConfidenceLevelConfig(confidenceLevel: ConfidenceLevel, definitionEnabled: Boolean, authValidationEnabled: Boolean)

@@ -15,11 +15,11 @@ components:
         The format of the supplied accounting period start date is invalid
       value:
         code: FORMAT_START_DATE
-        message: The provided Start date is invalid
+        message: The provided Start date is invalid or before 1900
 
     formatEndDate:
       description: |
-        The format of the supplied accounting period end date is invalid
+        The format of the supplied accounting period end date is invalid or after 2100
       value:
         code: FORMAT_END_DATE
         message: The provided End date is invalid

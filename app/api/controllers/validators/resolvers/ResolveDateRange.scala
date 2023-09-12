@@ -25,18 +25,20 @@ import java.time.LocalDate
 
 case class DateRange(startDate: LocalDate, endDate: LocalDate)
 
-case class ResolveDateRange(minYear: Int, maxYear: Int) extends Resolver[(String, String), DateRange] {
+object ResolveDateRange extends Resolver[(String, String), DateRange] {
 
+  private val minYear : Int = 1900
+  private val maxYear : Int = 2100
 
   def apply(value: (String, String), notUsedError: Option[MtdError], path: Option[String]): Validated[Seq[MtdError], DateRange] = {
     val (startDate, endDate) = value
     (
       ResolveIsoDate(startDate, StartDateFormatError),
       ResolveIsoDate(endDate, EndDateFormatError)
-    ).mapN(resolveDateRange(minYear, maxYear)).andThen(identity)
+    ).mapN(resolveDateRange).andThen(identity)
   }
 
-  private def resolveDateRange(minYear: Int, maxYear: Int)(parsedStartDate: LocalDate, parsedEndDate: LocalDate): Validated[Seq[MtdError], DateRange] = {
+  private def resolveDateRange(parsedStartDate: LocalDate, parsedEndDate: LocalDate): Validated[Seq[MtdError], DateRange] = {
 
     if (parsedStartDate.getYear <= minYear) {
       return Invalid(List(StartDateFormatError))
