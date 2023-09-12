@@ -16,6 +16,7 @@
 
 package v2.controllers.validators
 
+import config.AppConfig
 import api.controllers.validators.Validator
 import api.controllers.validators.resolvers._
 import api.models.downstream.TypeOfBusiness
@@ -26,12 +27,15 @@ import cats.implicits._
 import play.api.libs.json._
 import v2.models.request.{SubmitEndOfPeriodRequestBody, SubmitEndOfPeriodStatementRequestData}
 
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 
 @Singleton
-class SubmitEndOfPeriodStatementValidatorFactory {
+class SubmitEndOfPeriodStatementValidatorFactory @Inject() (appConfig: AppConfig) {
 
   private val resolveJson = new ResolveJsonObject[SubmitEndOfPeriodRequestBody]()
+  private lazy val minFromDate = appConfig.minimumFromDate
+  private lazy val maxToDate   = appConfig.maximumToDate
+  private lazy val resolveDateRange = ResolveDateRange(minFromDate, maxToDate)
 
   def validator(nino: String, body: JsValue): Validator[SubmitEndOfPeriodStatementRequestData] =
     new Validator[SubmitEndOfPeriodStatementRequestData] {
@@ -59,7 +63,7 @@ class SubmitEndOfPeriodStatementValidatorFactory {
         import parsed.body._
         List(
           ResolveBusinessId(businessId),
-          ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
+          resolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
           validateFinalised(finalised)
         )
           .traverse(identity)

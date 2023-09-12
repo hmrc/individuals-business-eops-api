@@ -25,25 +25,33 @@ import java.time.LocalDate
 
 case class DateRange(startDate: LocalDate, endDate: LocalDate)
 
-object ResolveDateRange extends Resolver[(String, String), DateRange] {
+case class ResolveDateRange(minYear: Int, maxYear: Int) extends Resolver[(String, String), DateRange] {
+
 
   def apply(value: (String, String), notUsedError: Option[MtdError], path: Option[String]): Validated[Seq[MtdError], DateRange] = {
     val (startDate, endDate) = value
     (
       ResolveIsoDate(startDate, StartDateFormatError),
       ResolveIsoDate(endDate, EndDateFormatError)
-    ).mapN(resolveDateRange).andThen(identity)
+    ).mapN(resolveDateRange(minYear, maxYear)).andThen(identity)
   }
 
-  private def resolveDateRange(parsedStartDate: LocalDate, parsedEndDate: LocalDate): Validated[Seq[MtdError], DateRange] = {
-    val startDateEpochTime = parsedStartDate.toEpochDay
-    val endDateEpochTime   = parsedEndDate.toEpochDay
+  private def resolveDateRange(minYear: Int, maxYear: Int)(parsedStartDate: LocalDate, parsedEndDate: LocalDate): Validated[Seq[MtdError], DateRange] = {
 
-    if ((endDateEpochTime - startDateEpochTime) <= 0) {
-      Invalid(List(RuleEndDateBeforeStartDateError))
-    } else {
-      Valid(DateRange(parsedStartDate, parsedEndDate))
+    if (parsedStartDate.getYear <= minYear) {
+      return Invalid(List(StartDateFormatError))
+    } 
+    
+    if (parsedEndDate.getYear >= maxYear) {
+      return Invalid(List(EndDateFormatError))
     }
+    
+    if (parsedEndDate.isBefore(parsedStartDate)) {
+      return Invalid(List(RuleEndDateBeforeStartDateError))
+    }
+    
+    return Valid(DateRange(parsedStartDate, parsedEndDate))
+  
   }
 
 }
