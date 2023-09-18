@@ -16,21 +16,20 @@
 
 package v2.controllers.validators
 
-import config.AppConfig
 import api.controllers.validators.Validator
 import api.controllers.validators.resolvers._
 import api.models.downstream.TypeOfBusiness
-import api.models.errors.{FinalisedFormatError, MtdError, TypeOfBusinessFormatError}
+import api.models.errors._
 import cats.data.Validated
 import cats.data.Validated._
 import cats.implicits._
 import play.api.libs.json._
 import v2.models.request.{SubmitEndOfPeriodRequestBody, SubmitEndOfPeriodStatementRequestData}
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 
 @Singleton
-class SubmitEndOfPeriodStatementValidatorFactory @Inject() (appConfig: AppConfig) {
+class SubmitEndOfPeriodStatementValidatorFactory {
 
   private val resolveJson = new ResolveJsonObject[SubmitEndOfPeriodRequestBody]()
   def validator(nino: String, body: JsValue): Validator[SubmitEndOfPeriodStatementRequestData] =
@@ -60,6 +59,8 @@ class SubmitEndOfPeriodStatementValidatorFactory @Inject() (appConfig: AppConfig
         List(
           ResolveBusinessId(businessId),
           ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
+          ResolveStartDate(accountingPeriod.startDate),
+          ResolveEndDate(accountingPeriod.endDate),
           validateFinalised(finalised)
         )
           .traverse(identity)

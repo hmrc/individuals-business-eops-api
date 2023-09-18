@@ -27,9 +27,6 @@ case class DateRange(startDate: LocalDate, endDate: LocalDate)
 
 object ResolveDateRange extends Resolver[(String, String), DateRange] {
 
-  private val minYear : Int = 1900
-  private val maxYear : Int = 2100
-
   def apply(value: (String, String), notUsedError: Option[MtdError], path: Option[String]): Validated[Seq[MtdError], DateRange] = {
     val (startDate, endDate) = value
     (
@@ -39,21 +36,14 @@ object ResolveDateRange extends Resolver[(String, String), DateRange] {
   }
 
   private def resolveDateRange(parsedStartDate: LocalDate, parsedEndDate: LocalDate): Validated[Seq[MtdError], DateRange] = {
+    val startDateEpochTime = parsedStartDate.toEpochDay
+    val endDateEpochTime   = parsedEndDate.toEpochDay
 
-    if (parsedStartDate.getYear <= minYear) {
-      return Invalid(List(StartDateFormatError))
-    } 
-    
-    if (parsedEndDate.getYear >= maxYear) {
-      return Invalid(List(EndDateFormatError))
+    if ((endDateEpochTime - startDateEpochTime) <= 0) {
+      Invalid(List(RuleEndDateBeforeStartDateError))
+    } else {
+      Valid(DateRange(parsedStartDate, parsedEndDate))
     }
-    
-    if (parsedEndDate.isBefore(parsedStartDate)) {
-      return Invalid(List(RuleEndDateBeforeStartDateError))
-    }
-    
-    return Valid(DateRange(parsedStartDate, parsedEndDate))
-  
   }
 
 }

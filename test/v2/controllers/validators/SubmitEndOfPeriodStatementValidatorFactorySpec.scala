@@ -22,9 +22,8 @@ import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 import v2.data.SubmitEndOfPeriodStatementData._
 import v2.models.request.{SubmitEndOfPeriodRequestBody, SubmitEndOfPeriodStatementRequestData}
-import mocks.MockAppConfig
 
-class SubmitEndOfPeriodStatementValidatorFactorySpec extends UnitSpec with MockAppConfig {
+class SubmitEndOfPeriodStatementValidatorFactorySpec extends UnitSpec {
 
   private implicit val correlationId: String = "1234"
 
@@ -41,7 +40,7 @@ class SubmitEndOfPeriodStatementValidatorFactorySpec extends UnitSpec with MockA
 
   private val parsedValidSubmitEndOfPeriodBody = validSubmitEngOfPeriodJson.as[SubmitEndOfPeriodRequestBody]
 
-  val validatorFactory: SubmitEndOfPeriodStatementValidatorFactory = new SubmitEndOfPeriodStatementValidatorFactory(mockAppConfig)
+  val validatorFactory: SubmitEndOfPeriodStatementValidatorFactory = new SubmitEndOfPeriodStatementValidatorFactory()
 
   private def validator(nino: String, body: JsValue) = validatorFactory.validator(nino, body)
 

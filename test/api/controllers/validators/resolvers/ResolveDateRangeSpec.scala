@@ -46,20 +46,11 @@ class ResolveDateRangeSpec extends UnitSpec {
         result shouldBe Invalid(List(EndDateFormatError))
       }
 
-      "passed a valid start date that is below date-ranges.minYear" in {
-        val result = ResolveDateRange("1899-06-21" -> validEnd)
-        result shouldBe Invalid(List(StartDateFormatError))
-      }
+    }
 
-      "passed a valid end date that is above date-ranges.maxYear" in {
-        val result = ResolveDateRange(validStart -> "2124-06-21")
-        result shouldBe Invalid(List(EndDateFormatError))
-      }
-
-      "passed an end date before start date" in {
-        val result = ResolveDateRange(validEnd -> validStart)
-        result shouldBe Invalid(List(RuleEndDateBeforeStartDateError))
-      }
+    "passed an end date before start date" in {
+      val result = ResolveDateRange(validEnd -> validStart)
+      result shouldBe Invalid(List(RuleEndDateBeforeStartDateError))
     }
   }
 
