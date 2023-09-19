@@ -24,19 +24,22 @@ import java.time.LocalDate
 
 class ResolveStartDateSpec extends UnitSpec {
 
+  val minYear          = 1900
+  val resolveStartDate = new ResolveStartDate(minYear)
+
   "ResolveStartDateRange" should {
     "return no errors" when {
       "passed a start date of 1900" in {
         val inputDate = "1900-01-21"
         val expected  = Valid(LocalDate.parse(inputDate))
-        val result    = ResolveStartDate(inputDate)
+        val result    = resolveStartDate(inputDate)
         result shouldBe expected
       }
 
       "passed a start date after 1900" in {
         val inputDate = "2021-01-21"
         val expected  = Valid(LocalDate.parse(inputDate))
-        val result    = ResolveStartDate(inputDate)
+        val result    = resolveStartDate(inputDate)
         result shouldBe expected
       }
     }
@@ -45,7 +48,7 @@ class ResolveStartDateSpec extends UnitSpec {
 
       "passed a start date that is earlier than 1900" in {
         val inputDate = "1899-06-21"
-        val result    = ResolveStartDate(inputDate)
+        val result    = resolveStartDate(inputDate)
         result shouldBe Invalid(List(StartDateFormatError))
       }
     }

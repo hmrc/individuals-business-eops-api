@@ -23,20 +23,22 @@ import support.UnitSpec
 import java.time.LocalDate
 
 class ResolveEndDateSpec extends UnitSpec {
+  val maxYear        = 2100
+  val resolveEndDate = new ResolveEndDate(maxYear)
 
   "ResolveEndDateRange" should {
     "return no errors" when {
       "passed a end date of 2100" in {
         val inputDate = "2100-01-21"
         val expected  = Valid(LocalDate.parse(inputDate))
-        val result    = ResolveEndDate(inputDate)
+        val result    = resolveEndDate(inputDate)
         result shouldBe expected
       }
 
       "passed a end date before 2100" in {
         val inputDate = "2018-01-21"
         val expected  = Valid(LocalDate.parse(inputDate))
-        val result    = ResolveEndDate("2018-01-21")
+        val result    = resolveEndDate("2018-01-21")
         result shouldBe expected
       }
     }
@@ -44,7 +46,7 @@ class ResolveEndDateSpec extends UnitSpec {
     "return errors" when {
 
       "passed a end date that is later than 2100" in {
-        val result = ResolveEndDate("2201-06-21")
+        val result = resolveEndDate("2201-06-21")
         result shouldBe Invalid(List(EndDateFormatError))
       }
     }

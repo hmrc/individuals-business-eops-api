@@ -22,14 +22,14 @@ import cats.data.Validated.{Invalid, Valid}
 
 import java.time.LocalDate
 
-object ResolveEndDate extends Resolver[String, LocalDate] {
-  private val maxYear: Int = 2100
+class ResolveEndDate(maxYear: Int) extends Resolver[String, LocalDate] {
 
   override def apply(value: String, notUsedError: Option[MtdError], path: Option[String]): Validated[Seq[MtdError], LocalDate] = {
     ResolveIsoDate(value, EndDateFormatError)
       .map(validate)
       .andThen(identity)
   }
+
   def validate(date: LocalDate): Validated[List[MtdError], LocalDate] = {
     if (date.getYear > maxYear) {
       Invalid(List(EndDateFormatError))

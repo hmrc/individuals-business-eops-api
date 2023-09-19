@@ -22,8 +22,7 @@ import cats.data.Validated.{Invalid, Valid}
 
 import java.time.LocalDate
 
-object ResolveStartDate extends Resolver[String, LocalDate] {
-  private val minYear: Int = 1900
+class ResolveStartDate(minYear: Int) extends Resolver[String, LocalDate] {
 
   override def apply(value: String, notUsedError: Option[MtdError], path: Option[String]): Validated[Seq[MtdError], LocalDate] = {
     ResolveIsoDate(value, StartDateFormatError)
