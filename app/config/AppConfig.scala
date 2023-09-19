@@ -65,6 +65,7 @@ trait AppConfig {
 
   // NRS Config
   def mtdNrsProxyBaseUrl: String
+
 }
 
 @Singleton
@@ -100,6 +101,7 @@ class AppConfigImpl @Inject() (config: ServicesConfig, configuration: Configurat
 
   // NRS Config
   val mtdNrsProxyBaseUrl: String = config.baseUrl("mtd-api-nrs-proxy")
+
 }
 
 case class ConfidenceLevelConfig(confidenceLevel: ConfidenceLevel, definitionEnabled: Boolean, authValidationEnabled: Boolean)

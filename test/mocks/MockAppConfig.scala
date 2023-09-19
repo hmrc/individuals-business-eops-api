@@ -60,6 +60,7 @@ trait MockAppConfig extends MockFactory {
 
     // NRS Config
     def mtdNrsProxyBaseUrl: CallHandler[String] = (() => mockAppConfig.mtdNrsProxyBaseUrl).expects()
+
   }
 
 }

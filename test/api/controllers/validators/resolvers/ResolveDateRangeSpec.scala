@@ -46,10 +46,11 @@ class ResolveDateRangeSpec extends UnitSpec {
         result shouldBe Invalid(List(EndDateFormatError))
       }
 
-      "passed an end date before start date" in {
-        val result = ResolveDateRange(validEnd -> validStart)
-        result shouldBe Invalid(List(RuleEndDateBeforeStartDateError))
-      }
+    }
+
+    "passed an end date before start date" in {
+      val result = ResolveDateRange(validEnd -> validStart)
+      result shouldBe Invalid(List(RuleEndDateBeforeStartDateError))
     }
   }
 

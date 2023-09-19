@@ -31,6 +31,9 @@ import javax.inject.Singleton
 @Singleton
 class SubmitEndOfPeriodStatementValidatorFactory {
 
+  val resolveStartDate = new ResolveStartDate(minYear = 1900)
+  val resolveEndDate = new ResolveEndDate(maxYear = 2100)
+
   private val resolveJson = new ResolveJsonObject[SubmitEndOfPeriodRequestBody]()
 
   def validator(nino: String, body: JsValue): Validator[SubmitEndOfPeriodStatementRequestData] =
@@ -57,8 +60,11 @@ class SubmitEndOfPeriodStatementValidatorFactory {
 
       private def validateMore(parsed: SubmitEndOfPeriodStatementRequestData): Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] = {
         import parsed.body._
+
         List(
           ResolveBusinessId(businessId),
+          resolveStartDate(accountingPeriod.startDate),
+          resolveEndDate(accountingPeriod.endDate),
           ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
           validateFinalised(finalised)
         )

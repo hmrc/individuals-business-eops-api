@@ -24,12 +24,12 @@
       "description": "Object containing the accounting period start and end dates",
       "properties": {
         "startDate": {
-          "description": "The date the accounting period started. Must be in the format YYYY-MM-DD.",
+          "description": "The date the accounting period started. Must be in the format YYYY-MM-DD. (Our systems only accept dates between 1900-01-01 and 2100-01-01.)",
           "type": "string",
           "example": "2021-04-06"
         },
         "endDate": {
-          "description": "The date the accounting period ended. Must be in the format YYYY-MM-DD.",
+          "description": "The date the accounting period ended. Must be in the format YYYY-MM-DD. (Our systems only accept dates between 1900-01-01 and 2100-01-01.)",
           "type": "string",
           "example": "2022-04-05"
         }

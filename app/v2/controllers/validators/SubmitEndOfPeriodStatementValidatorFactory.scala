@@ -19,7 +19,7 @@ package v2.controllers.validators
 import api.controllers.validators.Validator
 import api.controllers.validators.resolvers._
 import api.models.downstream.TypeOfBusiness
-import api.models.errors.{FinalisedFormatError, MtdError, TypeOfBusinessFormatError}
+import api.models.errors._
 import cats.data.Validated
 import cats.data.Validated._
 import cats.implicits._
@@ -30,6 +30,9 @@ import javax.inject.Singleton
 
 @Singleton
 class SubmitEndOfPeriodStatementValidatorFactory {
+
+  val resolveStartDate = new ResolveStartDate(minYear = 1900)
+  val resolveEndDate   = new ResolveEndDate(maxYear = 2100)
 
   private val resolveJson = new ResolveJsonObject[SubmitEndOfPeriodRequestBody]()
 
@@ -57,9 +60,12 @@ class SubmitEndOfPeriodStatementValidatorFactory {
 
       private def validateMore(parsed: SubmitEndOfPeriodStatementRequestData): Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] = {
         import parsed.body._
+
         List(
           ResolveBusinessId(businessId),
           ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
+          resolveStartDate(accountingPeriod.startDate),
+          resolveEndDate(accountingPeriod.endDate),
           validateFinalised(finalised)
         )
           .traverse(identity)

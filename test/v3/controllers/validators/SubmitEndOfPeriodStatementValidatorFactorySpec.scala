@@ -40,7 +40,7 @@ class SubmitEndOfPeriodStatementValidatorFactorySpec extends UnitSpec {
 
   private val parsedValidSubmitEndOfPeriodBody = validSubmitEngOfPeriodJson.as[SubmitEndOfPeriodRequestBody]
 
-  val validatorFactory = new SubmitEndOfPeriodStatementValidatorFactory
+  val validatorFactory: SubmitEndOfPeriodStatementValidatorFactory = new SubmitEndOfPeriodStatementValidatorFactory()
 
   private def validator(nino: String, body: JsValue) = validatorFactory.validator(nino, body)
 
