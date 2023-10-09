@@ -70,7 +70,7 @@ object RuleBusinessValidationFailure {
 object RuleBusinessValidationFailureTys
     extends MtdError("RULE_BUSINESS_VALIDATION_FAILURE", "There are business validation rule failures.", BAD_REQUEST)
 
-object RuleEndDateBeforeStartDateError extends MtdError("RULE_END_DATE_BEFORE_START_DATE", "The End date must be after the Start date", BAD_REQUEST)
+object RuleEndBeforeStartDateError extends MtdError("RULE_END_DATE_BEFORE_START_DATE", "The End date must be after the Start date", BAD_REQUEST)
 
 object RuleCountryCodeError extends MtdError("RULE_COUNTRY_CODE", "The country code is not a valid ISO 3166-1 alpha-3 country code", BAD_REQUEST)
 

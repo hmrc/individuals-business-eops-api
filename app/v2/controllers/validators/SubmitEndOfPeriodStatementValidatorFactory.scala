@@ -31,8 +31,7 @@ import javax.inject.Singleton
 @Singleton
 class SubmitEndOfPeriodStatementValidatorFactory {
 
-  val resolveStartDate = new ResolveStartDate(minYear = 1900)
-  val resolveEndDate   = new ResolveEndDate(maxYear = 2100)
+  private val resolveDateRange = ResolveDateRange.withLimits(minYear = 1900, maxYear = 2100)
 
   private val resolveJson = new ResolveJsonObject[SubmitEndOfPeriodRequestBody]()
 
@@ -45,7 +44,7 @@ class SubmitEndOfPeriodStatementValidatorFactory {
             ResolveNino(nino),
             resolveJson(body)
           )
-            .mapN(SubmitEndOfPeriodStatementRequestData) andThen validateMore
+            .mapN(SubmitEndOfPeriodStatementRequestData) andThen validateParsedBody
         }
 
       private def validateTypeOfBusiness: Validated[Seq[MtdError], Unit] = {
@@ -58,14 +57,13 @@ class SubmitEndOfPeriodStatementValidatorFactory {
         Validated.fromEither(either)
       }
 
-      private def validateMore(parsed: SubmitEndOfPeriodStatementRequestData): Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] = {
+      private def validateParsedBody(
+          parsed: SubmitEndOfPeriodStatementRequestData): Validated[Seq[MtdError], SubmitEndOfPeriodStatementRequestData] = {
         import parsed.body._
 
         List(
           ResolveBusinessId(businessId),
-          ResolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
-          resolveStartDate(accountingPeriod.startDate),
-          resolveEndDate(accountingPeriod.endDate),
+          resolveDateRange(accountingPeriod.startDate -> accountingPeriod.endDate),
           validateFinalised(finalised)
         )
           .traverse(identity)
