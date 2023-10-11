@@ -60,12 +60,12 @@ trait JsonObjectResolving[T] extends Logging {
       .groupBy(_.getClass)
       .values
       .map(failure => s"${failure.head.failureReason}: " + s"${failure.map(_.fromJsPath)}")
-      .toString
+      .toString()
       .dropRight(1)
       .drop(5)
 
     logger.warn(s"Request body failed validation with errors - $logString")
-    List(RuleIncorrectOrEmptyBodyError.copy(paths = Some(failures.map(_.fromJsPath).sorted)))
+    List(RuleIncorrectOrEmptyBodyError.withPaths(failures.map(_.fromJsPath).sorted))
   }
 
   protected class JsonFormatValidationFailure(path: JsPath, failure: String) {

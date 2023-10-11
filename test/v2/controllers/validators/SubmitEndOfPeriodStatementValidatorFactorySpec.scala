@@ -139,7 +139,7 @@ class SubmitEndOfPeriodStatementValidatorFactorySpec extends UnitSpec {
             )).validateAndWrapResult()
 
         result shouldBe Left(
-          ErrorWrapper(correlationId, RuleEndDateBeforeStartDateError)
+          ErrorWrapper(correlationId, RuleEndBeforeStartDateError)
         )
       }
     }

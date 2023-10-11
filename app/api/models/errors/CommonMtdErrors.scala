@@ -39,8 +39,9 @@ object InvalidTaxYearParameterError
     extends MtdError(code = "INVALID_TAX_YEAR_PARAMETER", message = "A tax year before 2023-24 was supplied", BAD_REQUEST)
 
 // Rule Errors
-object RuleTaxYearRangeInvalid
-    extends MtdError("RULE_TAX_YEAR_RANGE_INVALID", "Tax year range invalid. A tax year range of one year is required", BAD_REQUEST)
+object RuleTaxYearRangeInvalidError extends MtdError("RULE_TAX_YEAR_RANGE_INVALID", "A tax year range of one year is required", BAD_REQUEST)
+
+object RuleTaxYearNotEndedError extends MtdError("RULE_TAX_YEAR_NOT_ENDED", "The specified tax year has not yet ended", BAD_REQUEST)
 
 object RuleTaxYearNotSupportedError
     extends MtdError("RULE_TAX_YEAR_NOT_SUPPORTED", "The tax year specified does not lie within the supported range", BAD_REQUEST)
@@ -70,7 +71,7 @@ object RuleBusinessValidationFailure {
 object RuleBusinessValidationFailureTys
     extends MtdError("RULE_BUSINESS_VALIDATION_FAILURE", "There are business validation rule failures.", BAD_REQUEST)
 
-object RuleEndDateBeforeStartDateError extends MtdError("RULE_END_DATE_BEFORE_START_DATE", "The End date must be after the Start date", BAD_REQUEST)
+object RuleEndBeforeStartDateError extends MtdError("RULE_END_DATE_BEFORE_START_DATE", "The End date must be after the Start date", BAD_REQUEST)
 
 object RuleCountryCodeError extends MtdError("RULE_COUNTRY_CODE", "The country code is not a valid ISO 3166-1 alpha-3 country code", BAD_REQUEST)
 
