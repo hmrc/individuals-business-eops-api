@@ -60,7 +60,7 @@ trait JsonObjectResolving[T] extends Logging {
       .groupBy(_.getClass)
       .values
       .map(failure => s"${failure.head.failureReason}: " + s"${failure.map(_.fromJsPath)}")
-      .toString
+      .toString()
       .dropRight(1)
       .drop(5)
 
