@@ -34,21 +34,10 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
 
     "return a 204 status code" when {
 
-      "any valid request is made with a successful NRS call in a Tax Year Specific tax year" in new TysIfsTest {
-        val nrsSuccess: JsValue = Json.parse(
-          s"""
-             |{
-             |  "nrSubmissionId":"2dd537bc-4244-4ebf-bac9-96321be13cdc",
-             |  "cadesTSignature":"30820b4f06092a864886f70111111111c0445c464",
-             |  "timestamp":""
-             |}
-         """.stripMargin
-        )
-
+      "any valid request is made in a Tax Year Specific tax year" in new TysIfsTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
-          NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
           DownstreamStub.onSuccess(DownstreamStub.POST, downstreamUri, ACCEPTED)
         }
 
@@ -57,33 +46,11 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
         response.header("X-CorrelationId").nonEmpty shouldBe true
       }
 
-      "any valid request is made with a failed NRS call in a Tax Year Specific tax year" in new TysIfsTest {
-
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          MtdIdLookupStub.ninoFound(nino)
-          NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, InternalError.message)
-        }
-
-        val response: WSResponse = await(request().post(validMtdRequestJson))
-        response.status shouldBe NO_CONTENT
-        response.header("X-CorrelationId").nonEmpty shouldBe true
-      }
     }
 
     "return a 400 status code" when {
 
       "any invalid request is made and downstream returns an error" in new TysIfsTest {
-        val nrsSuccess: JsValue = Json.parse(
-          s"""
-             |{
-             |  "nrSubmissionId":"2dd537bc-4244-4ebf-bac9-96321be13cdc",
-             |  "cadesTSignature":"30820b4f06092a864886f70111111111c0445c464",
-             |  "timestamp":""
-             |}
-         """.stripMargin
-        )
-
         val downstreamResponse: String = s"""
           |{
           | "failures": [
@@ -101,7 +68,6 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
-          NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
           DownstreamStub.onError(DownstreamStub.POST, downstreamUri, BAD_REQUEST, downstreamResponse)
         }
 

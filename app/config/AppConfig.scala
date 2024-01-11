@@ -63,9 +63,6 @@ trait AppConfig {
   def featureSwitches: Configuration
   def endpointsEnabled(version: Version): Boolean
 
-  // NRS Config
-  def mtdNrsProxyBaseUrl: String
-
 }
 
 @Singleton
@@ -98,9 +95,6 @@ class AppConfigImpl @Inject() (config: ServicesConfig, configuration: Configurat
   def apiStatus(version: Version): String          = config.getString(s"api.${version.name}.status")
   def featureSwitches: Configuration               = configuration.getOptional[Configuration](s"feature-switch").getOrElse(Configuration.empty)
   def endpointsEnabled(version: Version): Boolean  = config.getBoolean(s"api.${version.name}.endpoints.enabled")
-
-  // NRS Config
-  val mtdNrsProxyBaseUrl: String = config.baseUrl("mtd-api-nrs-proxy")
 
 }
 
