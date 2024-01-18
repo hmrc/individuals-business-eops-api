@@ -58,9 +58,6 @@ trait MockAppConfig extends MockFactory {
     def confidenceLevelCheckEnabled: CallHandler[ConfidenceLevelConfig] =
       (() => mockAppConfig.confidenceLevelConfig).expects()
 
-    // NRS Config
-    def mtdNrsProxyBaseUrl: CallHandler[String] = (() => mockAppConfig.mtdNrsProxyBaseUrl).expects()
-
   }
 
 }

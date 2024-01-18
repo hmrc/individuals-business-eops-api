@@ -33,7 +33,6 @@ import scala.concurrent.ExecutionContext
 class SubmitEndOfPeriodStatementController @Inject() (val authService: EnrolmentsAuthService,
                                                       val lookupService: MtdIdLookupService,
                                                       val idGenerator: IdGenerator,
-                                                      nrsProxyService: NrsProxyService,
                                                       service: SubmitEndOfPeriodStatementService,
                                                       validatorFactory: SubmitEndOfPeriodStatementValidatorFactory,
                                                       cc: ControllerComponents)(implicit ec: ExecutionContext, appConfig: AppConfig)
@@ -52,10 +51,7 @@ class SubmitEndOfPeriodStatementController @Inject() (val authService: Enrolment
       val requestHandler =
         RequestHandler
           .withValidator(validator)
-          .withService { parsedRequest =>
-            nrsProxyService.submit(nino, parsedRequest.body)
-            service.submit(parsedRequest)
-          }
+          .withService(service.submit)
 
       requestHandler.handleRequest()
     }

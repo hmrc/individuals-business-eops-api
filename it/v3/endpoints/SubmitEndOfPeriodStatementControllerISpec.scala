@@ -33,22 +33,11 @@ class SubmitEndOfPeriodStatementControllerISpec extends V2IntegrationBaseSpec {
 
     "return a 204 status code" when {
 
-      "any valid request is made with a successful NRS call" in new Test {
-
-        val nrsSuccess: JsValue = Json.parse(
-          s"""
-             |{
-             |  "nrSubmissionId":"2dd537bc-4244-4ebf-bac9-96321be13cdc",
-             |  "cadesTSignature":"30820b4f06092a864886f70111111111c0445c464",
-             |  "timestamp":""
-             |}
-         """.stripMargin
-        )
+      "any valid request is made" in new Test {
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino)
-          NrsStub.onSuccess(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", ACCEPTED, nrsSuccess)
           DownstreamStub.onSuccess(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), NO_CONTENT)
         }
 
@@ -57,18 +46,6 @@ class SubmitEndOfPeriodStatementControllerISpec extends V2IntegrationBaseSpec {
         response.header("X-CorrelationId").nonEmpty shouldBe true
       }
 
-      "any valid request is made with a failed NRS call" in new Test {
-
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          MtdIdLookupStub.ninoFound(nino)
-          NrsStub.onError(NrsStub.POST, s"/mtd-api-nrs-proxy/$nino/itsa-eops", INTERNAL_SERVER_ERROR, InternalError.message)
-        }
-
-        val response: WSResponse = await(request().post(fullValidJson()))
-        response.status shouldBe NO_CONTENT
-        response.header("X-CorrelationId").nonEmpty shouldBe true
-      }
     }
 
     "return error according to spec" when {

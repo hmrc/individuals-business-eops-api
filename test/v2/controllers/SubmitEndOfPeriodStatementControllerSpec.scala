@@ -23,7 +23,7 @@ import api.models.outcomes.ResponseWrapper
 import mocks.MockAppConfig
 import play.api.mvc.Result
 import v2.controllers.validators.MockSubmitEndOfPeriodStatementValidatorFactory
-import v2.data.SubmitEndOfPeriodStatementData.{jsonRequestBody, validRequest}
+import v2.data.SubmitEndOfPeriodStatementData.jsonRequestBody
 import v2.mocks.services._
 import v2.models.request.{SubmitEndOfPeriodRequestBody, SubmitEndOfPeriodStatementRequestData}
 
@@ -34,7 +34,6 @@ class SubmitEndOfPeriodStatementControllerSpec
     extends ControllerBaseSpec
     with ControllerTestRunner
     with MockSubmitEndOfPeriodStatementValidatorFactory
-    with MockNrsProxyService
     with MockSubmitEndOfPeriodStatementService
     with MockAppConfig {
 
@@ -46,10 +45,6 @@ class SubmitEndOfPeriodStatementControllerSpec
     "return NO_CONTENT" when {
       "happy path" in new Test {
         willUseValidator(returningSuccess(requestData))
-
-        MockNrsProxyService
-          .submit(nino, validRequest)
-          .returns(Future.successful((): Unit))
 
         MockSubmitEndOfPeriodStatementService
           .submitEndOfPeriodStatementService(requestData)
@@ -69,10 +64,6 @@ class SubmitEndOfPeriodStatementControllerSpec
       "the service returns an error" in new Test {
         willUseValidator(returningSuccess(requestData))
 
-        MockNrsProxyService
-          .submit(nino, validRequest)
-          .returns(Future.successful((): Unit))
-
         MockSubmitEndOfPeriodStatementService
           .submitEndOfPeriodStatementService(requestData)
           .returns(Future.successful(Left(ErrorWrapper(correlationId, RuleTaxYearNotSupportedError))))
@@ -88,7 +79,6 @@ class SubmitEndOfPeriodStatementControllerSpec
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,
       validatorFactory = mockSubmitEndOfPeriodStatementValidatorFactory,
-      nrsProxyService = mockNrsProxyService,
       service = mockSubmitEndOfPeriodStatementService,
       cc = cc,
       idGenerator = mockIdGenerator
