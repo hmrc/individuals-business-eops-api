@@ -44,7 +44,7 @@ private[resolvers] class ResolveDateRange private (yearLimits: Option[YearLimits
     val startDateEpochTime = parsedStartDate.toEpochDay
     val endDateEpochTime   = parsedEndDate.toEpochDay
 
-    if ((endDateEpochTime - startDateEpochTime) <= 0) {
+    if ((endDateEpochTime - startDateEpochTime) < 0) {
       Invalid(List(RuleEndBeforeStartDateError))
     } else {
       Valid(DateRange(parsedStartDate, parsedEndDate))
