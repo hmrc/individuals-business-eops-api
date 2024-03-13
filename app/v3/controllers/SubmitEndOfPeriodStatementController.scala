@@ -21,7 +21,6 @@ import api.services.{EnrolmentsAuthService, MtdIdLookupService}
 import config.AppConfig
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
-import routing.{Version, Version3}
 import utils.IdGenerator
 import v3.controllers.validators.SubmitEndOfPeriodStatementValidatorFactory
 import v3.services._
@@ -44,7 +43,6 @@ class SubmitEndOfPeriodStatementController @Inject() (val authService: Enrolment
   def handleRequest(nino: String): Action[JsValue] =
     authorisedAction(nino).async(parse.json) { implicit request =>
       implicit val ctx: RequestContext = RequestContext.from(idGenerator, endpointLogContext)
-      implicit val version: Version    = Version.from(request, orElse = Version3)
 
       val validator = validatorFactory.validator(nino, request.body)
 
