@@ -179,7 +179,7 @@ class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec
     def request(): WSRequest = {
       setupStubs()
       buildRequest(mtdUri)
-        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123"))
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.3.0+json"), (AUTHORIZATION, "Bearer 123"))
     }
 
   }
