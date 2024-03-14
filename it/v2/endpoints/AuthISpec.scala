@@ -48,7 +48,7 @@ class AuthISpec extends V2IntegrationBaseSpec {
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri)
-        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.3.0+json"), (AUTHORIZATION, "Bearer 123")) // some bearer token))
+        .withHttpHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"), (AUTHORIZATION, "Bearer 123")) // some bearer token))
     }
 
     def errorBody(code: String, message: String): String =
