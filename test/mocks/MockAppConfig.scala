@@ -16,7 +16,8 @@
 
 package mocks
 
-import config.{AppConfig, ConfidenceLevelConfig}
+import cats.data.Validated
+import config.{AppConfig, ConfidenceLevelConfig, Deprecation}
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import play.api.Configuration
@@ -50,10 +51,12 @@ trait MockAppConfig extends MockFactory {
     def ifsEnvironmentHeaders: CallHandler[Option[Seq[String]]] = (() => mockAppConfig.ifsEnvironmentHeaders).expects()
 
     // API Config
-    def featureSwitches: CallHandler[Configuration]              = (() => mockAppConfig.featureSwitches).expects()
-    def apiGatewayContext: CallHandler[String]                   = (() => mockAppConfig.apiGatewayContext).expects()
-    def apiStatus(version: Version): CallHandler[String]         = (mockAppConfig.apiStatus(_: Version)).expects(version)
-    def endpointsEnabled(version: Version): CallHandler[Boolean] = (mockAppConfig.endpointsEnabled(_: Version)).expects(version)
+    def featureSwitches: CallHandler[Configuration]                                   = (() => mockAppConfig.featureSwitches).expects()
+    def apiGatewayContext: CallHandler[String]                                        = (() => mockAppConfig.apiGatewayContext).expects()
+    def apiStatus(version: Version): CallHandler[String]                              = (mockAppConfig.apiStatus(_: Version)).expects(version)
+    def endpointsEnabled(version: Version): CallHandler[Boolean]                      = (mockAppConfig.endpointsEnabled(_: Version)).expects(version)
+    def deprecationFor(version: Version): CallHandler[Validated[String, Deprecation]] = (mockAppConfig.deprecationFor(_: Version)).expects(version)
+    def apiDocumentationUrl(): CallHandler[String]                                    = (() => mockAppConfig.apiDocumentationUrl: String).expects()
 
     def confidenceLevelCheckEnabled: CallHandler[ConfidenceLevelConfig] =
       (() => mockAppConfig.confidenceLevelConfig).expects()
