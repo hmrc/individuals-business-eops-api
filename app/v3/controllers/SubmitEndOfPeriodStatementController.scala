@@ -16,11 +16,12 @@
 
 package v3.controllers
 
-import api.controllers.{AuthorisedController, EndpointLogContext, RequestContext, RequestHandler}
-import api.services.{EnrolmentsAuthService, MtdIdLookupService}
+import api.controllers.{AuditHandler, AuthorisedController, EndpointLogContext, RequestContext, RequestHandler}
+import api.services.{AuditService, EnrolmentsAuthService, MtdIdLookupService}
 import config.AppConfig
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
+import routing.{Version, Version3}
 import utils.IdGenerator
 import v3.controllers.validators.SubmitEndOfPeriodStatementValidatorFactory
 import v3.services._
@@ -33,6 +34,7 @@ class SubmitEndOfPeriodStatementController @Inject() (val authService: Enrolment
                                                       val lookupService: MtdIdLookupService,
                                                       val idGenerator: IdGenerator,
                                                       service: SubmitEndOfPeriodStatementService,
+                                                      auditService: AuditService,
                                                       validatorFactory: SubmitEndOfPeriodStatementValidatorFactory,
                                                       cc: ControllerComponents)(implicit ec: ExecutionContext, appConfig: AppConfig)
     extends AuthorisedController(cc) {
@@ -50,7 +52,14 @@ class SubmitEndOfPeriodStatementController @Inject() (val authService: Enrolment
         RequestHandler
           .withValidator(validator)
           .withService(service.submit)
-
+          .withAuditing(AuditHandler(
+            auditService,
+            auditType = "SubmitEOPSStatement",
+            transactionName = "submit-eops-statement",
+            apiVersion = Version.from(request, orElse = Version3),
+            params = Map("nino" -> nino),
+            Some(request.body)
+          ))
       requestHandler.handleRequest()
     }
 

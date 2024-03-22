@@ -17,11 +17,15 @@
 package v2.controllers
 
 import api.controllers.{ControllerBaseSpec, ControllerTestRunner}
+import api.models.audit.{AuditEvent, AuditResponse, GenericAuditDetail}
 import api.models.domain.Nino
 import api.models.errors.{ErrorWrapper, NinoFormatError, RuleTaxYearNotSupportedError}
 import api.models.outcomes.ResponseWrapper
+import api.services.MockAuditService
 import mocks.MockAppConfig
+import play.api.libs.json.JsValue
 import play.api.mvc.Result
+import routing.{Version, Version2}
 import v2.controllers.validators.MockSubmitEndOfPeriodStatementValidatorFactory
 import v2.data.SubmitEndOfPeriodStatementData.jsonRequestBody
 import v2.mocks.services._
@@ -35,8 +39,10 @@ class SubmitEndOfPeriodStatementControllerSpec
     with ControllerTestRunner
     with MockSubmitEndOfPeriodStatementValidatorFactory
     with MockSubmitEndOfPeriodStatementService
-    with MockAppConfig {
+    with MockAppConfig
+    with MockAuditService {
 
+  setApiVersion(Version2)
   private val requestBody: SubmitEndOfPeriodRequestBody = jsonRequestBody(typeOfBusiness = "foreign-property").as[SubmitEndOfPeriodRequestBody]
 
   private val requestData: SubmitEndOfPeriodStatementRequestData = SubmitEndOfPeriodStatementRequestData(Nino(nino), requestBody)
@@ -50,7 +56,12 @@ class SubmitEndOfPeriodStatementControllerSpec
           .submitEndOfPeriodStatementService(requestData)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, ()))))
 
-        runOkTest(NO_CONTENT)
+        runOkTestWithAudit(
+          expectedStatus = NO_CONTENT,
+          maybeAuditRequestBody = Some(jsonRequestBody()),
+          maybeExpectedResponseBody = None,
+          maybeAuditResponseBody = None
+        )
       }
     }
 
@@ -73,19 +84,36 @@ class SubmitEndOfPeriodStatementControllerSpec
     }
   }
 
-  trait Test extends ControllerTest {
+  trait Test extends ControllerTest with AuditEventChecking{
+
+    protected def apiVersion: Version = Version2
 
     val controller = new SubmitEndOfPeriodStatementController(
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,
       validatorFactory = mockSubmitEndOfPeriodStatementValidatorFactory,
       service = mockSubmitEndOfPeriodStatementService,
+      auditService = mockAuditService,
       cc = cc,
       idGenerator = mockIdGenerator
     )
 
     protected def callController(): Future[Result] = controller.handleRequest(nino)(fakeRequest.withBody(jsonRequestBody()))
 
+    protected def event(auditResponse: AuditResponse, requestBody: Option[JsValue]): AuditEvent[GenericAuditDetail] =
+      AuditEvent(
+        auditType = "SubmitEOPSStatement",
+        transactionName = "submit-eops-statement",
+        detail = GenericAuditDetail(
+          versionNumber = "2.0",
+          userType = "Individual",
+          agentReferenceNumber = None,
+          params = Map("nino" -> nino),
+          requestBody = requestBody,
+          `X-CorrelationId` = correlationId,
+          auditResponse = auditResponse
+        )
+      )
   }
 
 }
