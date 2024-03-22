@@ -17,15 +17,18 @@
 package v3.controllers
 
 import api.controllers.{ControllerBaseSpec, ControllerTestRunner}
+import api.models.audit.{AuditEvent, AuditResponse, GenericAuditDetail}
 import api.models.domain.Nino
 import api.models.errors.{ErrorWrapper, NinoFormatError, RuleTaxYearNotSupportedError}
 import api.models.outcomes.ResponseWrapper
+import api.services.MockAuditService
 import mocks.MockAppConfig
+import play.api.libs.json.JsValue
 import play.api.mvc.Result
-import v3.controllers.validators.MockSubmitEndOfPeriodStatementValidatorFactory
 import v3.data.SubmitEndOfPeriodStatementData.jsonRequestBody
-import v3.mocks.services._
 import v3.models.request.{SubmitEndOfPeriodRequestBody, SubmitEndOfPeriodStatementRequestData}
+import v3.controllers.validators.MockSubmitEndOfPeriodStatementValidatorFactory
+import v3.mocks.services._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,11 +38,11 @@ class SubmitEndOfPeriodStatementControllerSpec
     with ControllerTestRunner
     with MockSubmitEndOfPeriodStatementValidatorFactory
     with MockSubmitEndOfPeriodStatementService
-    with MockAppConfig {
+    with MockAppConfig with MockAuditService {
 
-  private val requestBody = jsonRequestBody(typeOfBusiness = "foreign-property").as[SubmitEndOfPeriodRequestBody]
+  private val requestBody: SubmitEndOfPeriodRequestBody = jsonRequestBody(typeOfBusiness = "foreign-property").as[SubmitEndOfPeriodRequestBody]
 
-  private val requestData = SubmitEndOfPeriodStatementRequestData(Nino(nino), requestBody)
+  private val requestData: SubmitEndOfPeriodStatementRequestData = SubmitEndOfPeriodStatementRequestData(Nino(nino), requestBody)
 
   "handleRequest" should {
     "return NO_CONTENT" when {
@@ -50,7 +53,12 @@ class SubmitEndOfPeriodStatementControllerSpec
           .submitEndOfPeriodStatementService(requestData)
           .returns(Future.successful(Right(ResponseWrapper(correlationId, ()))))
 
-        runOkTest(NO_CONTENT)
+        runOkTestWithAudit(
+          expectedStatus = NO_CONTENT,
+          maybeAuditRequestBody = Some(jsonRequestBody()),
+          maybeExpectedResponseBody = None,
+          maybeAuditResponseBody = None
+        )
       }
     }
 
@@ -73,19 +81,34 @@ class SubmitEndOfPeriodStatementControllerSpec
     }
   }
 
-  trait Test extends ControllerTest {
+  trait Test extends ControllerTest with AuditEventChecking {
 
     val controller = new SubmitEndOfPeriodStatementController(
       authService = mockEnrolmentsAuthService,
       lookupService = mockMtdIdLookupService,
       validatorFactory = mockSubmitEndOfPeriodStatementValidatorFactory,
       service = mockSubmitEndOfPeriodStatementService,
+      auditService = mockAuditService,
       cc = cc,
       idGenerator = mockIdGenerator
     )
 
     protected def callController(): Future[Result] = controller.handleRequest(nino)(fakeRequest.withBody(jsonRequestBody()))
 
+    protected def event(auditResponse: AuditResponse, requestBody: Option[JsValue]): AuditEvent[GenericAuditDetail] =
+      AuditEvent(
+        auditType = "SubmitEOPSStatement",
+        transactionName = "submit-eops-statement",
+        detail = GenericAuditDetail(
+          versionNumber = "3.0",
+          userType = "Individual",
+          agentReferenceNumber = None,
+          params = Map("nino" -> nino),
+          requestBody = requestBody,
+          `X-CorrelationId` = correlationId,
+          auditResponse = auditResponse
+        )
+      )
   }
 
 }

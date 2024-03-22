@@ -25,6 +25,8 @@ object Version {
   def apply(request: RequestHeader): Version =
     Versions.getFromRequest(request).getOrElse(throw new Exception("Missing or unsupported version found in request accept header"))
 
+  def from(request: RequestHeader, orElse: Version): Version =
+    Versions.getFromRequest(request).getOrElse(orElse)
   object VersionWrites extends Writes[Version] {
 
     def writes(version: Version): JsValue = version match {
