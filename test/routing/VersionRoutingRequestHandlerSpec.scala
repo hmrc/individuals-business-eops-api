@@ -16,10 +16,11 @@
 
 package routing
 
-import akka.actor.ActorSystem
+import api.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError}
 import mocks.MockAppConfig
 import org.scalatest.Inside
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Play.materializer
 import play.api.http.HeaderNames.ACCEPT
 import play.api.http.{HttpConfiguration, HttpErrorHandler, HttpFilters}
 import play.api.libs.json.Json
@@ -28,13 +29,11 @@ import play.api.routing.Router
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import support.UnitSpec
-import api.models.errors.{InvalidAcceptHeaderError, UnsupportedVersionError}
 
 class VersionRoutingRequestHandlerSpec extends UnitSpec with Inside with MockAppConfig with GuiceOneAppPerSuite {
   test =>
 
-  implicit private val actorSystem: ActorSystem = ActorSystem("test")
-  val action: DefaultActionBuilder              = app.injector.instanceOf[DefaultActionBuilder]
+  val action: DefaultActionBuilder = app.injector.instanceOf[DefaultActionBuilder]
 
   import play.api.mvc.Handler
   import play.api.routing.sird._
