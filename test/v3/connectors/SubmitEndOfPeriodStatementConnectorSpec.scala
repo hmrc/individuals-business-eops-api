@@ -21,14 +21,16 @@ import api.models.domain.{Nino, TaxYear}
 import api.models.downstream.TypeOfBusiness
 import api.models.errors.{DownstreamErrorCode, DownstreamErrors}
 import api.models.outcomes.ResponseWrapper
+import mocks.MockAppConfig
 import org.scalamock.handlers.CallHandler
+import play.api.Configuration
 import play.api.libs.json.JsObject
 import v3.data.SubmitEndOfPeriodStatementData._
 import v3.models.request.SubmitEndOfPeriodStatementRequestData
 
 import scala.concurrent.Future
 
-class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
+class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec with MockAppConfig {
 
   val nino: String          = "AA123456A"
   private val preTysTaxYear = TaxYear.fromMtd("2022-23")
@@ -61,11 +63,19 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       ).returns(Future.successful(outcome))
     }
 
-    protected def stubTysHttpResponse(outcome: DownstreamOutcome[Unit]): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
-      willPostEmpty(
-        url = s"$baseUrl/income-tax/income-sources/${taxYear.asTysDownstream}/" +
-          s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration"
-      ).returns(Future.successful(outcome))
+    protected def stubTysHttpResponse(outcome: DownstreamOutcome[Unit], emptyBracesEnabled:Boolean): CallHandler[Future[DownstreamOutcome[Unit]]]#Derived = {
+        emptyBracesEnabled match {
+          case true => willPost(
+            url = s"$baseUrl/income-tax/income-sources/${taxYear.asTysDownstream}/" +
+              s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration",
+            body = JsObject.empty
+          ).returns(Future.successful(outcome))
+
+          case _=> willPostEmpty(
+            url = s"$baseUrl/income-tax/income-sources/${taxYear.asTysDownstream}/" +
+              s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDateTys/$accountingPeriodEndDateTys/declaration"
+          ).returns(Future.successful(outcome))
+        }
     }
 
   }
@@ -85,13 +95,21 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
     }
 
     "a valid request is supplied for a Tax Year Specific tax year" should {
-      "return a successful response with the correct correlationId" in new TysIfsTest with Test {
-        def taxYear: TaxYear = tysTaxYear
-        stubTysHttpResponse(outcome)
+      def successfulResponseWithEmptyBraces(enabled: Boolean): Unit = {
+        s"return a successful response with the correct correlationId when emptyBraces.enabled is $enabled" in new TysIfsTest with Test {
+          MockAppConfig.featureSwitches returns Configuration("emptyBraces.enabled" -> enabled)
 
-        val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
-        result shouldBe outcome
+          def taxYear: TaxYear = tysTaxYear
+
+          stubTysHttpResponse(outcome, enabled)
+
+          val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
+          result shouldBe outcome
+        }
+
       }
+
+      Seq(true, false).foreach(successfulResponseWithEmptyBraces(_))
     }
 
     "a request returning a single error" should {
@@ -109,8 +127,9 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       }
 
       "return an unsuccessful response with the correct correlationId and a single error given a TYS tax year request" in new TysIfsTest with Test {
+        MockAppConfig.featureSwitches returns Configuration("emptyBraces.enabled" -> true)
         def taxYear: TaxYear = tysTaxYear
-        stubTysHttpResponse(outcome)
+        stubTysHttpResponse(outcome, true)
 
         val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
         result shouldBe outcome
@@ -132,8 +151,9 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
       }
 
       "return an unsuccessful response with the correct correlationId and multiple errors given a TYS tax year request" in new TysIfsTest with Test {
+        MockAppConfig.featureSwitches returns Configuration("emptyBraces.enabled" -> true)
         def taxYear: TaxYear = tysTaxYear
-        stubTysHttpResponse(outcome)
+        stubTysHttpResponse(outcome, true)
 
         val result: DownstreamOutcome[Unit] = await(connector.submitPeriodStatement(tysRequest))
         result shouldBe outcome

@@ -18,8 +18,14 @@ package config
 
 import play.api.Configuration
 
-case class FeatureSwitches(featureSwitchConfig: Configuration)
+case class FeatureSwitches(featureSwitchConfig: Configuration) {
+  val isEmptyBraces: Boolean = isEnabled("emptyBraces")
 
+  def isEnabled(feature: String): Boolean = isConfigTrue(feature + ".enabled")
+
+  private def isConfigTrue(feature: String): Boolean = featureSwitchConfig.getOptional[Boolean](feature).getOrElse(true)
+}
 object FeatureSwitches {
   def apply()(implicit appConfig: AppConfig): FeatureSwitches = FeatureSwitches(appConfig.featureSwitches)
 }
+
