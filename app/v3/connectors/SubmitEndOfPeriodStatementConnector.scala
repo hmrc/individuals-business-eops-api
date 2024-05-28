@@ -48,11 +48,21 @@ class SubmitEndOfPeriodStatementConnector @Inject() (val http: HttpClient, val a
       implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] =
         StandardDownstreamHttpParser.readsEmpty(successCode = SuccessCode(ACCEPTED))
 
-      postEmpty(
-        uri = TaxYearSpecificIfsUri[Unit](
-          s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
-            s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
-      )
+          featureSwitches.isEmptyBraces match {
+            case true => post(
+              body = JsObject.empty,
+              uri = TaxYearSpecificIfsUri[Unit](
+                s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
+                  s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
+            )
+            case _ => postEmpty(
+              uri = TaxYearSpecificIfsUri[Unit](
+                s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
+                  s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
+            )
+
+          }
+
     } else {
       implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] =
         StandardDownstreamHttpParser.readsEmpty(successCode = SuccessCode(NO_CONTENT))
