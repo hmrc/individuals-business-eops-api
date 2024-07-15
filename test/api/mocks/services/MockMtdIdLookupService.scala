@@ -16,17 +16,12 @@
 
 package api.mocks.services
 
-import api.models.errors.MtdError
 import api.services.MtdIdLookupService
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
-
-object MockMtdIdLookupService{
-  type MtdIdServiceOutcome = Either[MtdError, String]
-}
 
 trait MockMtdIdLookupService extends MockFactory {
 
