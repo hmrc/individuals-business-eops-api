@@ -16,7 +16,7 @@
 
 package api.mocks.services
 
-import api.connectors.MtdIdLookupOutcome
+import api.models.errors.MtdError
 import api.services.MtdIdLookupService
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
@@ -24,13 +24,17 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
+object MockMtdIdLookupService{
+  type MtdIdServiceOutcome = Either[MtdError, String]
+}
+
 trait MockMtdIdLookupService extends MockFactory {
 
   val mockMtdIdLookupService: MtdIdLookupService = mock[MtdIdLookupService]
 
   object MockedMtdIdLookupService {
 
-    def lookup(nino: String): CallHandler[Future[MtdIdLookupOutcome]] = {
+    def lookup(nino: String): CallHandler[Future[MtdIdLookupService.Outcome]] = {
       (mockMtdIdLookupService
         .lookup(_: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(nino, *, *)

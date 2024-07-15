@@ -22,13 +22,14 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
+
 trait MockMtdIdLookupConnector extends MockFactory {
 
   val mockMtdIdLookupConnector: MtdIdLookupConnector = mock[MtdIdLookupConnector]
 
   object MockedMtdIdLookupConnector {
 
-    def lookup(nino: String): CallHandler[Future[MtdIdLookupOutcome]] = {
+    def lookup(nino: String): CallHandler[Future[MtdIdLookupConnector.Outcome]] = {
       (mockMtdIdLookupConnector
         .getMtdId(_: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(nino, *, *)
