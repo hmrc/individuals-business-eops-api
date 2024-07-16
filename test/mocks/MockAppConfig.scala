@@ -58,7 +58,7 @@ trait MockAppConfig extends MockFactory {
     def deprecationFor(version: Version): CallHandler[Validated[String, Deprecation]] = (mockAppConfig.deprecationFor(_: Version)).expects(version)
     def apiDocumentationUrl(): CallHandler[String]                                    = (() => mockAppConfig.apiDocumentationUrl: String).expects()
 
-    def confidenceLevelCheckEnabled: CallHandler[ConfidenceLevelConfig] =
+    def confidenceLevelConfig: CallHandler[ConfidenceLevelConfig] =
       (() => mockAppConfig.confidenceLevelConfig).expects()
 
   }

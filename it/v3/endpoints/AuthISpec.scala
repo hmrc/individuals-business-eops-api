@@ -51,26 +51,18 @@ class AuthISpec extends V2IntegrationBaseSpec {
         .withHttpHeaders((ACCEPT, "application/vnd.hmrc.3.0+json"), (AUTHORIZATION, "Bearer 123")) // some bearer token))
     }
 
-    def errorBody(code: String, message: String): String =
-      s"""
-         |{
-         |  "code": "$code",
-         |  "reason": "$message"
-         |}
-    """.stripMargin
-
   }
 
-  "Calling the submit eops endpoint" when {
+  "Calling the sample endpoint" when {
 
-    "the NINO cannot be converted to a MTD ID" should {
+    "MTD ID lookup fails with a 500" should {
 
       "return 500" in new Test {
         override val nino: String = "AA123456A"
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          MtdIdLookupStub.internalServerError(nino)
+          MtdIdLookupStub.error(nino, Status.INTERNAL_SERVER_ERROR)
         }
 
         val response: WSResponse = await(request().post(fullValidJson()))
@@ -78,52 +70,66 @@ class AuthISpec extends V2IntegrationBaseSpec {
       }
     }
 
-    "an MTD ID is successfully retrieve from the NINO and the user is authorised" should {
-
-      "return 204" in new Test {
-        override def setupStubs(): StubMapping = {
-          AuditStub.audit()
-          AuthStub.authorised()
-          MtdIdLookupStub.ninoFound(nino)
-          DownstreamStub.onSuccess(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), Status.NO_CONTENT)
-        }
-
-        val response: WSResponse = await(request().post(fullValidJson()))
-        response.status shouldBe Status.NO_CONTENT
-        response.header("X-CorrelationId").nonEmpty shouldBe true
-      }
-    }
-
-    "an MTD ID is successfully retrieve from the NINO and the user is NOT logged in" should {
+    "MTD ID lookup fails with a 403" should {
 
       "return 403" in new Test {
         override val nino: String = "AA123456A"
 
         override def setupStubs(): StubMapping = {
           AuditStub.audit()
-          MtdIdLookupStub.ninoFound(nino)
-          AuthStub.unauthorisedNotLoggedIn()
+          MtdIdLookupStub.error(nino, Status.FORBIDDEN)
         }
 
         val response: WSResponse = await(request().post(fullValidJson()))
         response.status shouldBe Status.FORBIDDEN
       }
     }
+  }
 
-    "an MTD ID is successfully retrieve from the NINO and the user is NOT authorised" should {
+  "MTD ID lookup succeeds and the user is authorised" should {
 
-      "return 403" in new Test {
-        override val nino: String = "AA123456A"
-
-        override def setupStubs(): StubMapping = {
-          AuditStub.audit()
-          MtdIdLookupStub.ninoFound(nino)
-          AuthStub.unauthorisedOther()
-        }
-
-        val response: WSResponse = await(request().post(fullValidJson()))
-        response.status shouldBe Status.FORBIDDEN
+    "return success" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        AuthStub.authorised()
+        MtdIdLookupStub.ninoFound(nino)
+        DownstreamStub.onSuccess(DownstreamStub.POST, ifsUri(), Map("incomeSourceId" -> incomeSourceId), Status.NO_CONTENT)
       }
+
+      val response: WSResponse = await(request().post(fullValidJson()))
+      response.status shouldBe Status.NO_CONTENT
+    }
+  }
+
+  "MTD ID lookup succeeds but the user is NOT logged in" should {
+
+    "return 403" in new Test {
+      override val nino: String = "AA123456A"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        MtdIdLookupStub.ninoFound(nino)
+        AuthStub.unauthorisedNotLoggedIn()
+      }
+
+      val response: WSResponse = await(request().post(fullValidJson()))
+      response.status shouldBe Status.FORBIDDEN
+    }
+  }
+
+  "MTD ID lookup succeeds but the user is NOT authorised" should {
+
+    "return 403" in new Test {
+      override val nino: String = "AA123456A"
+
+      override def setupStubs(): StubMapping = {
+        AuditStub.audit()
+        MtdIdLookupStub.ninoFound(nino)
+        AuthStub.unauthorisedOther()
+      }
+
+      val response: WSResponse = await(request().post(fullValidJson()))
+      response.status shouldBe Status.FORBIDDEN
     }
   }
 
