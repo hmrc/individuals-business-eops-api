@@ -39,6 +39,8 @@ class SubmitEndOfPeriodStatementController @Inject() (val authService: Enrolment
                                                       cc: ControllerComponents)(implicit ec: ExecutionContext, appConfig: AppConfig)
     extends AuthorisedController(cc) {
 
+  override val endpointName: String = "submit-end-of-period-statement"
+
   implicit val endpointLogContext: EndpointLogContext =
     EndpointLogContext(controllerName = "SubmitEndOfPeriodStatementController", endpointName = "Submit end of period statement")
 

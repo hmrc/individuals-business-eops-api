@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package api.mocks.services
+package api.services
 
-import api.services.MtdIdLookupService
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import api.models.errors.MtdError
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
+
+object MockMtdIdLookupService {
+  type MtdIdServiceOutcome = Either[MtdError, String]
+}
 
 trait MockMtdIdLookupService extends MockFactory {
 

@@ -52,6 +52,7 @@ object Version {
 
 sealed trait Version {
   val name: String
+
   override def toString: String = name
 }
 

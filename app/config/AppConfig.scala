@@ -50,6 +50,8 @@ trait AppConfig {
   def ifsToken: String
   def ifsEnvironmentHeaders: Option[Seq[String]]
 
+  def endpointAllowsSupportingAgents(endpointName: String):Boolean
+
   lazy val ifsDownstreamConfig: DownstreamConfig =
     DownstreamConfig(baseUrl = ifsBaseUrl, env = ifsEnv, token = ifsToken, environmentHeaders = ifsEnvironmentHeaders)
 
@@ -70,11 +72,12 @@ trait AppConfig {
   def endpointsEnabled(version: Version): Boolean
   def apiDocumentationUrl: String
   def deprecationFor(version: Version): Validated[String, Deprecation]
+  def safeEndpointsEnabled(version: String): Boolean
 
 }
 
 @Singleton
-class AppConfigImpl @Inject() (config: ServicesConfig, configuration: Configuration) extends AppConfig {
+class AppConfigImpl @Inject() (config: ServicesConfig, val configuration: Configuration) extends AppConfig {
   // API Name
   val appName: String = config.getString("appName")
 
@@ -105,6 +108,13 @@ class AppConfigImpl @Inject() (config: ServicesConfig, configuration: Configurat
   def apiStatus(version: Version): String          = config.getString(s"api.${version.name}.status")
   def featureSwitches: Configuration               = configuration.getOptional[Configuration](s"feature-switch").getOrElse(Configuration.empty)
   def endpointsEnabled(version: Version): Boolean  = config.getBoolean(s"api.${version.name}.endpoints.enabled")
+
+  /** Like endpointsEnabled, but will return false if version doesn't exist.
+   */
+  def safeEndpointsEnabled(version: String): Boolean =
+    configuration
+      .getOptional[Boolean](s"api.$version.endpoints.enabled")
+      .getOrElse(false)
 
   def apiDocumentationUrl: String =
     configuration
@@ -149,6 +159,14 @@ class AppConfigImpl @Inject() (config: ServicesConfig, configuration: Configurat
     } else NotDeprecated.valid
 
   }
+
+  override def endpointAllowsSupportingAgents(endpointName: String): Boolean =
+    supportingAgentEndpoints.getOrElse(endpointName, false)
+
+  private val supportingAgentEndpoints: Map[String, Boolean] =
+    configuration
+      .getOptional[Map[String, Boolean]]("api.supporting-agent-endpoints")
+      .getOrElse(Map.empty)
 
 }
 

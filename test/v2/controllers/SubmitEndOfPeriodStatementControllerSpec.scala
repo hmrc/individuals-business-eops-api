@@ -22,7 +22,8 @@ import api.models.domain.Nino
 import api.models.errors.{ErrorWrapper, NinoFormatError, RuleTaxYearNotSupportedError}
 import api.models.outcomes.ResponseWrapper
 import api.services.MockAuditService
-import mocks.MockAppConfig
+import config.MockAppConfig
+import play.api.Configuration
 import play.api.libs.json.JsValue
 import play.api.mvc.Result
 import routing.{Version, Version2}
@@ -42,7 +43,6 @@ class SubmitEndOfPeriodStatementControllerSpec
     with MockAppConfig
     with MockAuditService {
 
-  setApiVersion(Version2)
   private val requestBody: SubmitEndOfPeriodRequestBody = jsonRequestBody(typeOfBusiness = "foreign-property").as[SubmitEndOfPeriodRequestBody]
 
   private val requestData: SubmitEndOfPeriodStatementRequestData = SubmitEndOfPeriodStatementRequestData(Nino(nino), requestBody)
@@ -84,7 +84,7 @@ class SubmitEndOfPeriodStatementControllerSpec
     }
   }
 
-  trait Test extends ControllerTest with AuditEventChecking{
+  trait Test extends ControllerTest with AuditEventChecking[GenericAuditDetail]{
 
     protected def apiVersion: Version = Version2
 
@@ -99,6 +99,12 @@ class SubmitEndOfPeriodStatementControllerSpec
     )
 
     protected def callController(): Future[Result] = controller.handleRequest(nino)(fakeRequest.withBody(jsonRequestBody()))
+
+    MockedAppConfig.featureSwitchConfig.anyNumberOfTimes() returns Configuration(
+      "supporting-agents-access-control.enabled" -> true
+    )
+
+    MockedAppConfig.endpointAllowsSupportingAgents(controller.endpointName).anyNumberOfTimes() returns false
 
     protected def event(auditResponse: AuditResponse, requestBody: Option[JsValue]): AuditEvent[GenericAuditDetail] =
       AuditEvent(

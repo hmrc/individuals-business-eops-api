@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package mocks
+package config
 
 import cats.data.Validated
-import config.{AppConfig, ConfidenceLevelConfig, Deprecation}
-import org.scalamock.handlers.CallHandler
+import org.scalamock.handlers.{CallHandler, CallHandler0}
 import org.scalamock.scalatest.MockFactory
 import play.api.Configuration
 import routing.Version
@@ -27,12 +26,11 @@ trait MockAppConfig extends MockFactory {
 
   implicit val mockAppConfig: AppConfig = mock[AppConfig]
 
-  object MockAppConfig {
-
+  object MockedAppConfig {
     // MTD ID Lookup Config
-    def mtdIdBaseUrl: CallHandler[String] = (() => mockAppConfig.mtdIdBaseUrl).expects()
+    def mtdIdBaseUrl: CallHandler[String] = (() => mockAppConfig.mtdIdBaseUrl: String).expects()
 
-    // DES Config
+    // Des config
     def desBaseUrl: CallHandler[String]                         = (() => mockAppConfig.desBaseUrl).expects()
     def desToken: CallHandler[String]                           = (() => mockAppConfig.desToken).expects()
     def desEnvironment: CallHandler[String]                     = (() => mockAppConfig.desEnv).expects()
@@ -51,15 +49,35 @@ trait MockAppConfig extends MockFactory {
     def ifsEnvironmentHeaders: CallHandler[Option[Seq[String]]] = (() => mockAppConfig.ifsEnvironmentHeaders).expects()
 
     // API Config
-    def featureSwitches: CallHandler[Configuration]                                   = (() => mockAppConfig.featureSwitches).expects()
-    def apiGatewayContext: CallHandler[String]                                        = (() => mockAppConfig.apiGatewayContext).expects()
-    def apiStatus(version: Version): CallHandler[String]                              = (mockAppConfig.apiStatus(_: Version)).expects(version)
-    def endpointsEnabled(version: Version): CallHandler[Boolean]                      = (mockAppConfig.endpointsEnabled(_: Version)).expects(version)
+    def featureSwitches: CallHandler[Configuration]              = (() => mockAppConfig.featureSwitches: Configuration).expects()
+    def featureSwitchConfig: CallHandler[Configuration]          = (() => mockAppConfig.featureSwitches: Configuration).expects()
+    def apiGatewayContext: CallHandler[String]                   = (() => mockAppConfig.apiGatewayContext).expects()
+    def apiStatus(version: Version): CallHandler[String]         = (mockAppConfig.apiStatus: Version => String).expects(version)
+
+//    def endpointsEnabled(version: String): CallHandler[Boolean]  = (mockAppConfig.endpointsEnabled(_: String)).expects(version)
+//    def endpointsEnabled(version: Version): CallHandler[Boolean] = (mockAppConfig.endpointsEnabled(_: Version)).expects(version)
+//
+//    def apiVersionReleasedInProduction(version: String): CallHandler[Boolean] =
+//      (mockAppConfig.apiVersionReleasedInProduction: String => Boolean).expects(version)
+//
+//    def endpointReleasedInProduction(version: String, key: String): CallHandler[Boolean] =
+//      (mockAppConfig.endpointReleasedInProduction: (String, String) => Boolean).expects(version, key)
+
+    def confidenceLevelConfig: CallHandler0[ConfidenceLevelConfig] =
+      (() => mockAppConfig.confidenceLevelConfig).expects()
+
+    def confidenceLevelCheckEnabled: CallHandler[ConfidenceLevelConfig] =
+      (() => mockAppConfig.confidenceLevelConfig: ConfidenceLevelConfig).expects()
+
+    def endpointAllowsSupportingAgents(endpointName: String): CallHandler[Boolean] =
+      (mockAppConfig.endpointAllowsSupportingAgents(_: String)).expects(endpointName)
+
+
     def deprecationFor(version: Version): CallHandler[Validated[String, Deprecation]] = (mockAppConfig.deprecationFor(_: Version)).expects(version)
+
+    def endpointsEnabled(version: Version): CallHandler[Boolean]                      = (mockAppConfig.endpointsEnabled(_: Version)).expects(version)
     def apiDocumentationUrl(): CallHandler[String]                                    = (() => mockAppConfig.apiDocumentationUrl: String).expects()
 
-    def confidenceLevelConfig: CallHandler[ConfidenceLevelConfig] =
-      (() => mockAppConfig.confidenceLevelConfig).expects()
 
   }
 
