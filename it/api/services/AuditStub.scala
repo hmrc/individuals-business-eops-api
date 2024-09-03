@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package v2.stubs
+package api.services
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.http.Status._
+import play.api.http.Status.NO_CONTENT
 import support.WireMockMethods
 
 object AuditStub extends WireMockMethods {

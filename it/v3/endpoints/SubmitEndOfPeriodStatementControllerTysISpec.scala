@@ -18,6 +18,7 @@ package v3.endpoints
 
 import api.models.domain.TaxYear
 import api.models.errors._
+import api.services.{AuthStub, DownstreamStub, MtdIdLookupStub}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import itData.SubmitEndOfPeriodStatementData._
 import play.api.http.HeaderNames.ACCEPT
@@ -26,7 +27,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.AUTHORIZATION
 import support.V2IntegrationBaseSpec
-import v2.stubs._
 
 class SubmitEndOfPeriodStatementControllerTysISpec extends V2IntegrationBaseSpec {
 

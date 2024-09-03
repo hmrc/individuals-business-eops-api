@@ -24,6 +24,9 @@ case class FeatureSwitches(featureSwitchConfig: Configuration) {
   def isEnabled(feature: String): Boolean = isConfigTrue(feature + ".enabled")
 
   private def isConfigTrue(feature: String): Boolean = featureSwitchConfig.getOptional[Boolean](feature).getOrElse(true)
+
+  val supportingAgentsAccessControlEnabled: Boolean = isEnabled("supporting-agents-access-control")
+
 }
 object FeatureSwitches {
   def apply()(implicit appConfig: AppConfig): FeatureSwitches = FeatureSwitches(appConfig.featureSwitches)
