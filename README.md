@@ -30,7 +30,7 @@ To view documentation locally ensure the Individuals Business EOPS API is runnin
 `./run_local_with_dependencies.sh`
 
 Then go to http://localhost:9680/api-documentation/docs/openapi/preview and use this port and version:
-`http://localhost:7785/api/conf/1.0/application.yaml`
+`http://localhost:7785/api/conf/3.0/application.yaml`
 
 ## Changelog
 

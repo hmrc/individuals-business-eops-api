@@ -7,6 +7,8 @@ info:
   description: |
     # Send fraud prevention data
     HMRC monitors transactions to help protect your customers' confidential data from criminals and fraudsters. 
+    
+    **Some of the endpoints in this API return accounting period start and end dates. These should not be displayed to users of your software and will be removed in a future update.**
 
     <div class="govuk-warning-text warning-icon-fix">
       <span class="govuk-warning-text__icon warning-icon-ui-fix" aria-hidden="true">!</span>
