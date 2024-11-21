@@ -97,7 +97,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
 
     "a valid request is supplied for a Tax Year Specific tax year" should {
       def successfulResponseWithEmptyBraces(enabled: Boolean): Unit ={
-        s"return a successful response with the correct correlationId when emptyBraces.enabled is $enabled" in new TysIfsTest with Test {
+        s"return a successful response with the correct correlationId when emptyBraces.enabled is $enabled" in new IfsTest with Test {
           MockedAppConfig.featureSwitches returns Configuration("emptyBraces.enabled" -> enabled)
 
           def taxYear: TaxYear = tysTaxYear
@@ -126,7 +126,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         result shouldBe outcome
       }
 
-      "return an unsuccessful response with the correct correlationId and a single error given a TYS tax year request" in new TysIfsTest with Test {
+      "return an unsuccessful response with the correct correlationId and a single error given a TYS tax year request" in new IfsTest with Test {
         MockedAppConfig.featureSwitches returns Configuration("emptyBraces.enabled" -> true)
         def taxYear: TaxYear = tysTaxYear
         stubTysHttpResponse(outcome, true)
@@ -150,7 +150,7 @@ class SubmitEndOfPeriodStatementConnectorSpec extends ConnectorSpec {
         result shouldBe outcome
       }
 
-      "return an unsuccessful response with the correct correlationId and multiple errors given a TYS tax year request" in new TysIfsTest with Test {
+      "return an unsuccessful response with the correct correlationId and multiple errors given a TYS tax year request" in new IfsTest with Test {
         MockedAppConfig.featureSwitches returns Configuration("emptyBraces.enabled" -> true)
         def taxYear: TaxYear = tysTaxYear
         stubTysHttpResponse(outcome, true)
