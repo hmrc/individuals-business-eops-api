@@ -48,21 +48,19 @@ class SubmitEndOfPeriodStatementConnector @Inject() (val http: HttpClient, val a
       implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] =
         StandardDownstreamHttpParser.readsEmpty(successCode = SuccessCode(ACCEPTED))
 
-      featureSwitches.isEmptyBraces match {
-        case true =>
-          post(
-            body = JsObject.empty,
-            uri = IfsUri[Unit](
-              s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
-                s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
-          )
-        case _ =>
-          postEmpty(
-            uri = IfsUri[Unit](
-              s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
-                s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
-          )
-
+      if (featureSwitches.isEmptyBraces) {
+        post(
+          body = JsObject.empty,
+          uri = IfsUri[Unit](
+            s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
+              s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
+        )
+      } else {
+        postEmpty(
+          uri = IfsUri[Unit](
+            s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
+              s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
+        )
       }
 
     } else {
