@@ -16,7 +16,7 @@
 
 package api.connectors
 
-import api.connectors.DownstreamUri.{IfsUri, TaxYearSpecificIfsUri}
+import api.connectors.DownstreamUri.IfsUri
 import api.models.outcomes.ResponseWrapper
 import config.{AppConfig, MockAppConfig}
 import mocks.MockHttpClient
@@ -122,7 +122,7 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
 
   "for TYS IFS" when {
     "post" must {
-      "posts with the required tysIfs headers and returns the result" in new Test with TysIfsTest {
+      "posts with the required tysIfs headers and returns the result" in new Test with IfsTest {
         MockedHttpClient
           .post(
             absoluteUrl,
@@ -132,12 +132,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
-        await(connector.post(body, TaxYearSpecificIfsUri[Result](url))) shouldBe outcome
+        await(connector.post(body, IfsUri[Result](url))) shouldBe outcome
       }
     }
 
     "get" must {
-      "get with the required headers and return the result" in new Test with TysIfsTest {
+      "get with the required headers and return the result" in new Test with IfsTest {
         MockedHttpClient
           .get(
             absoluteUrl,
@@ -147,12 +147,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
-        await(connector.get(TaxYearSpecificIfsUri[Result](url), queryParams = qps)) shouldBe outcome
+        await(connector.get(IfsUri[Result](url), queryParams = qps)) shouldBe outcome
       }
     }
 
     "delete" must {
-      "delete with the required headers and return the result" in new Test with TysIfsTest {
+      "delete with the required headers and return the result" in new Test with IfsTest {
         MockedHttpClient
           .delete(
             absoluteUrl,
@@ -161,12 +161,12 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
-        await(connector.delete(TaxYearSpecificIfsUri[Result](url))) shouldBe outcome
+        await(connector.delete(IfsUri[Result](url))) shouldBe outcome
       }
     }
 
     "put" must {
-      "put with the required headers and return result" in new Test with TysIfsTest {
+      "put with the required headers and return result" in new Test with IfsTest {
         MockedHttpClient
           .put(
             absoluteUrl,
@@ -176,7 +176,7 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
             excludedHeaders = Seq("AnotherHeader" -> "HeaderValue"))
           .returns(Future.successful(outcome))
 
-        await(connector.put(body, TaxYearSpecificIfsUri[Result](url))) shouldBe outcome
+        await(connector.put(body, IfsUri[Result](url))) shouldBe outcome
       }
     }
 
@@ -186,7 +186,7 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
         testNoDuplicatedContentType("content-type" -> "application/user-type")
 
         def testNoDuplicatedContentType(userContentType: (String, String)): Unit =
-          s"for user content type header $userContentType" in new Test with TysIfsTest {
+          s"for user content type header $userContentType" in new Test with IfsTest {
             MockedHttpClient
               .put(
                 absoluteUrl,
@@ -197,7 +197,7 @@ class BaseDownstreamConnectorSpec extends ConnectorSpec {
               )
               .returns(Future.successful(outcome))
 
-            await(connector.put(body, TaxYearSpecificIfsUri[Result](url))) shouldBe outcome
+            await(connector.put(body, IfsUri[Result](url))) shouldBe outcome
           }
       }
     }

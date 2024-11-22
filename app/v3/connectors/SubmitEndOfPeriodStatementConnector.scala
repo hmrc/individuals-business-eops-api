@@ -16,7 +16,7 @@
 
 package v3.connectors
 
-import api.connectors.DownstreamUri.{IfsUri, TaxYearSpecificIfsUri}
+import api.connectors.DownstreamUri.IfsUri
 import api.connectors.httpparsers.StandardDownstreamHttpParser
 import api.connectors.httpparsers.StandardDownstreamHttpParser.SuccessCode
 import api.connectors.{BaseDownstreamConnector, DownstreamOutcome}
@@ -48,20 +48,20 @@ class SubmitEndOfPeriodStatementConnector @Inject() (val http: HttpClient, val a
       implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] =
         StandardDownstreamHttpParser.readsEmpty(successCode = SuccessCode(ACCEPTED))
 
-          featureSwitches.isEmptyBraces match {
-            case true => post(
-              body = JsObject.empty,
-              uri = TaxYearSpecificIfsUri[Unit](
-                s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
-                  s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
-            )
-            case _ => postEmpty(
-              uri = TaxYearSpecificIfsUri[Unit](
-                s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
-                  s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
-            )
-
-          }
+      if (featureSwitches.isEmptyBraces) {
+        post(
+          body = JsObject.empty,
+          uri = IfsUri[Unit](
+            s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
+              s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
+        )
+      } else {
+        postEmpty(
+          uri = IfsUri[Unit](
+            s"income-tax/income-sources/${taxYear.asTysDownstream}/" +
+              s"$nino/$incomeSourceId/${TypeOfBusiness.toTys(incomeSourceType)}/$accountingPeriodStartDate/$accountingPeriodEndDate/declaration")
+        )
+      }
 
     } else {
       implicit val httpReads: HttpReads[DownstreamOutcome[Unit]] =
