@@ -15,7 +15,7 @@ The Individuals Business End of Period Statement API allows software packages to
 
 To run the microservice from console, use `sbt run`. (starts on port 7785 by default)
 
-To start the service manager profile: `sm --start MTDFB_BUSINESS_EOPS`.
+To start the service manager profile: `sm2 --start MTDFB_BUSINESS_EOPS`.
 
 ## Run Tests
 
